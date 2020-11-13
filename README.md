@@ -89,3 +89,17 @@
     - GLFW precisa de OpenGL pra rodar? 
 - 3) Baixar loader do Glad através do webservice https://glad.dav1d.de/
 - 4) Linkar Glad
+
+
+
+## Conceitos OpenGL
+
+## Swap Buffers
+Para que um renderer possa desenhar na tela, as informações de cor de cada pixel devem ser armazenadas em um buffer. Quando utilizamos apenas um buffer para isso, temos problemas de flicker, causado pelo tempo de resposta entre a troca do buffer anterior para o mais recente. No OpenGL isso é resolvido com o Swap Buffer, que utiliza dois buffers para desenhar na tela, sendo eles o front e back.
+
+- Back: As saídas de comandos de render vão para esse buffer
+- Front: Cor final da imagem que é mostrada na tela
+
+O OpenGL por sua vez passa o conteúdo do back para o front buffer, então o front buffer nunca ficará vazio e o problema de flicker é resolvido.
+
+

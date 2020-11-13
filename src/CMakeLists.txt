@@ -2,7 +2,7 @@ add_executable(Sandbox main.cpp)
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
-#target_link_libraries(Sandbox opengl32)
+target_link_libraries(Sandbox opengl32)
 
 target_compile_definitions(Sandbox PRIVATE GLFW_INCLUDE_NONE)
 
