@@ -103,3 +103,285 @@ Para que um renderer possa desenhar na tela, as informações de cor de cada pix
 O OpenGL por sua vez passa o conteúdo do back para o front buffer, então o front buffer nunca ficará vazio e o problema de flicker é resolvido.
 
 
+## Pipeline gráfico
+
+- Em OpenGL tudo fica no espaço 3D, porém a janela é um array 2D de pixels coloridos
+- O pipeline gráfico do OpenGL é dividido em duas partes:
+    - 1) Transformar os objetos que estão no espaço de coordenadas 3D em pixels 2D
+    - 2) Transformar essas coordenadas 2D resultantes em pixels coloridos
+
+- Essas partes por sua vez possuem vários passos, e cada passo recebe como input o output do passo anterior
+- São altamente especializados e podem ser executados em paralelo em programas na GPU
+- Esses programas são chamados de **Shaders**, e a função deles é processar um passo do pipeline gráfico
+- O pipeline pode ser resumido nos seguintes passos:
+    - 1) Input: Recebe dados de vértices como input
+    - 2) Vertex shader: Input = vértices, output = vértices modificados
+    - 3) Shape assembly: Input = vértices, output = forma primitiva
+    - 4) Geometry shader: Input = primitive, output = geometria completa
+    - 5) Tests, blending: Input = geometria, output = fragmentos
+    - 6) Fragment shader: Input = fragmentos, output = fragmentos modificados
+    - 7) Rasterização
+
+## Shaders:
+- Shaders são feitos em **GLSL**, uma linguagem de shaders com sintaxe semelhante a C
+
+### Dúvidas
+- Pra que servem geometry shaders?
+- O que exatamente o geometry shader faz?
+
+### Vertex buffers:
+- Buffers são um dos tipos de objeto do OpenGL
+- Buffers podem assumir vários tipos diferentes, dependendo dos dados que armazenam
+- Para enviarmos dados de vértices para um shader, é preciso:
+    - 1) Criar um vertex buffer
+    - 2) Vinculà-lo a um tipo de buffer
+        - Só um buffer pode estar vinculado a um tipo por vez
+        - Uma vez vinculado, todas as funções usadas no tipo especificado serão aplicadas a ele
+    - 3) Passar os vértices para o buffer
+    - 4) Especificar como os dados do buffer devem ser interpretados pelo shader
+    - 5) No shader, declarar um atributo com a keyword in, que receberá dados do buffer
+- Esse processo é todo **feito pela CPU**, então o ideal é passar sempre o maior número de vértices possível de uma só vez
+    - Isso é feito para evitar um gargalo, pois a CPU é muito mais lenta que a GPU
+
+```
+unsigned int vbo;
+glGenBuffers(1, &vbo);	// Criar um buffer
+glBindBuffer(GL_ARRAY_BUFFER, vbo);	// Vincula o buffer ao tipo GL_BUFFER_ARRAY
+
+// A função glBufferData é feita especificamente pra copiar dados definidos pelo usuário para buffers
+// Seu último parâmetro pode assumir 3 valores:
+// GL_STREAM_DRAW: Os dados são settados apenas uma vez e usada pela GPU poucas vezes
+// GL_STATIC_DRAW: Os dados são settados apenas uma vez e usados várias vezes
+// GL_DYNAMIC_DRAW: Os dados são settados e usados várias vezes
+glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Copia os vértices para o buffer
+
+// Especifica como os atributos do VBO devem ser usados pelo vertex shader, os atributos são:
+// index: indice da VBO que queremos configurar, nesse caso é 0 (valor passado para glEnableVertexAttribArray e para layout dentro do shader)
+// size: número de atributos por valor (3 para vec3, 4 para vec4 etc)
+// type: tipo de cada valor
+// normalized: especifica se queremos que os dados sejam normalizados automaticamente ao passar
+// stride: tamanho total entre atributos consecutivos, nesse caso é o tamanho de 3 floats (vec3)
+// pointer: offset para dizer a partir de que posição do array podemos ler o dado que estamos configurando
+glEnableVertexAttribArray(0);
+
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+```
+
+### Vertex shader:
+- OpenGL moderno exige que o desenvolvedor faça ao menos um vertex shader para desenhar na tela
+
+```
+#version 330 core	// Especifica versão do OpenGL
+
+layout(location = 0) in vec3 aPos;	// Recebe dados do buffer no índice 0
+
+void main() {
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+```
+
+- Esse tipo de shader deve devolver os vértices em NDC (normalized device coordinates)
+    - Vértices com x, y e z fora do intervalo [-1.0, 1.0] são clippados após o primeiro passo de rasterização
+    - O viewport do OpenGL transforma essas coordenadas em NDC para screen space, e então em fragmentos, que serão passados para o fragment shader
+
+### Geometry shader
+- É o tipo de shader menos utilizado e o único que vem por padrão no OpenGL
+- São responsáveis por distorcer a geometria, adicionando vértices, arestas etc
+
+
+### Fragment shader
+- Assim como o vertex shader, também é obrigatório no OpenGL
+- Fragment shaders recebem como input fragmentos
+    - Um fragmento contém todos os dados necessários para desenhar um pixel (posição, cor etc)
+- Calcula a cor final dos pixels
+- É onde os efeitos mais avançados geralmente são feitos
+
+```
+#version 330 core
+
+out vec4 fragColor;	// Declara o output como um vec4 (cor)
+
+void main() {
+    fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);	// Retorna uma cor sólida para todos os pixels
+}
+```
+
+### Compilando um shader
+
+- Para compilar um shader, basta passá-lo em forma de string para a função glCreateShader do OpenGL
+- A compilação de shaders é portanto feita de forma dinâmica, em tempo de execução
+
+```
+const char* vertexShaderSource = ˜// coding do shader aqui˜
+unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER); // GL_FRAGMENT_SHADER caso seja um fragment shader
+
+glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // Vincula o código fonte do shader a um objeto shader
+glCompileShader(vertexShader);
+```
+
+- Para verificar os logs de compilação do shader, basta rodar o código:
+
+```
+// Verifica se o shader compilou com sucesso
+int success;
+glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+
+// Printa mensagens de erro caso o shader tenha erros de compilação
+if(!success) {
+    char infoLog[512];
+    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+    std::cout << ˜Erro: ˜ << infoLog << ˜\n˜;
+}
+```
+
+### Shader program
+
+- Após compilar os shaders, é preciso linká-los a um shader program para que possam ser utilizados
+- Ao linkar os shaders, o program automatiza a passagem da saída de um shader para a entrada do próximo
+
+```
+unsigned int shaderProgram;
+shaderProgram = glCreateProgram();	// Cria o objeto do shaderProgram
+
+glAttachShader(shaderProgram, vertexShader);
+glAttachShader(shaderProgram, fragmentShader);
+glLinkProgram(shaderProgram);	// Linka os inputs e outputs dos shaders
+```
+
+- De forma semelhante a compilação, podemos verificar se a linkagem dos shaders funcionou:
+
+```
+Int sucess;
+glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+
+if(!success) {
+    char infoLog[512];
+    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+}
+```
+
+- Para utilizar um shader no próximo draw call, basta utilizar a função glUseProgram
+- Todas as chamadas de renderização ou de shaders após glUseProgram farão referência ao program utilizado
+
+```
+glUseProgram(shaderProgram);
+```
+
+- Após linkar os shaders, caso não queira utilizá-los em outros programas, é uma boa prática deletá-los
+
+```
+glDeleteShader(vertexShader);
+glDeleteShader(fragmentShader);
+```
+
+### Vertex Array Object
+
+- VAOs servem para guardar configurações de VBOs, evitando a necessidade de repetí-las toda vez que se deseja desenhar algo
+- A sintaxe de criação de uma VAO é como a de qualquer objeto
+- Para usar uma VAO, é preciso dar bind nela e só depois criar/configurar uma VBO
+- Apenas uma VAO pode ser bindada por vez
+- Isso significa que VBOs criadas após o bind serão associadas a essa VAO
+- Além do bind antes da configuração, é preciso dar bind antes de desenhar, pois apenas a VAO bindada será desenhada
+
+```
+
+unsigned int vao;
+glGenVertexArrays(1, &vao);
+glBindVertexArray(vao);
+
+// === Configura VBOs ===
+...
+// === Configura VBOs ===
+
+glBindVertexArray(vao);
+openGLFunctionsToDrawThings();
+```
+
+### Desenhando na tela
+-  Após definir os buffers e arrays, basta seguir os passos:
+
+```
+glUseProgram(shaderProgram);        // 1) Determinar qual shader será utilizado
+glBindVertexArrays(vao);            // 2) Bindar a VAO que será desenhada
+
+// arg1: tipo do objeto
+// arg2: indice do vertex array que queremos desenhar (os vertex attribs foram bindados em 0)
+// arg3: Quantos vértices serão desenhados
+glDrawArrays(GL_TRIANGLES, 0, 3);   // 3) Desenhar os vértices, nesse caso especificando que formam um triângulo
+```
+
+
+### Element Buffer Objects
+- Um dos problemas de desenhar itens usando apenas VBOs é que os vértices precisam ser declarados em ordem para cada triângulo
+- Isso significa que mesmo que dois objetos tenham vértices iguais, eles não podem ser reaproveitados
+```
+// Perceba que os triângulos compartilham seus vértices 2 e 3
+float vertices[] = {
+    // Triângulo 1
+    0.5f, 0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    -0.5f, 0.5f, 0.0f,
+
+    // Triângulo 2
+    0.5f, -0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+    -0.5f, 0.5f, 0.0f
+};
+```
+
+- Para resolver esse problema, é preciso declarar um EBO (Element Buffer Object)
+    - Ele possui índices para os vértices de um objeto
+    - Esses índices dizem ao OpenGL quais vértices de um VBO devem ser usados para desenhar um triângulo
+    - Isso significa que precisamos apenas declarar os vértices únicos e os indices de cada triângulo
+
+```
+float vertices[] = {
+    0.5f, 0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+    -0.5f, 0.5f, 0.0f
+};
+
+unsigned int indices[] = {
+    0, 1, 3,        // Triângulo 1
+    1, 2, 3         // Triângulo 2
+};
+```
+
+- Eles são declarados iguai a qualquer buffer
+    - Assim como as VBOs, os VEOs ficam associados ao VAO atual
+
+```
+unsigned int ebo;
+glGenBuffers(1, &ebo);
+
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+```
+
+- Para desenhar elementos a partir de um EBO, utiliza-se a função `glDrawElements`
+    - O EBO é passado para o VAO, então só é preciso dar bind nele se ele não tiver em um VAO 
+
+```
+glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+// arg1: type of object
+// arg2: number of indices
+// arg3: type of the indices
+// arg4: index to start reading from ebo (offset)
+glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+```
+
+### Diferentes formas de desenhar um triângulo
+- VBO + glDrawArrays
+- VBO + EBO + glDrawElements
+- VAO
+    - Passa os elementos pra função de draw, então a função depende do que foi declarado na VAO
+
+
+## Debugging
+- Wireframe mode:
+
+```
+glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);      // Desenha os objetos como linhas, sem preenchimento de cor (wireframe)
+glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);      // Desenha os objetos com cores (sem wireframe)
+```
