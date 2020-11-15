@@ -372,10 +372,13 @@ glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 ```
 
 ### Diferentes formas de desenhar um triângulo
-- VBO + glDrawArrays
+A partir do OpenGL 3.3 Core, o uso de VAOs se tornou obrigatório, então um triângulo pode ser desenhado usando as duas abordagens:
+
+- VAO + VBO + glDrawArrays
 - VBO + EBO + glDrawElements
-- VAO
-    - Passa os elementos pra função de draw, então a função depende do que foi declarado na VAO
+
+- Obs: O VAO passa os buffers pra função de draw
+    - Isso significa que a função de draw depende de quais buffers foram bindados
 
 
 ## Debugging

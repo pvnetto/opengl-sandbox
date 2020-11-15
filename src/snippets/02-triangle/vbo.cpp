@@ -41,27 +41,18 @@ int main() {
 
 	// 0) Declares VAO and VBOs + attributes
 	float vertices[] = {
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f
+	    -0.5f, -0.5f, 0.0f, // left
+	    0.5f, -0.5f, 0.0f,  // right
+	    0.0f, 0.5f, 0.0f    // top
 	};
 
-    unsigned int indices[] = {
-        0, 1, 3,        // Triangle 1
-        1, 2, 3         // Triangle 2
-    };
-
-	unsigned int vao, vbo, ebo;
+	unsigned int vao, vbo;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
 
 	// Binds VAO, so all subsequent buffers are bound to it
 	glBindVertexArray(vao);
 
-    // Binds VBO after VAO and defines its data
-    // Binding order is important here, the VBO is only associated to the VAO if it's bound after it
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
 
@@ -69,12 +60,7 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
-    // Binds EBO after VAO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
 	// Unbinds buffers so they're not accidentally used
-    // >> DO NOT UNBIND EBO <<
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -159,9 +145,7 @@ int main() {
 		// 4) Use shader program, bind VAO and draw the triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(vao);
-
-        // glDrawElements is used for VAOs with element array buffers
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// === Swaps buffers ===
 		glfwPollEvents();
