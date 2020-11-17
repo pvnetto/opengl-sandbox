@@ -122,16 +122,11 @@ O OpenGL por sua vez passa o conteúdo do back para o front buffer, então o fro
     - 6) Fragment shader: Input = fragmentos, output = fragmentos modificados
     - 7) Rasterização
 
-## Shaders:
-- Shaders são feitos em **GLSL**, uma linguagem de shaders com sintaxe semelhante a C
-
-### Dúvidas
-- Pra que servem geometry shaders?
-- O que exatamente o geometry shader faz?
 
 ### Vertex buffers:
 - Buffers são um dos tipos de objeto do OpenGL
-- Buffers podem assumir vários tipos diferentes, dependendo dos dados que armazenam
+- Nada mais são do que arrays de dados de tipo genérico que serão consumidos por shaders
+- Ou seja, buffers podem armazenar vários tipos diferentes, tudo depende de qual informação queremos passar pros shaders
 - Para enviarmos dados de vértices para um shader, é preciso:
     - 1) Criar um vertex buffer
     - 2) Vinculà-lo a um tipo de buffer
@@ -160,119 +155,35 @@ glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Co
 // size: número de atributos por valor (3 para vec3, 4 para vec4 etc)
 // type: tipo de cada valor
 // normalized: especifica se queremos que os dados sejam normalizados automaticamente ao passar
-// stride: tamanho total entre atributos consecutivos, nesse caso é o tamanho de 3 floats (vec3)
+// stride: distância em bytes entre o início de um atributo e o início do próximo. nesse caso é o tamanho de 3 floats (vec3)
 // pointer: offset para dizer a partir de que posição do array podemos ler o dado que estamos configurando
 glEnableVertexAttribArray(0);
 
 glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 ```
 
-### Vertex shader:
-- OpenGL moderno exige que o desenvolvedor faça ao menos um vertex shader para desenhar na tela
+#### Atributos extra
+- É possível passar vários tipos de atributos diferentes via vertex buffer
 
 ```
-#version 330 core	// Especifica versão do OpenGL
+float vertexData[] = {
+    // vertices         // cores
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // direita
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // esquerda
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // cima
+};
 
-layout(location = 0) in vec3 aPos;	// Recebe dados do buffer no índice 0
+// Posição do vértice
+// O stride tem tamanho 6 * sizeof(float), 3 floats do vértice + 3 floats da cor
+glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+glEnableVertexAttribArray(0);       // O shader deve buscar em layout = 0
 
-void main() {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-}
+// Cor
+glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+glEnableVertexAttribArray(1);       // O shader deve buscar em layout = 1
 ```
 
-- Esse tipo de shader deve devolver os vértices em NDC (normalized device coordinates)
-    - Vértices com x, y e z fora do intervalo [-1.0, 1.0] são clippados após o primeiro passo de rasterização
-    - O viewport do OpenGL transforma essas coordenadas em NDC para screen space, e então em fragmentos, que serão passados para o fragment shader
-
-### Geometry shader
-- É o tipo de shader menos utilizado e o único que vem por padrão no OpenGL
-- São responsáveis por distorcer a geometria, adicionando vértices, arestas etc
-
-
-### Fragment shader
-- Assim como o vertex shader, também é obrigatório no OpenGL
-- Fragment shaders recebem como input fragmentos
-    - Um fragmento contém todos os dados necessários para desenhar um pixel (posição, cor etc)
-- Calcula a cor final dos pixels
-- É onde os efeitos mais avançados geralmente são feitos
-
-```
-#version 330 core
-
-out vec4 fragColor;	// Declara o output como um vec4 (cor)
-
-void main() {
-    fragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);	// Retorna uma cor sólida para todos os pixels
-}
-```
-
-### Compilando um shader
-
-- Para compilar um shader, basta passá-lo em forma de string para a função glCreateShader do OpenGL
-- A compilação de shaders é portanto feita de forma dinâmica, em tempo de execução
-
-```
-const char* vertexShaderSource = ˜// coding do shader aqui˜
-unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER); // GL_FRAGMENT_SHADER caso seja um fragment shader
-
-glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // Vincula o código fonte do shader a um objeto shader
-glCompileShader(vertexShader);
-```
-
-- Para verificar os logs de compilação do shader, basta rodar o código:
-
-```
-// Verifica se o shader compilou com sucesso
-int success;
-glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-// Printa mensagens de erro caso o shader tenha erros de compilação
-if(!success) {
-    char infoLog[512];
-    glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-    std::cout << ˜Erro: ˜ << infoLog << ˜\n˜;
-}
-```
-
-### Shader program
-
-- Após compilar os shaders, é preciso linká-los a um shader program para que possam ser utilizados
-- Ao linkar os shaders, o program automatiza a passagem da saída de um shader para a entrada do próximo
-
-```
-unsigned int shaderProgram;
-shaderProgram = glCreateProgram();	// Cria o objeto do shaderProgram
-
-glAttachShader(shaderProgram, vertexShader);
-glAttachShader(shaderProgram, fragmentShader);
-glLinkProgram(shaderProgram);	// Linka os inputs e outputs dos shaders
-```
-
-- De forma semelhante a compilação, podemos verificar se a linkagem dos shaders funcionou:
-
-```
-Int sucess;
-glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-
-if(!success) {
-    char infoLog[512];
-    glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-}
-```
-
-- Para utilizar um shader no próximo draw call, basta utilizar a função glUseProgram
-- Todas as chamadas de renderização ou de shaders após glUseProgram farão referência ao program utilizado
-
-```
-glUseProgram(shaderProgram);
-```
-
-- Após linkar os shaders, caso não queira utilizá-los em outros programas, é uma boa prática deletá-los
-
-```
-glDeleteShader(vertexShader);
-glDeleteShader(fragmentShader);
-```
+- Observe que um atributo sempre deve estar associado a um vértice
 
 ### Vertex Array Object
 

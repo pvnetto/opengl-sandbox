@@ -40,12 +40,16 @@ int main() {
 	glViewport(0, 0, width, height);
 
 	// 0) Declares VAO and VBOs + attributes
-	
-	// Vertices are drawn counter-clockwise when using glDrawArrays 
 	float vertices[] = {
-	    -0.5f, -0.5f, 0.0f, // left
-	    0.5f, -0.5f, 0.0f,  // right
-	    0.0f, 0.5f, 0.0f    // top
+        // Triangle 1
+        -0.8f, -0.2f, 0.0f,     // left
+	    -0.4f, -0.2f, 0.0f,     // right
+	    -0.6f, 0.2f, 0.0f,      // top
+
+        // Triangle 2
+        0.0f, -0.2f, 0.0f,     // left
+	    0.4f, -0.2f, 0.0f,     // right
+	    0.2f, 0.2f, 0.0f,      // top
 	};
 
 	unsigned int vao, vbo;
@@ -58,8 +62,11 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
 
-	// Attributes are declared on slot 0, so the shader should use layout = 0 to find them
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    // glVertexAttribPointer should tell the shader how to read buffer data
+    // In this case we are declaring vec3 parameters as subsequent float values in an array,
+    // so size = 3, type = float and stride = 3 * sizeof(float)
+	// Also, Attributes are declared on slot 0, so the shader should use layout = 0 to find them
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
 	// Unbinds buffers so they're not accidentally used
@@ -147,7 +154,7 @@ int main() {
 		// 4) Use shader program, bind VAO and draw the triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// === Swaps buffers ===
 		glfwPollEvents();
