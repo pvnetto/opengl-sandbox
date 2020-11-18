@@ -92,8 +92,8 @@ int main() {
 	glBindVertexArray(0);
 
 	// 3) Declares shader program
-	Shader shader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/vertex_basic.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/frag_basic.frag");
+	Shader shader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/02_vertex_out.vert",
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/02_frag_in.frag");
 
 	while (!glfwWindowShouldClose(window)) {
 		// === Processes inputs ===
