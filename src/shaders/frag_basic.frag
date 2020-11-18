@@ -3,5 +3,5 @@
 out vec4 fragmentColor;     // Declares an output value
 
 void main() {
-    fragmentColor = vec4(1.0, 0.3, 0.2, 1.0);      // Sets fragment to a solid color
+    fragmentColor = vec4(0.7f, 0.2f, 0.8f, 1.0f);      // Sets fragment to a solid color
 }

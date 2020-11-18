@@ -1,4 +1,7 @@
-add_executable(Sandbox main.cpp)
+set(SANDBOX_SOURCES
+		shared/Shader.cpp)
+
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
