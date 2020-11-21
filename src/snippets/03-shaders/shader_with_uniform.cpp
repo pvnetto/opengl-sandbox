@@ -2,8 +2,6 @@
 #include <glad/glad.h>
 #include <iostream>
 
-#include "stb_image.h"
-
 #include "shared/Shader.h"
 
 void OnWindowResize(GLFWwindow *window, int width, int height) {
