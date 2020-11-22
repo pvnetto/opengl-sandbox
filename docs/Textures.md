@@ -110,7 +110,7 @@ glGenTexture(1, &texture);
 
 ```
 int width, height, numOfChannels;
-unsigned int* data = stbi_load("my_texture.png", &width, &height, &numOfChannels, 0);
+unsigned char* data = stbi_load("my_texture.png", &width, &height, &numOfChannels, 0);
 ```
 
 - Obs: As coordenadas das imagens da **stb são o inverso do OpenGL**, então é preciso **flippá-las antes de carregar**
