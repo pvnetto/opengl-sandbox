@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     // Reads shader files 
     std::string vertexCode = ReadShader(vertexPath);
@@ -42,6 +44,10 @@ void Shader::SetInt(const std::string& uniformName, int val) const {
 
 void Shader::SetFloat(const std::string& uniformName, float val) const {
     glUniform1f(glGetUniformLocation(id, uniformName.c_str()), val);
+}
+
+void Shader::SetMatrix(const std::string& uniformName, glm::mat4 mat) {
+    glUniformMatrix4fv(glGetUniformLocation(id, uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 std::string Shader::ReadShader(const char* path) {

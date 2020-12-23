@@ -8,14 +8,17 @@ Inicialmente temos apenas os vértices em espaço local, com o centro do própri
 
 Pode-se dizer então que as transformações são usadas para **converter as coordenadas de um objeto entre diferentes espaços**, até que elas deixem de ser informações apenas do objeto e passem a ser uma **representação precisa de como o objeto será visualizado**.
 
-Uma forma de pensar sobre esses espaços é que 
+Uma forma de pensar sobre esses espaços é que cada um tem sua própria origem, então quando transformamos de um espaço para outro, é **como se estivéssemos convertendo uma coordenada de uma origem para outra**.   
 
 
 ### Local
 
-O espaço local é o estado inicial de um objeto, onde suas coordenadas 
+O espaço local é o **estado inicial das coordenadas um objeto**, que são calculadas a partir de uma origem relativa ao próprio objeto. Quando **importamos um modelo** de um software de modelagem 3D, recebemos as coordenadas do objeto em espaço local.
+
 
 ### World
+
+
 
 ### View
 

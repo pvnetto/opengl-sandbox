@@ -193,18 +193,7 @@ Ex: Dado um vetor de escala (s1, s2, s3)
 **Rotação**:
 Rotação é a matriz menos intuitiva e só pode ser compreendida por completo depois de estudar álgebra linear. No entanto, **não precisamos entender a fundo como funciona** para aplicarmos. Só é importante saber que **as matrizes de rotação são diferentes para cada eixo**
 
-Ex:
-```
-// Rotação no eixo x
-```
-
-```
-// Rotação no eixo y
-```
-
-```
-// Rotação no eixo z
-```
+Podemos encontrar essas matrizes [nesse guia](https://learnopengl.com/Getting-started/Transformations).
 
 ### Combinando as matrizes
 

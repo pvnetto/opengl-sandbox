@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 class Shader {
 public:
 	Shader(const char* vertexPath, const char* fragmentPath);
@@ -16,6 +18,7 @@ public:
     void SetBool(const std::string& uniformName, bool val) const;
     void SetInt(const std::string& uniformName, int val) const;
     void SetFloat(const std::string& uniformName, float val) const;
+    void SetMatrix(const std::string& uniformName, glm::mat4 mat);
 
 private:
 	unsigned int id;

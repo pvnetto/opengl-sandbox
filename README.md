@@ -18,9 +18,9 @@
 
 
 ### Como o OpenGL funciona?
-- O OpenGL é como se fosse uma grande MÁQUINA DE ESTADOS
+- O OpenGL é como se fosse uma grande **máquina de estados**
     - Pensar nele dessa forma vai ajudar a entendê-lo mais facilmente
-- Esse estado é armazenado em algo chamado de Context
+- Esse estado é armazenado em algo chamado de **Context**
 - Quando usamos o OpenGL, geralmente mudamos o seu estado através de opções, manipulação de buffers etc
 - Após fazermos as modificações necessárias no estado, solicitamos que o OpenGL utilize-o para desenhar na tela
 - No OpenGL, basicamente existem dois tipos de funções: as que modificam o estado e as que usam o estado

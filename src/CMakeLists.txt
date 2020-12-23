@@ -5,6 +5,7 @@ add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
+target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox stb)
 target_link_libraries(Sandbox opengl32)
 
@@ -15,6 +16,7 @@ target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
 )
 
 set_target_properties(Sandbox PROPERTIES
