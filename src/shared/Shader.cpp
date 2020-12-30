@@ -12,17 +12,17 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     unsigned int fragmentShaderID = CompileShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);
 
     // Creates program with both shaders
-    id = glCreateProgram();
-    glAttachShader(id, vertexShaderID);
-    glAttachShader(id, fragmentShaderID);
-    glLinkProgram(id);
+    m_id = glCreateProgram();
+    glAttachShader(m_id, vertexShaderID);
+    glAttachShader(m_id, fragmentShaderID);
+    glLinkProgram(m_id);
 
     int linkSuccess;
-    glGetProgramiv(id, GL_LINK_STATUS, &linkSuccess);
+    glGetProgramiv(m_id, GL_LINK_STATUS, &linkSuccess);
 
     if(!linkSuccess) {
         char linkInfo[512];
-        glGetProgramInfoLog(id, 512, NULL, linkInfo);
+        glGetProgramInfoLog(m_id, 512, NULL, linkInfo);
         std::cout << "Failed to link shader " << linkInfo << "\n";
     }
 
@@ -31,23 +31,23 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 }
 
 void Shader::Use() {
-    glUseProgram(id);
+    glUseProgram(m_id);
 }
 
 void Shader::SetBool(const std::string& uniformName, bool val) const {
-    glUniform1i(glGetUniformLocation(id, uniformName.c_str()), (int) val);
+    glUniform1i(glGetUniformLocation(m_id, uniformName.c_str()), (int) val);
 }
 
 void Shader::SetInt(const std::string& uniformName, int val) const {
-    glUniform1i(glGetUniformLocation(id, uniformName.c_str()), val);
+    glUniform1i(glGetUniformLocation(m_id, uniformName.c_str()), val);
 }
 
 void Shader::SetFloat(const std::string& uniformName, float val) const {
-    glUniform1f(glGetUniformLocation(id, uniformName.c_str()), val);
+    glUniform1f(glGetUniformLocation(m_id, uniformName.c_str()), val);
 }
 
 void Shader::SetMatrix(const std::string& uniformName, glm::mat4 mat) {
-    glUniformMatrix4fv(glGetUniformLocation(id, uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
+    glUniformMatrix4fv(glGetUniformLocation(m_id, uniformName.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 std::string Shader::ReadShader(const char* path) {

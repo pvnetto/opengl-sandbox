@@ -6,6 +6,8 @@
 
 #include "stb_image.h"
 
+#include "shared/Camera.h"
+#include "shared/FreeCameraController.h"
 #include "shared/Primitive.h"
 #include "shared/Shader.h"
 
@@ -19,8 +21,23 @@ void HandleWindowInput(GLFWwindow *window) {
 	}
 }
 
-int main() {
+void UpdateMousePos(GLFWwindow* window, double mouseX, double mouseY);
 
+glm::vec2 mousePos;
+bool firstMouseMove = true;
+
+float lastFrame = 0;
+float deltaTime = 0;
+
+// 1) Instantiates camera and its controller
+Camera camera(
+	glm::vec3(0.f, 0.f, 5.f),
+	glm::vec3(0.f, -90.f, 0.f),
+	glm::vec3(0.f, 1.f, 0.f));
+
+FreeCameraController camController(camera, 4.5f);
+
+int main() {
 	int width = 800, height = 600;
 
 	glfwInit();
@@ -29,15 +46,15 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL);
-	if (!window) {
+	GLFWwindow *m_window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL);
+	if (!m_window) {
 		std::cout << "Failed to create an OpenGL window :(\n";
 		glfwTerminate();
 		return -1;
 	}
 
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, OnWindowResize);
+	glfwMakeContextCurrent(m_window);
+	glfwSetFramebufferSizeCallback(m_window, OnWindowResize);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize Glad :(\n";
@@ -47,7 +64,7 @@ int main() {
 	glViewport(0, 0, width, height);
 
 	auto verticesVec = PrimitiveShape::Cube();
-	float* vertices = verticesVec.data();
+	float *vertices = verticesVec.data();
 
 	unsigned int vao, vbo;
 	glGenVertexArrays(1, &vao);
@@ -112,16 +129,22 @@ int main() {
 
 	stbi_image_free(tex2Data);
 
-	// 1) Enables depth test, so vertices are stored on a z-buffer before drawing
 	glEnable(GL_DEPTH_TEST);
 
-	while (!glfwWindowShouldClose(window)) {
+	glfwSetCursorPosCallback(m_window, UpdateMousePos);
+
+	while (!glfwWindowShouldClose(m_window)) {
+		// Calculates delta time
+		float currentFrame = (float)glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// === Processes inputs ===
-		HandleWindowInput(window);
+		HandleWindowInput(m_window);
+		camController.HandleKeyboardInput(m_window, deltaTime);
 
 		// === Rendering ===
 		glClearColor(0.5f, 0.2f, 0.1f, 1);
-		// 2) Clears z-buffer before rendering
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		shader.Use();
@@ -129,37 +152,39 @@ int main() {
 		shader.SetInt("tex", 0);
 		shader.SetInt("anotherTex", 1);
 
-		// 3) Creates model matrix
 		glm::mat4 model(1.0f);
-		model = glm::translate(model, glm::vec3(0.5f, 0.2f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.f, 1.f, 0.f));
 		model = glm::rotate(model, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::rotate(model, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 		model = glm::rotate(model, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
 
-		// 4) Creates view matrix
-		glm::mat4 view(1.0f);
-		glm::vec3 cameraPos (0.0f, 0.0f, -3.0f);
-		view = glm::translate(view, -cameraPos);
-
-		// 5) Creates projection matrix
-		glm::mat4 projection(1.0f);
-		float fov = 90.f, aspectRatio = width / height, near = 0.1f, far = 100.f;
-		projection = glm::perspective(fov, aspectRatio, near, far);
-
-		// 6) Passes MVP matrices as uniforms to shader
 		shader.SetMatrix("model", model);
-		shader.SetMatrix("view", view);
-		shader.SetMatrix("projection", projection);
+		shader.SetMatrix("view", camera.GetView());
+		shader.SetMatrix("projection", camera.GetProjection());
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// === Swaps buffers ===
 		glfwPollEvents();
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(m_window);
 	}
 
 	glfwTerminate();
 	return 0;
+}
+
+void UpdateMousePos(GLFWwindow* window, double mouseX, double mouseY) {
+	if(firstMouseMove) {
+		mousePos = glm::vec2(mouseX, mouseY);
+		firstMouseMove = false;
+		return;
+	}
+
+	glm::vec2 newMousePos(mouseX, mouseY);
+	glm::vec2 mouseDelta (newMousePos.x - mousePos.x, mousePos.y - newMousePos.y);
+	mousePos = newMousePos;
+
+	camController.HandleMouseInput(window, mouseDelta, deltaTime);
 }

@@ -21,7 +21,7 @@ public:
     void SetMatrix(const std::string& uniformName, glm::mat4 mat);
 
 private:
-	unsigned int id;
+	unsigned int m_id;
 
     std::string ReadShader(const char* path);
     const unsigned int CompileShader(const char* code, GLenum type);
