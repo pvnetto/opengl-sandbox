@@ -4,8 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
+#include "stb_image.h"
 
-#include "shared/Texture2D.h"
 #include "shared/Camera.h"
 #include "shared/FreeCameraController.h"
 #include "shared/Primitive.h"
@@ -85,15 +85,11 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_emission_map.frag");
+	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.vert",
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/08_material.frag");
 
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
-
-	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
-	Texture2D::LoadTexture(GL_TEXTURE1, "../../src/assets/container_specular.png");
-	Texture2D::LoadTexture(GL_TEXTURE2, "../../src/assets/matrix.jpg");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -133,26 +129,22 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glm::mat4 litModel(1.0f);
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 0.0f, 1.0f));
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.12f, glm::vec3(0.0f, 1.0f, 0.0f));
+		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+		litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		phongShader.Use();
 		phongShader.SetMatrix("model", litModel);
 		phongShader.SetMatrix("view", camera.GetView());
 		phongShader.SetMatrix("projection", camera.GetProjection());
-
-		phongShader.SetInt("material.diffuseMap", 0);
-		phongShader.SetInt("material.specularMap", 1);
-		phongShader.SetInt("material.emissionMap", 2);
+		phongShader.SetVector3("material.color", glm::vec3(0.2f, 0.35f, 1.f));
 		phongShader.SetFloat("material.ambientStrength", 0.1f);
-		phongShader.SetFloat("material.diffuseStrength", 0.5f);
+		phongShader.SetFloat("material.diffuseStrength", 0.8f);
 		phongShader.SetFloat("material.specularStrength", 1.f);
-		phongShader.SetFloat("material.shininess", 32.f);
-
+		phongShader.SetVector3("material.specularColor", glm::vec3{0.5f, 0.5f, 0.5f});
+		phongShader.SetFloat("material.shininess", 64.f);
 		phongShader.SetVector3("light.color", lightColor);
 		phongShader.SetVector3("light.position", lightSourcePos);
 		phongShader.SetVector3("viewPos", camera.GetPosition());
-		phongShader.SetFloat("time", (float) glfwGetTime());
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

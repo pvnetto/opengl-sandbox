@@ -86,14 +86,13 @@ int main() {
 	glBindVertexArray(0);
 
 	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_emission_map.frag");
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.frag");
 
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
 
 	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
 	Texture2D::LoadTexture(GL_TEXTURE1, "../../src/assets/container_specular.png");
-	Texture2D::LoadTexture(GL_TEXTURE2, "../../src/assets/matrix.jpg");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -143,7 +142,6 @@ int main() {
 
 		phongShader.SetInt("material.diffuseMap", 0);
 		phongShader.SetInt("material.specularMap", 1);
-		phongShader.SetInt("material.emissionMap", 2);
 		phongShader.SetFloat("material.ambientStrength", 0.1f);
 		phongShader.SetFloat("material.diffuseStrength", 0.5f);
 		phongShader.SetFloat("material.specularStrength", 1.f);
@@ -152,7 +150,6 @@ int main() {
 		phongShader.SetVector3("light.color", lightColor);
 		phongShader.SetVector3("light.position", lightSourcePos);
 		phongShader.SetVector3("viewPos", camera.GetPosition());
-		phongShader.SetFloat("time", (float) glfwGetTime());
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
