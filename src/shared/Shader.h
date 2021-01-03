@@ -19,6 +19,7 @@ public:
     void SetInt(const std::string& uniformName, int val) const;
     void SetFloat(const std::string& uniformName, float val) const;
     void SetMatrix(const std::string& uniformName, glm::mat4 mat);
+    void SetVector3(const std::string& uniformName, glm::vec3 vec);
 
 private:
 	unsigned int m_id;

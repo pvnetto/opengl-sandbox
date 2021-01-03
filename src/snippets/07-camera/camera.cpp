@@ -29,6 +29,7 @@ bool firstMouseMove = true;
 float lastFrame = 0;
 float deltaTime = 0;
 
+// 1) Instantiates camera and its controller
 Camera camera(
 	glm::vec3(0.f, 0.f, 5.f),
 	glm::vec3(0.f, -90.f, 0.f),
@@ -73,28 +74,65 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, verticesVec.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.frag");
+	Shader shader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/03_frag_tex.frag");
 
-	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
+	int texWidth, texHeight, numOfChannels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char *brickData = stbi_load("../../src/assets/bricks.jpg", &texWidth, &texHeight, &numOfChannels, 0);
+
+	if (!brickData) {
+		std::cout << "Couldn't load texture\n";
+	}
+
+	unsigned int brickTexture;
+	glGenTextures(1, &brickTexture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, brickTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, brickData);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(brickTexture);
+
+	stbi_image_free(brickData);
+
+	// Loads another texture
+	int tex2Width, tex2Height, tex2Channels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char *tex2Data = stbi_load("../../src/assets/yps.png", &tex2Width, &tex2Height, &tex2Channels, 0);
+
+	if (!tex2Data) {
+		std::cout << "Couldn't load texture\n";
+	}
+
+	unsigned int tex2;
+	glGenTextures(1, &tex2);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, tex2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex2Width, tex2Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex2Data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(tex2);
+
+	stbi_image_free(tex2Data);
 
 	glEnable(GL_DEPTH_TEST);
 
 	glfwSetCursorPosCallback(m_window, UpdateMousePos);
-	
+
 	while (!glfwWindowShouldClose(m_window)) {
 		// Calculates delta time
 		float currentFrame = (float)glfwGetTime();
@@ -106,39 +144,24 @@ int main() {
 		camController.HandleKeyboardInput(m_window, deltaTime);
 
 		// === Rendering ===
-		glClearColor(0.1f, 0.1f, 0.12f, 1);
+		glClearColor(0.5f, 0.2f, 0.1f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightColor{ 1.f, 0.8f, 0.6f };
-		glm::vec3 lightSourcePos = glm::vec3(
-			std::cos((float) glfwGetTime()),
-			std::cos((float) glfwGetTime()) * std::sin((float) glfwGetTime()),
-			std::sin((float) glfwGetTime())) * 2.f;
+		shader.Use();
+		shader.SetFloat("horizontalOffset", std::sin(glfwGetTime()) * 1.0f);
+		shader.SetInt("tex", 0);
+		shader.SetInt("anotherTex", 1);
 
-		glm::mat4 sourceModel(1.0f);
-		sourceModel = glm::translate(sourceModel, lightSourcePos);
-		sourceModel = glm::scale(sourceModel, glm::vec3(0.3f, 0.3f, 0.3f));
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, glm::vec3(0.f, 1.f, 0.f));
+		model = glm::rotate(model, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
 
-		lightSourceShader.Use();
-		lightSourceShader.SetMatrix("model", sourceModel);
-		lightSourceShader.SetMatrix("view", camera.GetView());
-		lightSourceShader.SetMatrix("projection", camera.GetProjection());
-		lightSourceShader.SetVector3("lightColor", lightColor);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		glm::mat4 litModel(1.0f);
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-		phongShader.Use();
-		phongShader.SetMatrix("model", litModel);
-		phongShader.SetMatrix("view", camera.GetView());
-		phongShader.SetMatrix("projection", camera.GetProjection());
-		phongShader.SetVector3("objectColor", glm::vec3(0.2f, 0.35f, 1.f));
-		phongShader.SetVector3("lightColor", lightColor);
-		phongShader.SetVector3("lightPos", lightSourcePos);
-		phongShader.SetVector3("viewPos", camera.GetPosition());
+		shader.SetMatrix("model", model);
+		shader.SetMatrix("view", camera.GetView());
+		shader.SetMatrix("projection", camera.GetProjection());
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

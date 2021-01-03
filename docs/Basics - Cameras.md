@@ -36,7 +36,7 @@ LookAt = base^T * -translação
 ### Direção (forward)
 O vetor de direção é o mais complexo entre os 3 vetores base, pois ele deve **considerar os ângulos de rotação da câmera** para ser calculado.
 
-Se utilizarmos euler para rotacionar, precisaremos **apenas dos ângulos yaw e pitch**, já que câmeras dificilmente são rotacionadas ao redor de Z, e como as câmeras costumam ser rotacionadas **mais ao redor de Y do que X**, nossa **hierarquia de rotação deve ser Y (yaw) > X (pitch)**. Isso significa que yaw irá influenciar os X, Y, Z e pitch apenas X e Z. Temos então a seguinte fórmula:
+Se utilizarmos euler para rotacionar, precisaremos **apenas dos ângulos yaw e pitch**, já que câmeras dificilmente são rotacionadas ao redor de Z, e como as câmeras costumam ser rotacionadas **mais ao redor de Y do que X**, nossa **hierarquia de rotação deve ser Y (yaw) > X (pitch)**. Isso significa que **yaw irá influenciar os X, Y, Z** e **pitch apenas X e Z**. Temos então a seguinte fórmula:
 
 ```
 glm::vec3 cameraDirection = glm::vec3(

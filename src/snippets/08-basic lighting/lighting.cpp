@@ -29,6 +29,7 @@ bool firstMouseMove = true;
 float lastFrame = 0;
 float deltaTime = 0;
 
+// 1) Instantiates camera and its controller
 Camera camera(
 	glm::vec3(0.f, 0.f, 5.f),
 	glm::vec3(0.f, -90.f, 0.f),
@@ -73,20 +74,17 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, verticesVec.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.frag");
+	Shader lightingShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_basic_lighting.frag");
 
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
@@ -94,7 +92,7 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	glfwSetCursorPosCallback(m_window, UpdateMousePos);
-	
+
 	while (!glfwWindowShouldClose(m_window)) {
 		// Calculates delta time
 		float currentFrame = (float)glfwGetTime();
@@ -106,17 +104,18 @@ int main() {
 		camController.HandleKeyboardInput(m_window, deltaTime);
 
 		// === Rendering ===
-		glClearColor(0.1f, 0.1f, 0.12f, 1);
+		glClearColor(0.5f, 0.2f, 0.1f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightColor{ 1.f, 0.8f, 0.6f };
-		glm::vec3 lightSourcePos = glm::vec3(
+		// 1) Draws light source
+		glm::vec3 lightColor{ 0.8f, 0.8f, 1.f };
+		glm::vec3 orbitPosition = glm::vec3(
 			std::cos((float) glfwGetTime()),
 			std::cos((float) glfwGetTime()) * std::sin((float) glfwGetTime()),
 			std::sin((float) glfwGetTime())) * 2.f;
 
 		glm::mat4 sourceModel(1.0f);
-		sourceModel = glm::translate(sourceModel, lightSourcePos);
+		sourceModel = glm::translate(sourceModel, orbitPosition);
 		sourceModel = glm::scale(sourceModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
 		lightSourceShader.Use();
@@ -127,18 +126,18 @@ int main() {
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
+		// 2) Draws lit object
 		glm::mat4 litModel(1.0f);
 		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
 		litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		litModel = glm::rotate(litModel, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		phongShader.Use();
-		phongShader.SetMatrix("model", litModel);
-		phongShader.SetMatrix("view", camera.GetView());
-		phongShader.SetMatrix("projection", camera.GetProjection());
-		phongShader.SetVector3("objectColor", glm::vec3(0.2f, 0.35f, 1.f));
-		phongShader.SetVector3("lightColor", lightColor);
-		phongShader.SetVector3("lightPos", lightSourcePos);
-		phongShader.SetVector3("viewPos", camera.GetPosition());
+		lightingShader.Use();
+		lightingShader.SetMatrix("model", litModel);
+		lightingShader.SetMatrix("view", camera.GetView());
+		lightingShader.SetMatrix("projection", camera.GetProjection());
+		lightingShader.SetVector3("objectColor", glm::vec3(0.2f, 0.35f, 1.f));
+		lightingShader.SetVector3("lightColor", lightColor);
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

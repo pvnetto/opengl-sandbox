@@ -85,8 +85,8 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong.frag");
+	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong_view.vert",
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/07_phong_view.frag");
 
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
@@ -109,8 +109,9 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightColor{ 1.f, 0.8f, 0.6f };
-		glm::vec3 lightSourcePos = glm::vec3(
+		glm::vec3 litObjectPos {0.0f, 1.f, 0.f};
+		glm::vec3 lightColor{ 0.8f, 0.8f, 1.f };
+		glm::vec3 lightSourcePos = litObjectPos + glm::vec3(
 			std::cos((float) glfwGetTime()),
 			std::cos((float) glfwGetTime()) * std::sin((float) glfwGetTime()),
 			std::sin((float) glfwGetTime())) * 2.f;
@@ -123,13 +124,16 @@ int main() {
 		lightSourceShader.SetMatrix("model", sourceModel);
 		lightSourceShader.SetMatrix("view", camera.GetView());
 		lightSourceShader.SetMatrix("projection", camera.GetProjection());
+		lightSourceShader.SetVector3("lightPosWorld", lightSourcePos);
 		lightSourceShader.SetVector3("lightColor", lightColor);
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glm::mat4 litModel(1.0f);
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		litModel = glm::translate(litModel, litObjectPos);
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		phongShader.Use();
 		phongShader.SetMatrix("model", litModel);
@@ -137,8 +141,6 @@ int main() {
 		phongShader.SetMatrix("projection", camera.GetProjection());
 		phongShader.SetVector3("objectColor", glm::vec3(0.2f, 0.35f, 1.f));
 		phongShader.SetVector3("lightColor", lightColor);
-		phongShader.SetVector3("lightPos", lightSourcePos);
-		phongShader.SetVector3("viewPos", camera.GetPosition());
 
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);

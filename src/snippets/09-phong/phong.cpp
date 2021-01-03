@@ -109,7 +109,7 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glm::vec3 lightColor{ 1.f, 0.8f, 0.6f };
+		glm::vec3 lightColor{ 0.8f, 0.8f, 1.f };
 		glm::vec3 lightSourcePos = glm::vec3(
 			std::cos((float) glfwGetTime()),
 			std::cos((float) glfwGetTime()) * std::sin((float) glfwGetTime()),
@@ -128,8 +128,9 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glm::mat4 litModel(1.0f);
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-		litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		// litModel = glm::rotate(litModel, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		phongShader.Use();
 		phongShader.SetMatrix("model", litModel);

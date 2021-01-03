@@ -15,6 +15,10 @@ void FreeCameraController::HandleKeyboardInput(GLFWwindow *window, float deltaTi
 		moveDirection = -m_camera->GetRight();
 	} else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		moveDirection = m_camera->GetRight();
+	} else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		moveDirection = m_camera->GetUp();
+	} else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		moveDirection = -m_camera->GetUp();
 	}
 
 	m_camera->AddPosition(moveDirection * m_moveSpeed * deltaTime);

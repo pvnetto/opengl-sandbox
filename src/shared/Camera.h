@@ -14,6 +14,8 @@ public:
     glm::vec3 GetRight() const;
     glm::vec3 GetUp() const;
 
+    glm::vec3 GetPosition() const { return m_position; }
+
     void SetPosition(glm::vec3 position) { m_position = position; }
     void SetRotation(glm::vec3 newRotation);
 
