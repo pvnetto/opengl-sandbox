@@ -1,3 +1,5 @@
+// Emission maps will output colors regardless of light conditions,
+// that is, they don't need to be lit to output a color
 #version 330 core
 
 struct Material {

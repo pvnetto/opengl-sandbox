@@ -36,54 +36,6 @@ Camera camera(
 
 FreeCameraController camController(camera, 4.5f);
 
-struct DirectionalLight {
-	glm::vec3 Direction;
-	glm::vec3 Color;
-
-	DirectionalLight(glm::vec3 direction, glm::vec3 color)
-	    : Direction(direction),
-	      Color(color) {}
-};
-
-struct PointLight {
-	glm::vec3 Position;
-	glm::vec3 Color;
-
-	float ConstantAttenuation;
-	float LinearAttenuation;
-	float QuadraticAttenuation;
-
-	PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic)
-	    : Position(position),
-	      Color(color),
-	      ConstantAttenuation(constant),
-	      LinearAttenuation(linear),
-	      QuadraticAttenuation(quadratic) {}
-};
-
-struct SpotLight {
-	glm::vec3 Position;
-	glm::vec3 Direction;
-	glm::vec3 Color;
-
-	float ConstantAttenuation;
-	float LinearAttenuation;
-	float QuadraticAttenuation;
-
-	float CutoffAngle;
-	float ShadowSmoothAngle;
-
-	SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float constant, float linear, float quadratic, float cutoff, float smoothing)
-	    : Position(position),
-		  Direction(direction),
-	      Color(color),
-	      ConstantAttenuation(constant),
-	      LinearAttenuation(linear),
-	      QuadraticAttenuation(quadratic),
-		  CutoffAngle(cutoff),
-		  ShadowSmoothAngle(smoothing) {}
-};
-
 int main() {
 	int width = 800, height = 600;
 
@@ -134,7 +86,7 @@ int main() {
 	glBindVertexArray(0);
 
 	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/11_multiple_lights.frag");
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/10_spotlight.frag");
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	                         "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
 	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
@@ -158,49 +110,20 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		SpotLight spotlight {
-			{ 0.f, 5.f, 0.f },
-			{ 0.f, -1.f, 0.f },
-			{ 0.8f, 0.3f, 0.2f },
-			1.0f, 0.09f, 0.032f,
-			30.0f, 6.0f 
-		};
-
-		glm::mat4 spotlightModel(1.0f);
-		spotlightModel = glm::translate(spotlightModel, spotlight.Position);
-		spotlightModel = glm::scale(spotlightModel, glm::vec3(0.3f, 0.3f, 0.3f));
+		glm::vec3 lightColor{1.f, 0.8f, 0.6f};
+		glm::vec3 lightSourcePos{0.f, 5.f, 0.f};
+		glm::vec3 lightSourceDir {0.f, -1.f, 0.f};
+		glm::mat4 sourceModel(1.0f);
+		sourceModel = glm::translate(sourceModel, lightSourcePos);
+		sourceModel = glm::scale(sourceModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
 		lightSourceShader.Use();
-		lightSourceShader.SetMatrix("model", spotlightModel);
+		lightSourceShader.SetMatrix("model", sourceModel);
 		lightSourceShader.SetMatrix("view", camera.GetView());
 		lightSourceShader.SetMatrix("projection", camera.GetProjection());
-		lightSourceShader.SetVector3("lightColor", spotlight.Color);
+		lightSourceShader.SetVector3("lightColor", lightColor);
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-
-		PointLight pointLight {
-			{ 0.0f, 2.0f, 3.f },
-			{ 1.f, 0.8f, 0.6f },
-			1.f, 0.09f, 0.032f
-		};
-
-		glm::mat4 pointLightModel(1.0f);
-		pointLightModel = glm::translate(pointLightModel, pointLight.Position);
-		pointLightModel = glm::scale(pointLightModel, glm::vec3(0.3f, 0.3f, 0.3f));
-
-		lightSourceShader.Use();
-		lightSourceShader.SetMatrix("model", pointLightModel);
-		lightSourceShader.SetMatrix("view", camera.GetView());
-		lightSourceShader.SetMatrix("projection", camera.GetProjection());
-		lightSourceShader.SetVector3("lightColor", pointLight.Color);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		std::vector<DirectionalLight> directionalLights {
-			DirectionalLight{ glm::normalize(glm::vec3{ 0.0f, -0.5f, 0.3f }), { 1.f, 0.8f, 0.6f } },
-			DirectionalLight{ glm::normalize(glm::vec3{ 0.0f, -0.5f, -0.3f }), { 0.3f, 0.8f, 0.3f } }	
-		};
 
 		phongShader.Use();
 
@@ -211,26 +134,14 @@ int main() {
 		phongShader.SetFloat("material.specularStrength", 1.f);
 		phongShader.SetFloat("material.shininess", 32.f);
 
-		phongShader.SetVector3("spotlight.color", spotlight.Color);
-		phongShader.SetVector3("spotlight.position", spotlight.Position);
-		phongShader.SetVector3("spotlight.direction", spotlight.Direction);
-		phongShader.SetFloat("spotlight.constantAttenuation", spotlight.ConstantAttenuation);
-		phongShader.SetFloat("spotlight.linearAttenuation", spotlight.LinearAttenuation);
-		phongShader.SetFloat("spotlight.quadraticAttenuation", spotlight.QuadraticAttenuation);
-		phongShader.SetFloat("spotlight.cutoffAngle", glm::radians(spotlight.CutoffAngle));
-		phongShader.SetFloat("spotlight.shadowSmoothAngle", glm::radians(spotlight.ShadowSmoothAngle));
-
-		phongShader.SetVector3("pointLight.color", pointLight.Color);
-		phongShader.SetVector3("pointLight.position", pointLight.Position);
-		phongShader.SetFloat("pointLight.constantAttenuation", pointLight.ConstantAttenuation);
-		phongShader.SetFloat("pointLight.linearAttenuation", pointLight.LinearAttenuation);
-		phongShader.SetFloat("pointLight.quadraticAttenuation", pointLight.QuadraticAttenuation);
-
-		for(int i = 0; i < directionalLights.size(); i++) {
-			std::string idxStr = std::to_string(i);
-			phongShader.SetVector3("directionalLights[" + idxStr + "].color", directionalLights[i].Color);
-			phongShader.SetVector3("directionalLights[" + idxStr + "].direction", directionalLights[i].Direction);
-		}
+		phongShader.SetVector3("light.color", lightColor);
+		phongShader.SetVector3("light.position", lightSourcePos);
+		phongShader.SetVector3("light.direction", lightSourceDir);
+		phongShader.SetFloat("light.constantAttenuation", 1.f);
+		phongShader.SetFloat("light.linearAttenuation", 0.09f);
+		phongShader.SetFloat("light.quadraticAttenuation", 0.032f);
+		phongShader.SetFloat("light.cutoffAngle", 30.f);
+		phongShader.SetFloat("light.shadowSmoothAngle", 6.f);
 
 		phongShader.SetVector3("viewPos", camera.GetPosition());
 		phongShader.SetFloat("time", (float) glfwGetTime());
