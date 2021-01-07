@@ -87,8 +87,8 @@ int main() {
 
 	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/10_directional_light.frag");
-	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
-	Texture2D::LoadTexture(GL_TEXTURE1, "../../src/assets/container_specular.png");
+	Texture2D::LoadTexture(0, "../../src/assets/container.png");
+	Texture2D::LoadTexture(1, "../../src/assets/container_specular.png");
 
 	glEnable(GL_DEPTH_TEST);
 

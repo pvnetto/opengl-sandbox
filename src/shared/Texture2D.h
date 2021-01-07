@@ -4,5 +4,5 @@
 
 class Texture2D {
 public:
-	static void LoadTexture(const int textureUnit, const std::string &path);
+	static int LoadTexture(const int textureUnit, const std::string &path);
 };

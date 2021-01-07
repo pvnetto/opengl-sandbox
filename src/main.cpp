@@ -4,7 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-
 #include "shared/Texture2D.h"
 #include "shared/Camera.h"
 #include "shared/FreeCameraController.h"
@@ -52,6 +51,8 @@ struct PointLight {
 	float ConstantAttenuation;
 	float LinearAttenuation;
 	float QuadraticAttenuation;
+
+	PointLight() { }
 
 	PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic)
 	    : Position(position),
@@ -110,35 +111,14 @@ int main() {
 
 	glViewport(0, 0, width, height);
 
-	auto verticesVec = PrimitiveShape::Cube();
-	float *vertices = verticesVec.data();
-
-	unsigned int vao, vbo;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, verticesVec.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(5 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	unsigned int diffuseTex = Texture2D::LoadTexture(0, "../../src/assets/container.png");
+	unsigned int specularTex = Texture2D::LoadTexture(1, "../../src/assets/container_specular.png");
+	Mesh mesh{ PrimitiveShape::Cube(), std::vector<unsigned int>(), { diffuseTex, specularTex } };
 
 	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/11_multiple_lights.frag");
+	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/12_default.frag");
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	                         "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
-	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
-	Texture2D::LoadTexture(GL_TEXTURE1, "../../src/assets/container_specular.png");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -158,32 +138,12 @@ int main() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		SpotLight spotlight {
-			{ 0.f, 5.f, 0.f },
-			{ 0.f, -1.f, 0.f },
-			{ 0.8f, 0.3f, 0.2f },
-			1.0f, 0.09f, 0.032f,
-			30.0f, 6.0f 
-		};
-
-		glm::mat4 spotlightModel(1.0f);
-		spotlightModel = glm::translate(spotlightModel, spotlight.Position);
-		spotlightModel = glm::scale(spotlightModel, glm::vec3(0.3f, 0.3f, 0.3f));
-
-		lightSourceShader.Use();
-		lightSourceShader.SetMatrix("model", spotlightModel);
-		lightSourceShader.SetMatrix("view", camera.GetView());
-		lightSourceShader.SetMatrix("projection", camera.GetProjection());
-		lightSourceShader.SetVector3("lightColor", spotlight.Color);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-
-		PointLight pointLight {
-			{ 0.0f, 2.0f, 3.f },
-			{ 1.f, 0.8f, 0.6f },
-			1.f, 0.09f, 0.032f
-		};
+		PointLight pointLight;
+		pointLight.Position = { 0.0f, 2.0f, 3.f };
+		pointLight.Color = { 1.f, 0.8f, 0.6f };
+		pointLight.ConstantAttenuation = 1.f;
+		pointLight.LinearAttenuation = 0.09f;
+		pointLight.QuadraticAttenuation = 0.032f;
 
 		glm::mat4 pointLightModel(1.0f);
 		pointLightModel = glm::translate(pointLightModel, pointLight.Position);
@@ -194,16 +154,9 @@ int main() {
 		lightSourceShader.SetMatrix("view", camera.GetView());
 		lightSourceShader.SetMatrix("projection", camera.GetProjection());
 		lightSourceShader.SetVector3("lightColor", pointLight.Color);
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-
-		std::vector<DirectionalLight> directionalLights {
-			DirectionalLight{ glm::normalize(glm::vec3{ 0.0f, -0.5f, 0.3f }), { 1.f, 0.8f, 0.6f } },
-			DirectionalLight{ glm::normalize(glm::vec3{ 0.0f, -0.5f, -0.3f }), { 0.3f, 0.8f, 0.3f } }	
-		};
+		mesh.Draw(lightSourceShader);
 
 		phongShader.Use();
-
 		phongShader.SetInt("material.diffuseMap", 0);
 		phongShader.SetInt("material.specularMap", 1);
 		phongShader.SetFloat("material.ambientStrength", 0.1f);
@@ -211,26 +164,11 @@ int main() {
 		phongShader.SetFloat("material.specularStrength", 1.f);
 		phongShader.SetFloat("material.shininess", 32.f);
 
-		phongShader.SetVector3("spotlight.color", spotlight.Color);
-		phongShader.SetVector3("spotlight.position", spotlight.Position);
-		phongShader.SetVector3("spotlight.direction", spotlight.Direction);
-		phongShader.SetFloat("spotlight.constantAttenuation", spotlight.ConstantAttenuation);
-		phongShader.SetFloat("spotlight.linearAttenuation", spotlight.LinearAttenuation);
-		phongShader.SetFloat("spotlight.quadraticAttenuation", spotlight.QuadraticAttenuation);
-		phongShader.SetFloat("spotlight.cutoffAngle", glm::radians(spotlight.CutoffAngle));
-		phongShader.SetFloat("spotlight.shadowSmoothAngle", glm::radians(spotlight.ShadowSmoothAngle));
-
 		phongShader.SetVector3("pointLight.color", pointLight.Color);
 		phongShader.SetVector3("pointLight.position", pointLight.Position);
 		phongShader.SetFloat("pointLight.constantAttenuation", pointLight.ConstantAttenuation);
 		phongShader.SetFloat("pointLight.linearAttenuation", pointLight.LinearAttenuation);
 		phongShader.SetFloat("pointLight.quadraticAttenuation", pointLight.QuadraticAttenuation);
-
-		for(int i = 0; i < directionalLights.size(); i++) {
-			std::string idxStr = std::to_string(i);
-			phongShader.SetVector3("directionalLights[" + idxStr + "].color", directionalLights[i].Color);
-			phongShader.SetVector3("directionalLights[" + idxStr + "].direction", directionalLights[i].Direction);
-		}
 
 		phongShader.SetVector3("viewPos", camera.GetPosition());
 		phongShader.SetFloat("time", (float) glfwGetTime());
@@ -247,8 +185,7 @@ int main() {
 			phongShader.SetMatrix("view", camera.GetView());
 			phongShader.SetMatrix("projection", camera.GetProjection());
 
-			glBindVertexArray(vao);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			mesh.Draw(phongShader);
 		}
 
 		// === Swaps buffers ===

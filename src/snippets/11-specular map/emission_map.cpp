@@ -91,9 +91,9 @@ int main() {
 	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
 	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
 
-	Texture2D::LoadTexture(GL_TEXTURE0, "../../src/assets/container.png");
-	Texture2D::LoadTexture(GL_TEXTURE1, "../../src/assets/container_specular.png");
-	Texture2D::LoadTexture(GL_TEXTURE2, "../../src/assets/matrix.jpg");
+	Texture2D::LoadTexture(0, "../../src/assets/container.png");
+	Texture2D::LoadTexture(1, "../../src/assets/container_specular.png");
+	Texture2D::LoadTexture(2, "../../src/assets/matrix.jpg");
 
 	glEnable(GL_DEPTH_TEST);
 
