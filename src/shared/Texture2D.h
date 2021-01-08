@@ -1,8 +1,22 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
-class Texture2D {
+struct Texture {
+	unsigned int ID;
+	std::string Path;
+
+	Texture() {}
+	Texture(unsigned int id, std::string path)
+	    : ID(id),
+	      Path(path) { }
+};
+
+class TextureLoader {
 public:
-	static int LoadTexture(const int textureUnit, const std::string &path);
+	Texture LoadTexture(const std::string &path, const int textureUnit=0);
+
+private:
+	static std::vector<Texture> s_loadedTextures;
 };

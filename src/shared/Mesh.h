@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Shader.h"
+#include "Texture2D.h"
 
 // Defining vertices as structs is useful to take advantage of the 'offsetof' macro
 struct Vertex {
@@ -22,9 +23,9 @@ class Mesh {
 public:
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
-    std::vector<unsigned int> m_textures;
+    std::vector<Texture> m_textures;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<unsigned int> textures );
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures );
 
     void Draw(Shader& shader);
 

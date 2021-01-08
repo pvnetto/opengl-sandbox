@@ -4,19 +4,31 @@
 #include <glad/glad.h>
 #include "stb_image.h"
 
-int Texture2D::LoadTexture(const int index, const std::string& path) {
-	// 4) Loads textures
+std::vector<Texture> TextureLoader::s_loadedTextures = std::vector<Texture>();
+
+Texture TextureLoader::LoadTexture(const std::string& path, const int index) {
+	for(int i = 0; i < s_loadedTextures.size(); i++) {
+		if(std::strcmp(s_loadedTextures[i].Path.data(), path.c_str()) == 0) {
+			return s_loadedTextures[i];
+		}
+	}
+
 	int texWidth, texHeight, numOfChannels;
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *texData = stbi_load(path.c_str(), &texWidth, &texHeight, &numOfChannels, 0);
 
-
 	if (!texData) {
 		std::cout << "Couldn't load texture\n";
-		return 0;
+		return Texture{ 0, "" };
 	}
 
-	auto colorMode = path.find(".png") == std::string::npos ? GL_RGB : GL_RGBA; 
+	auto colorMode = GL_RGB;
+	if(numOfChannels == 1)
+		colorMode = GL_R;
+	else if(numOfChannels == 3)
+		colorMode = GL_RGB;
+	else if(numOfChannels == 4)
+		colorMode = GL_RGBA;
 
 	unsigned int tex;
 	glGenTextures(1, &tex);
@@ -31,5 +43,8 @@ int Texture2D::LoadTexture(const int index, const std::string& path) {
 
 	stbi_image_free(texData);
 
-	return tex;
+	Texture texture {tex, path};
+	s_loadedTextures.push_back(texture);
+
+	return texture;
 }

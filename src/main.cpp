@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-#include "shared/Texture2D.h"
+#include "shared/Model.h"
 #include "shared/Camera.h"
 #include "shared/FreeCameraController.h"
 #include "shared/Primitive.h"
@@ -29,8 +29,8 @@ float lastFrame = 0;
 float deltaTime = 0;
 
 Camera camera(
-	glm::vec3(-4.6f, 6.7f, 5.12f),
-	glm::vec3(-41.f, -49.f, 0.f),
+	glm::vec3(-3.8f, 1.3f, 6.2f),
+	glm::vec3(-8.f, -46.5f, 0.f),
 	glm::vec3(0.f, 1.f, 0.f));
 
 FreeCameraController camController(camera, 4.5f);
@@ -111,14 +111,15 @@ int main() {
 
 	glViewport(0, 0, width, height);
 
-	unsigned int diffuseTex = Texture2D::LoadTexture(0, "../../src/assets/container.png");
-	unsigned int specularTex = Texture2D::LoadTexture(1, "../../src/assets/container_specular.png");
-	Mesh mesh{ PrimitiveShape::Cube(), std::vector<unsigned int>(), { diffuseTex, specularTex } };
+	TextureLoader textureLoader;
+	Texture diffuseTex = textureLoader.LoadTexture("../../src/assets/container.png", 0);
+	Texture specularTex = textureLoader.LoadTexture("../../src/assets/container_specular.png", 1);
 
-	Shader phongShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/09_specular_map.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/12_default.frag");
-	Shader lightSourceShader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/05_vertex_mvp.vert",
-	                         "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/06_frag_light_source.frag");
+	Mesh cubeMesh { PrimitiveShape::Cube(), std::vector<unsigned int>(), { diffuseTex, specularTex } };
+	Model backpackModel { "../../src/assets/backpack/backpack.obj" };
+
+	Shader phongShader("../../src/shaders/09_specular_map.vert", "../../src/shaders/12_default.frag");
+	Shader lightSourceShader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_light_source.frag");
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -139,7 +140,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		PointLight pointLight;
-		pointLight.Position = { 0.0f, 2.0f, 3.f };
+		pointLight.Position = { 0.0f, 2.0f, 7.f };
 		pointLight.Color = { 1.f, 0.8f, 0.6f };
 		pointLight.ConstantAttenuation = 1.f;
 		pointLight.LinearAttenuation = 0.09f;
@@ -154,9 +155,14 @@ int main() {
 		lightSourceShader.SetMatrix("view", camera.GetView());
 		lightSourceShader.SetMatrix("projection", camera.GetProjection());
 		lightSourceShader.SetVector3("lightColor", pointLight.Color);
-		mesh.Draw(lightSourceShader);
+		cubeMesh.Draw(lightSourceShader);
 
+		glm::mat4 model {1.0f};
+		model = glm::translate(model, glm::vec3(0.0f, 0.f, 3.f));
 		phongShader.Use();
+		phongShader.SetMatrix("model", model);
+		phongShader.SetMatrix("view", camera.GetView());
+		phongShader.SetMatrix("projection", camera.GetProjection());
 		phongShader.SetInt("material.diffuseMap", 0);
 		phongShader.SetInt("material.specularMap", 1);
 		phongShader.SetFloat("material.ambientStrength", 0.1f);
@@ -173,20 +179,7 @@ int main() {
 		phongShader.SetVector3("viewPos", camera.GetPosition());
 		phongShader.SetFloat("time", (float) glfwGetTime());
 
-		int boxCount = 25;
-		int rowSize = 5;
-		float gridSize = 1.2f;
-		for(int i = 0; i < boxCount; i++) {
-			glm::mat4 litModel(1.0f);
-			int rowIdx = (i / rowSize) - (rowSize / 2);
-			int colIdx = (i % rowSize) - (rowSize / 2);
-			litModel = glm::translate(litModel, glm::vec3(rowIdx * gridSize, 0.f, colIdx * gridSize));
-			phongShader.SetMatrix("model", litModel);
-			phongShader.SetMatrix("view", camera.GetView());
-			phongShader.SetMatrix("projection", camera.GetProjection());
-
-			mesh.Draw(phongShader);
-		}
+		backpackModel.Draw(phongShader);
 
 		// === Swaps buffers ===
 		glfwPollEvents();

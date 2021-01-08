@@ -3,7 +3,8 @@ set(SANDBOX_SOURCES
 		shared/Camera.cpp
 		shared/FreeCameraController.cpp
 		shared/Texture2D.cpp
-		shared/Mesh.cpp)
+		shared/Mesh.cpp
+		shared/Model.cpp)
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 

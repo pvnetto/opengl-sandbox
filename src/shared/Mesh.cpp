@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<unsigned int> textures)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures)
     : m_vertices(vertices),
       m_indices(indices),
       m_textures(textures) {
@@ -47,7 +47,7 @@ void Mesh::Draw(Shader &shader) {
 
         shader.SetInt("material.texture" + std::to_string(i), i);
 
-        glBindTexture(GL_TEXTURE_2D, m_textures[i]);
+        glBindTexture(GL_TEXTURE_2D, m_textures[i].ID);
     }
 
     // resets active texture unit to 0 (default)
