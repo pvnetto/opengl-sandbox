@@ -9,6 +9,8 @@
 #include "shared/FreeCameraController.h"
 #include "shared/Primitive.h"
 #include "shared/Shader.h"
+#include "shared/Light.h"
+#include "shared/Window.h"
 
 void OnWindowResize(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -35,81 +37,8 @@ Camera camera(
 
 FreeCameraController camController(camera, 4.5f);
 
-struct DirectionalLight {
-	glm::vec3 Direction;
-	glm::vec3 Color;
-
-	DirectionalLight(glm::vec3 direction, glm::vec3 color)
-	    : Direction(direction),
-	      Color(color) {}
-};
-
-struct PointLight {
-	glm::vec3 Position;
-	glm::vec3 Color;
-
-	float ConstantAttenuation;
-	float LinearAttenuation;
-	float QuadraticAttenuation;
-
-	PointLight() { }
-
-	PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic)
-	    : Position(position),
-	      Color(color),
-	      ConstantAttenuation(constant),
-	      LinearAttenuation(linear),
-	      QuadraticAttenuation(quadratic) {}
-};
-
-struct SpotLight {
-	glm::vec3 Position;
-	glm::vec3 Direction;
-	glm::vec3 Color;
-
-	float ConstantAttenuation;
-	float LinearAttenuation;
-	float QuadraticAttenuation;
-
-	float CutoffAngle;
-	float ShadowSmoothAngle;
-
-	SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float constant, float linear, float quadratic, float cutoff, float smoothing)
-	    : Position(position),
-		  Direction(direction),
-	      Color(color),
-	      ConstantAttenuation(constant),
-	      LinearAttenuation(linear),
-	      QuadraticAttenuation(quadratic),
-		  CutoffAngle(cutoff),
-		  ShadowSmoothAngle(smoothing) {}
-};
-
 int main() {
-	int width = 800, height = 600;
-
-	glfwInit();
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow *m_window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL);
-	if (!m_window) {
-		std::cout << "Failed to create an OpenGL window :(\n";
-		glfwTerminate();
-		return -1;
-	}
-
-	glfwMakeContextCurrent(m_window);
-	glfwSetFramebufferSizeCallback(m_window, OnWindowResize);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize Glad :(\n";
-		return -1;
-	}
-
-	glViewport(0, 0, width, height);
+	Window window;
 
 	TextureLoader textureLoader;
 	Texture diffuseTex = textureLoader.LoadTexture("../../src/assets/container.png", 0);
@@ -120,20 +49,20 @@ int main() {
 
 	Shader phongShader("../../src/shaders/09_specular_map.vert", "../../src/shaders/12_default.frag");
 	Shader lightSourceShader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_light_source.frag");
-
-	glEnable(GL_DEPTH_TEST);
-
-	glfwSetCursorPosCallback(m_window, UpdateMousePos);
 	
-	while (!glfwWindowShouldClose(m_window)) {
+	glViewport(0, 0, window.GetWidth(), window.GetHeight());
+	glEnable(GL_DEPTH_TEST);
+	glfwSetCursorPosCallback(window.GetNativeWindow(), UpdateMousePos);
+
+	while (!glfwWindowShouldClose(window.GetNativeWindow())) {
 		// Calculates delta time
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		// === Processes inputs ===
-		HandleWindowInput(m_window);
-		camController.HandleKeyboardInput(m_window, deltaTime);
+		HandleWindowInput(window.GetNativeWindow());
+		camController.HandleKeyboardInput(window.GetNativeWindow(), deltaTime);
 
 		// === Rendering ===
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
@@ -183,7 +112,7 @@ int main() {
 
 		// === Swaps buffers ===
 		glfwPollEvents();
-		glfwSwapBuffers(m_window);
+		glfwSwapBuffers(window.GetNativeWindow());
 	}
 
 	glfwTerminate();

@@ -16,7 +16,7 @@ Reproduzir esse fenômeno de forma realista é computacionalmente caro, por isso
 
 O modelo mais básico de iluminação possui 3 componentes: **ambiente**, **difuso** e **especular**, e é conhecido como **modelo Phong**. Modelos mais complexos possuem mais componentes, porém são mais complexos de implementar e exigem mais poder computacional.
 
-Em geral, esses modelos **são implementados no fragment shader**, porém também é possível fazê-los diretamente no vertex shader. Quando calculado no vertex shader*, o modelo deixa de ser Phong e passa a ser chamado de Goraud.
+Em geral, esses modelos **são implementados no fragment shader**, porém também é possível fazê-los diretamente no vertex shader. Quando calculado no vertex shader, o modelo deixa de ser Phong e passa a ser chamado de Goraud.
 
 
 ### Ambiente
