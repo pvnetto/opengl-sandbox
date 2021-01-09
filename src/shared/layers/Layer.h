@@ -1,6 +1,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+class Window;
+class Event;
 
 class Layer {
 public:
@@ -11,6 +15,7 @@ public:
 	virtual void OnDettach() {}
 	virtual void OnUpdate() {}
 	virtual void OnImGuiRender() {}
+	virtual void OnEvent(Event& evt) {}
 
 	inline const std::string &GetName() const { return m_name; }
 

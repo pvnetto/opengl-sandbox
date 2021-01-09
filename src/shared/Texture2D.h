@@ -15,7 +15,7 @@ struct Texture {
 
 class TextureLoader {
 public:
-	Texture LoadTexture(const std::string &path, const int textureUnit=0);
+	static Texture LoadTexture(const std::string &path, const int textureUnit=0);
 
 private:
 	static std::vector<Texture> s_loadedTextures;

@@ -5,6 +5,7 @@
 
 class Camera {
 public:
+    Camera() {}
 	Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up);
 
     glm::mat4 GetView() const;

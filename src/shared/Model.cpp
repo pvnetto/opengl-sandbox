@@ -79,12 +79,11 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene) {
 
 std::vector<Texture> Model::LoadMaterialTextures(aiMaterial *mat, aiTextureType type) {
     std::vector<Texture> textures;
-    TextureLoader loader;
     for(unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString path;
         mat->GetTexture(type, i, &path);
 
-        textures.push_back(loader.LoadTexture(m_directory + "/" + path.C_Str()));
+        textures.push_back(TextureLoader::LoadTexture(m_directory + "/" + path.C_Str()));
     }
 
     return textures;

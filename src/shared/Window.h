@@ -1,5 +1,9 @@
 #pragma once
 
+#include "layers/Layer.h"
+#include "Event.h"
+
+#include <functional>
 #include <GLFW/glfw3.h>
 #include <string>
 
@@ -13,15 +17,26 @@ struct WindowProps {
 
 class Window {
 public:
+    using EventCallbackFn = std::function<void(Event &)>;
+
     Window(const WindowProps &props = WindowProps());
     ~Window();
 
     void OnUpdate();
+    void HandleEvent(Event& evt);
 
     inline int GetWidth() { return m_windowData.Width; }
     inline int GetHeight() { return m_windowData.Height; }
 
     GLFWwindow* GetNativeWindow() { return m_window; }
+
+    void AttachLayer(Layer* layer);
+    void DettachLayer(Layer* layer);
+
+    std::vector<Layer*> m_layers;
+
+    float lastFrame = 0;
+    static float deltaTime;
 
 private:
     void Init(const WindowProps& props);
@@ -31,8 +46,13 @@ private:
     struct WindowData {
         std::string Title;
         unsigned int Width, Height;
+        EventCallbackFn EventCallback;
+
+        // Mouse state
+        glm::vec2 LastMousePos;
+        bool MouseFirstMove = true;
     };
 
     GLFWwindow* m_window;
-    WindowData m_windowData; 
+    WindowData m_windowData;
 };

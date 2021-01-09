@@ -11,10 +11,7 @@
 #include "shared/Shader.h"
 #include "shared/Light.h"
 #include "shared/Window.h"
-
-void OnWindowResize(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
+#include "shared/layers/CameraLayer.h"
 
 void HandleWindowInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -22,29 +19,19 @@ void HandleWindowInput(GLFWwindow *window) {
 	}
 }
 
-void UpdateMousePos(GLFWwindow* window, double mouseX, double mouseY);
-
-glm::vec2 mousePos;
-bool firstMouseMove = true;
-
-float lastFrame = 0;
-float deltaTime = 0;
-
-Camera camera(
-	glm::vec3(-3.8f, 1.3f, 6.2f),
-	glm::vec3(-8.f, -46.5f, 0.f),
-	glm::vec3(0.f, 1.f, 0.f));
-
-FreeCameraController camController(camera, 4.5f);
-
 int main() {
 	Window window;
+	CameraLayer* cameraLayer = new CameraLayer(glm::vec3(-3.8f, 1.3f, 6.2f),
+	                                   glm::vec3(-8.f, -46.5f, 0.f),
+	                                   glm::vec3(0.f, 1.f, 0.f));
+	window.AttachLayer(cameraLayer);
 
-	TextureLoader textureLoader;
-	Texture diffuseTex = textureLoader.LoadTexture("../../src/assets/container.png", 0);
-	Texture specularTex = textureLoader.LoadTexture("../../src/assets/container_specular.png", 1);
+	std::vector<Texture> textures = {
+		TextureLoader::LoadTexture("../../src/assets/container.png", 0),
+		TextureLoader::LoadTexture("../../src/assets/container_specular.png", 1)
+	};
 
-	Mesh cubeMesh { PrimitiveShape::Cube(), std::vector<unsigned int>(), { diffuseTex, specularTex } };
+	Mesh cubeMesh { PrimitiveShape::Cube(), std::vector<unsigned int>(), textures };
 	Model backpackModel { "../../src/assets/backpack/backpack.obj" };
 
 	Shader phongShader("../../src/shaders/09_specular_map.vert", "../../src/shaders/12_default.frag");
@@ -52,17 +39,13 @@ int main() {
 	
 	glViewport(0, 0, window.GetWidth(), window.GetHeight());
 	glEnable(GL_DEPTH_TEST);
-	glfwSetCursorPosCallback(window.GetNativeWindow(), UpdateMousePos);
 
 	while (!glfwWindowShouldClose(window.GetNativeWindow())) {
 		// Calculates delta time
-		float currentFrame = (float)glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
+		window.OnUpdate();
 
 		// === Processes inputs ===
 		HandleWindowInput(window.GetNativeWindow());
-		camController.HandleKeyboardInput(window.GetNativeWindow(), deltaTime);
 
 		// === Rendering ===
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
@@ -81,8 +64,8 @@ int main() {
 
 		lightSourceShader.Use();
 		lightSourceShader.SetMatrix("model", pointLightModel);
-		lightSourceShader.SetMatrix("view", camera.GetView());
-		lightSourceShader.SetMatrix("projection", camera.GetProjection());
+		lightSourceShader.SetMatrix("view", cameraLayer->GetCamera().GetView());
+		lightSourceShader.SetMatrix("projection", cameraLayer->GetCamera().GetProjection());
 		lightSourceShader.SetVector3("lightColor", pointLight.Color);
 		cubeMesh.Draw(lightSourceShader);
 
@@ -90,8 +73,8 @@ int main() {
 		model = glm::translate(model, glm::vec3(0.0f, 0.f, 3.f));
 		phongShader.Use();
 		phongShader.SetMatrix("model", model);
-		phongShader.SetMatrix("view", camera.GetView());
-		phongShader.SetMatrix("projection", camera.GetProjection());
+		phongShader.SetMatrix("view", cameraLayer->GetCamera().GetView());
+		phongShader.SetMatrix("projection", cameraLayer->GetCamera().GetProjection());
 		phongShader.SetInt("material.diffuseMap", 0);
 		phongShader.SetInt("material.specularMap", 1);
 		phongShader.SetFloat("material.ambientStrength", 0.1f);
@@ -105,7 +88,7 @@ int main() {
 		phongShader.SetFloat("pointLight.linearAttenuation", pointLight.LinearAttenuation);
 		phongShader.SetFloat("pointLight.quadraticAttenuation", pointLight.QuadraticAttenuation);
 
-		phongShader.SetVector3("viewPos", camera.GetPosition());
+		phongShader.SetVector3("viewPos", cameraLayer->GetCamera().GetPosition());
 		phongShader.SetFloat("time", (float) glfwGetTime());
 
 		backpackModel.Draw(phongShader);
@@ -117,18 +100,4 @@ int main() {
 
 	glfwTerminate();
 	return 0;
-}
-
-void UpdateMousePos(GLFWwindow* window, double mouseX, double mouseY) {
-	if(firstMouseMove) {
-		mousePos = glm::vec2(mouseX, mouseY);
-		firstMouseMove = false;
-		return;
-	}
-
-	glm::vec2 newMousePos(mouseX, mouseY);
-	glm::vec2 mouseDelta (newMousePos.x - mousePos.x, mousePos.y - newMousePos.y);
-	mousePos = newMousePos;
-
-	camController.HandleMouseInput(window, mouseDelta, deltaTime);
 }
