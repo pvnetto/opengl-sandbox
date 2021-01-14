@@ -14,12 +14,12 @@ int main() {
 	window.AttachLayer(new LOGL_02_EBO());
 
 	glViewport(0, 0, window.GetWidth(), window.GetHeight());
-	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);	// Depth testing should be enabled when rendering 3D objects
 
 	while (!glfwWindowShouldClose(window.GetNativeWindow())) {
 		// === Rendering ===
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Depth buffer should be cleared when rendering 3D objects
 
 		// === Update ===
 		window.OnUpdate();

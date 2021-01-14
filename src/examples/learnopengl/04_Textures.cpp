@@ -6,13 +6,13 @@
 #include <iostream>
 
 void LOGL_04_Textures::OnAttach() {
-	// 0) Declares VAO and VBOs + attributes
+	// 0) Declares vertex data with UVs
 	float verticesA[] = {
-	    // Triangle 1
-	    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // left
-	    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // right
-	    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,   // top-right
-	    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,  // top-left
+	    // Coordinates              // UVs
+	    -0.5f, -0.5f, 0.0f,         0.0f, 0.0f,
+	    0.5f, -0.5f, 0.0f,          1.0f, 0.0f,
+	    0.5f, 0.5f, 0.0f,           1.0f, 1.0f,
+	    -0.5f, 0.5f, 0.0f,          0.0f, 1.0f,
 	};
 
 	unsigned int indices[] = {
