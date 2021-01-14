@@ -6,6 +6,8 @@
 #include "examples/learnopengl/02_EBO.h"
 #include "examples/learnopengl/02_VAO.h"
 #include "examples/learnopengl/02_VBO.h"
+#include "examples/learnopengl/03_Shaders.h"
+#include "examples/learnopengl/04_Textures.h"
 #include "examples/learnopengl/13_Meshes.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
@@ -22,6 +24,8 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
     ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO, "02 - VBO");
     ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO, "02 - VAO");
     ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO, "02 - EBO");
+    ADD_SIMPLE(LearnOpenGL, LOGL_03_Shaders, "03 - Shaders with uniforms");
+    ADD_SIMPLE(LearnOpenGL, LOGL_04_Textures, "04 - Textures");
     ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes, "13 - Meshes");
 }
 

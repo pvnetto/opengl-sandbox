@@ -1,55 +1,18 @@
+#include "04_Textures.h"
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <stb_image.h>
 #include <iostream>
 
-#include "stb_image.h"
-
-#include "shared/Shader.h"
-
-void OnWindowResize(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
-
-void HandleWindowInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-}
-
-int main() {
-
-	int width = 800, height = 600;
-
-	glfwInit();
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL);
-	if (!window) {
-		std::cout << "Failed to create an OpenGL window :(\n";
-		glfwTerminate();
-		return -1;
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, OnWindowResize);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize Glad :(\n";
-		return -1;
-	}
-
-	glViewport(0, 0, width, height);
-
+void LOGL_04_Textures::OnAttach() {
 	// 0) Declares VAO and VBOs + attributes
 	float verticesA[] = {
 	    // Triangle 1
-	    -0.5f, -0.5f, 0.0f, 		0.0f, 0.0f, 	// left
-	    0.5f, -0.5f, 0.0f, 			1.0f, 0.0f,  	// right
-	    0.5f, 0.5f, 0.0f, 			1.0f, 1.0f,   	// top-right
-	    -0.5f, 0.5f, 0.0f, 			0.0f, 1.0f,  	// top-left
+	    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // left
+	    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // right
+	    0.5f, 0.5f, 0.0f, 1.0f, 1.0f,   // top-right
+	    -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,  // top-left
 	};
 
 	unsigned int indices[] = {
@@ -57,12 +20,12 @@ int main() {
 	    2, 3, 0,
 	};
 
-	unsigned int vao, vbo, ebo;
-	glGenVertexArrays(1, &vao);
+	unsigned int vbo, ebo;
+	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &vbo);
 	glGenBuffers(1, &ebo);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesA), verticesA, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
 
@@ -80,8 +43,7 @@ int main() {
 	glBindVertexArray(0);
 
 	// 3) Declares shader program
-	Shader shader("C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/03_vertex_tex.vert",
-	              "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/src/shaders/03_frag_tex.frag");
+	m_shader = Shader("../../src/shaders/03_vertex_tex.vert", "../../src/shaders/03_frag_tex.frag");
 
 	// 4) Loads textures
 	int texWidth, texHeight, numOfChannels;
@@ -107,7 +69,7 @@ int main() {
 
 	// Loads another texture
 	int tex2Width, tex2Height, tex2Channels;
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(true);     // BEWARE: Y coordinates are flipped on OpenGL, so textures must be flipped 
 	unsigned char *tex2Data = stbi_load("../../src/assets/yps.png", &tex2Width, &tex2Height, &tex2Channels, 0);
 
 	if (!tex2Data) {
@@ -126,29 +88,13 @@ int main() {
 	glGenerateMipmap(tex2);
 
 	stbi_image_free(tex2Data);
+}
 
-	while (!glfwWindowShouldClose(window)) {
-		// === Processes inputs ===
-		HandleWindowInput(window);
+void LOGL_04_Textures::OnUpdate() {
+	m_shader.Use();
+	m_shader.SetInt("tex", 0);
+	m_shader.SetInt("anotherTex", 1);
 
-		// === Rendering ===
-		glClearColor(0.5f, 0.2f, 0.1f, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// 5) Use shader program, bind VAO and draw the triangle
-		shader.Use();
-		shader.SetFloat("horizontalOffset", std::sin(glfwGetTime()) * 1.0f);
-		shader.SetInt("tex", 0);
-		shader.SetInt("anotherTex", 1);
-
-		glBindVertexArray(vao);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-
-		// === Swaps buffers ===
-		glfwPollEvents();
-		glfwSwapBuffers(window);
-	}
-
-	glfwTerminate();
-	return 0;
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }
