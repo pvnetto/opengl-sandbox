@@ -17,14 +17,21 @@ Window::Window(const WindowProps &props) {
 
 	Init(props);
 	m_imGuiLayer = new ImGuiLayer();
-	AttachLayer(m_imGuiLayer);
-	AttachLayer(new ExampleGUILayer());
+	m_imGuiLayer->OnAttach();
+
+	m_exampleLayer = new ExampleGUILayer();
+	m_exampleLayer->OnAttach();
 }
 
 Window::~Window() {
 	Shutdown();
 	for (auto layer : m_layers)
 		delete layer;
+	
+	delete m_imGuiLayer;
+	m_imGuiLayer = nullptr;
+	delete m_exampleLayer;
+	m_exampleLayer = nullptr;
 }
 
 void Window::Init(const WindowProps &props) {
@@ -99,9 +106,12 @@ void Window::OnUpdate() {
 
 	if (m_imGuiLayer) {
 		m_imGuiLayer->Begin();
+
+		m_exampleLayer->OnImGuiRender();
 		for (int i = 0; i < m_layers.size(); i++) {
 			m_layers[i]->OnImGuiRender();
 		}
+		
 		m_imGuiLayer->End();
 	}
 
@@ -138,9 +148,6 @@ void Window::DettachLayer(Layer *layer) {
 		(dettached)->OnDettach();
 		m_layers.erase(it);
 
-		if (dettached == m_imGuiLayer)
-			m_imGuiLayer = nullptr;
-
 		delete dettached;
 	}
 }
@@ -153,10 +160,6 @@ void Window::Reset() {
 	while (m_layers.size() > 0) {
 		DettachLayer(m_layers[0]);
 	}
-
-	m_imGuiLayer = new ImGuiLayer();
-	AttachLayer(m_imGuiLayer);
-	AttachLayer(new ExampleGUILayer());
 }
 
 void Window::HandleEvent(Event &evt) {

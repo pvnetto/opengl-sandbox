@@ -11,7 +11,9 @@ set(SANDBOX_SOURCES
 		shared/layers/ExampleGUILayer.cpp
 		shared/ImGui/ImGuiLayer.cpp
 		shared/ImGui/ImGuiBuild.cpp
+		examples/learnopengl/02_VBO.cpp
 		examples/learnopengl/02_EBO.cpp
+		examples/learnopengl/02_VAO.cpp
 		examples/learnopengl/13_Meshes.cpp)
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})

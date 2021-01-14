@@ -4,10 +4,14 @@
 
 #include "shared/Window.h"
 #include "examples/learnopengl/02_EBO.h"
+#include "examples/learnopengl/02_VAO.h"
+#include "examples/learnopengl/02_VBO.h"
 #include "examples/learnopengl/13_Meshes.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {BookOfShaders, "Book Of Shaders"}, {Trigonometry, "Trigonometry"}, {Matrices, "Matrices"}};
+
+#define ADD_SIMPLE(category, type, name) m_examples[category].push_back(std::make_shared<SimpleExample<type>>(name))
 
 ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	m_examples.emplace(LearnOpenGL, std::vector<std::shared_ptr<Example>>());
@@ -15,14 +19,13 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
     m_examples.emplace(Trigonometry, std::vector<std::shared_ptr<Example>>());
     m_examples.emplace(Matrices, std::vector<std::shared_ptr<Example>>());
 
-	m_examples[LearnOpenGL].push_back(std::make_shared<SimpleExample<LOGL_02_EBO>>("02 - EBO"));
-    m_examples[LearnOpenGL].push_back(std::make_shared<SimpleExample<LOGL_13_Meshes>>("13 - Meshes"));
+    ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO, "02 - VBO");
+    ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO, "02 - VAO");
+    ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO, "02 - EBO");
+    ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes, "13 - Meshes");
 }
 
 void ExampleGUILayer::OnImGuiRender() {
-	static bool show = true;
-	ImGui::ShowDemoWindow(&show);
-
 	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
 
 	for (int i = 0; i < CategoryCount; i++) {

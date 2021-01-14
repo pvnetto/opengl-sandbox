@@ -63,6 +63,7 @@ private:
     GLFWwindow* m_window;
     WindowData m_windowData;
     ImGuiLayer* m_imGuiLayer;
+    Layer* m_exampleLayer;
 
     float lastFrame = 0;
     float m_deltaTime = 0;
