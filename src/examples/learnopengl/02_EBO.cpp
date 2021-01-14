@@ -1,45 +1,11 @@
+#include "02_EBO.h"
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
 
-void OnWindowResize(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
-}
-
-void HandleWindowInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-}
-
-int main() {
-
-	int width = 800, height = 600;
-
-	glfwInit();
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL);
-	if (!window) {
-		std::cout << "Failed to create an OpenGL window :(\n";
-		glfwTerminate();
-		return -1;
-	}
-
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, OnWindowResize);
-
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize Glad :(\n";
-		return -1;
-	}
-
-	glViewport(0, 0, width, height);
-
-	// 0) Declares VAO and VBOs + attributes
+void LOGL_02_EBO::OnAttach() {
+    // === 0) Declares VAO and VBOs + attributes
 	float vertices[] = {
         0.5f, 0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
@@ -52,7 +18,6 @@ int main() {
         1, 2, 3         // Triangle 2
     };
 
-	unsigned int vao, vbo, ebo;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
@@ -78,7 +43,7 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	// 1) Declares and compiles vertex shaders
+	// === 1) Declares and compiles vertex shaders
 	std::string vertexShaderSource = "";
 	vertexShaderSource += "#version 330 core\n";
 	vertexShaderSource += "layout (location = 0) in vec3 aPosition;\n";
@@ -99,10 +64,10 @@ int main() {
 		char info[512];
 		glGetShaderInfoLog(vertexShader, 512, NULL, info);
 		std::cout << "Failed to compile vertex shader: " << info << "\n";
-		return -1;
+		return;
 	}
 
-	// 2) Declares and compiles fragment shaders
+	// === 2) Declares and compiles fragment shaders
 	std::string fragmentShaderSrc = "";
 	fragmentShaderSrc += "#version 330 core\n";
 	fragmentShaderSrc += "out vec4 fragmentColor;\n";
@@ -124,50 +89,36 @@ int main() {
 		char info[512];
 		glGetShaderInfoLog(fragmentShader, 512, NULL, info);
 		std::cout << "Failed to compile fragment shader: " << info << "\n";
-		return -1;
+		return;
 	}
 
-	// 3) Declares shader program
-	int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+	// === 3) Declares shader program
+	m_shaderProgram = glCreateProgram();
+	glAttachShader(m_shaderProgram, vertexShader);
+	glAttachShader(m_shaderProgram, fragmentShader);
+	glLinkProgram(m_shaderProgram);
 
 	// (OPTIONAL) Check for program errors
 	int programSuccess;
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &programSuccess);
+	glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &programSuccess);
 
 	if (!programSuccess) {
 		char info[512];
-		glGetProgramInfoLog(shaderProgram, 512, NULL, info);
+		glGetProgramInfoLog(m_shaderProgram, 512, NULL, info);
 		std::cout << "Failed to link shader program: " << info << "\n";
-		return -1;
+		return;
 	}
 
 	// (OPTIONAL) Deletes all shaders included in shader program
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+}
 
-	while (!glfwWindowShouldClose(window)) {
-		// === Processes inputs ===
-		HandleWindowInput(window);
+void LOGL_02_EBO::OnUpdate() {
+    // === 4) Use shader program, bind VAO and draw the triangle
+    glUseProgram(m_shaderProgram);
+    glBindVertexArray(vao);
 
-		// === Rendering ===
-		glClearColor(0.5f, 0.2f, 0.1f, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// 4) Use shader program, bind VAO and draw the triangle
-		glUseProgram(shaderProgram);
-		glBindVertexArray(vao);
-
-        // glDrawElements is used for VAOs with element array buffers
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
-
-		// === Swaps buffers ===
-		glfwPollEvents();
-		glfwSwapBuffers(window);
-	}
-
-	glfwTerminate();
-	return 0;
+    // glDrawElements is used for VAOs with element array buffers
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

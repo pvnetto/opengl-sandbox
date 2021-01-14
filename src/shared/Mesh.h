@@ -25,6 +25,7 @@ public:
     std::vector<unsigned int> m_indices;
     std::vector<Texture> m_textures;
 
+    Mesh() = default;
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures );
 
     void Draw(Shader& shader);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "layers/Layer.h"
+#include "ImGui/ImGuiLayer.h"
 #include "Event.h"
 
 #include <functional>
@@ -17,6 +18,10 @@ struct WindowProps {
 
 class Window {
 public:
+    static Window* s_instance;
+
+    std::vector<Layer*> m_layers;
+
     using EventCallbackFn = std::function<void(Event &)>;
 
     Window(const WindowProps &props = WindowProps());
@@ -25,22 +30,24 @@ public:
     void OnUpdate();
     void HandleEvent(Event& evt);
 
+    inline float DeltaTime() { return m_deltaTime; }
     inline int GetWidth() { return m_windowData.Width; }
     inline int GetHeight() { return m_windowData.Height; }
 
     GLFWwindow* GetNativeWindow() { return m_window; }
 
     void AttachLayer(Layer* layer);
+    void AttachLayer(std::vector<Layer*> layers);
     void DettachLayer(Layer* layer);
+    
+    void ScheduleReset(std::vector<Layer*> layers);
 
-    std::vector<Layer*> m_layers;
-
-    float lastFrame = 0;
-    static float deltaTime;
+	inline static Window* Get() { return s_instance; }
 
 private:
     void Init(const WindowProps& props);
     void Shutdown();
+    void Reset();
 
 private:
     struct WindowData {
@@ -55,4 +62,10 @@ private:
 
     GLFWwindow* m_window;
     WindowData m_windowData;
+    ImGuiLayer* m_imGuiLayer;
+
+    float lastFrame = 0;
+    float m_deltaTime = 0;
+
+    std::vector<Layer*> m_newLayers;
 };

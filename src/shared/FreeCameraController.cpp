@@ -31,7 +31,7 @@ void FreeCameraController::HandleEvent(Event &evt) {
 		if (m_moving) {
 			// x, y are inverted for rotation
 			glm::vec3 rotationDelta = glm::vec3(mouseEvt->MouseDelta().y, mouseEvt->MouseDelta().x, 0.f);
-			m_camera->AddRotation(rotationDelta * ROTATION_SPEED * Window::deltaTime);
+			m_camera->AddRotation(rotationDelta * ROTATION_SPEED * Window::Get()->DeltaTime());
 		}
 
 		evt.m_handled = true;

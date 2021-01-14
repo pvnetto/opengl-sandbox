@@ -1,7 +1,5 @@
 #include "CameraLayer.h"
 
-#include "shared/Window.h"
-
 #include <functional>
 
 CameraLayer::CameraLayer(glm::vec3 position, glm::vec3 rotationEuler, glm::vec3 up) : Layer("Camera Layer") {

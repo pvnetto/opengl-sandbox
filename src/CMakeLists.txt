@@ -7,13 +7,19 @@ set(SANDBOX_SOURCES
 		shared/Model.cpp
 		shared/Window.cpp
 		shared/layers/Layer.cpp
-		shared/layers/CameraLayer.cpp)
+		shared/layers/CameraLayer.cpp
+		shared/layers/ExampleGUILayer.cpp
+		shared/ImGui/ImGuiLayer.cpp
+		shared/ImGui/ImGuiBuild.cpp
+		examples/learnopengl/02_EBO.cpp
+		examples/learnopengl/13_Meshes.cpp)
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
 target_link_libraries(Sandbox glm)
+target_link_libraries(Sandbox imgui)
 target_link_libraries(Sandbox opengl32)
 target_link_libraries(Sandbox assimp)
 target_link_libraries(Sandbox stb)
@@ -25,6 +31,7 @@ target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include
 )

@@ -1,22 +1,30 @@
 #include "Window.h"
+#include "shared/layers/ExampleGUILayer.h"
+
 #include <glad/glad.h>
 #include <iostream>
+#include <algorithm>
 
 static bool s_GLFWInitialized = false;
-float Window::deltaTime = 0;
+Window *Window::s_instance = nullptr;
 
 static void GLFWErrorCallback(int error, const char *description) {
 	std::cout << "::ERROR::GLFW::" << description << "\n";
 }
 
 Window::Window(const WindowProps &props) {
+	s_instance = this;
+
 	Init(props);
+	m_imGuiLayer = new ImGuiLayer();
+	AttachLayer(m_imGuiLayer);
+	AttachLayer(new ExampleGUILayer());
 }
 
 Window::~Window() {
+	Shutdown();
 	for (auto layer : m_layers)
 		delete layer;
-	Shutdown();
 }
 
 void Window::Init(const WindowProps &props) {
@@ -49,9 +57,9 @@ void Window::Init(const WindowProps &props) {
 
 	glfwSetCursorPosCallback(m_window, [](GLFWwindow *window, double mouseX, double mouseY) {
 		WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
-		
+
 		glm::vec2 mousePos = glm::vec2(mouseX, mouseY);
-		if(data.MouseFirstMove) {
+		if (data.MouseFirstMove) {
 			data.LastMousePos = mousePos;
 			data.MouseFirstMove = false;
 		}
@@ -88,9 +96,29 @@ void Window::Shutdown() {
 void Window::OnUpdate() {
 	for (Layer *layer : m_layers)
 		layer->OnUpdate();
+
+	if (m_imGuiLayer) {
+		m_imGuiLayer->Begin();
+		for (int i = 0; i < m_layers.size(); i++) {
+			m_layers[i]->OnImGuiRender();
+		}
+		m_imGuiLayer->End();
+	}
+
 	float currentFrame = (float)glfwGetTime();
-	deltaTime = currentFrame - lastFrame;
+	m_deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+
+	if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(m_window, true);
+	}
+
+	// Quick hack to make resetting work
+	if(m_newLayers.size() > 0) {
+		Reset();
+		AttachLayer(m_newLayers);
+		m_newLayers.clear();
+	}
 }
 
 void Window::AttachLayer(Layer *layer) {
@@ -98,12 +126,37 @@ void Window::AttachLayer(Layer *layer) {
 	layer->OnAttach();
 }
 
+void Window::AttachLayer(std::vector<Layer *> layers) {
+	for (auto layer : layers)
+		AttachLayer(layer);
+}
+
 void Window::DettachLayer(Layer *layer) {
 	auto it = std::find(m_layers.begin(), m_layers.end(), layer);
 	if (it != m_layers.end()) {
+		Layer *dettached = *it;
+		(dettached)->OnDettach();
 		m_layers.erase(it);
-		(*it)->OnDettach();
+
+		if (dettached == m_imGuiLayer)
+			m_imGuiLayer = nullptr;
+
+		delete dettached;
 	}
+}
+
+void Window::ScheduleReset(std::vector<Layer*> layers) {
+	m_newLayers = layers;
+}
+
+void Window::Reset() {
+	while (m_layers.size() > 0) {
+		DettachLayer(m_layers[0]);
+	}
+
+	m_imGuiLayer = new ImGuiLayer();
+	AttachLayer(m_imGuiLayer);
+	AttachLayer(new ExampleGUILayer());
 }
 
 void Window::HandleEvent(Event &evt) {
