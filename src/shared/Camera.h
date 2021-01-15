@@ -15,7 +15,8 @@ public:
     glm::vec3 GetRight() const;
     glm::vec3 GetUp() const;
 
-    glm::vec3 GetPosition() const { return m_position; }
+    glm::vec3& GetPosition() { return m_position; }
+    glm::vec3 GetRotationEuler() { return m_rotationEuler; }
 
     void SetPosition(glm::vec3 position) { m_position = position; }
     void SetRotation(glm::vec3 newRotation);
@@ -23,8 +24,8 @@ public:
     void AddRotation(glm::vec3 rotationDelta);
     void AddPosition(glm::vec3 positionDelta) { m_position += positionDelta; }
 
-    void SetOrthographic(float width, float height, float near, float far);
     void SetPerspective(float fieldOfView, float aspectRatio, float near, float far);
+    void SetOrthographic(float sizeX, float sizeY, float near, float far);
     
 private:
     glm::vec3 m_position;

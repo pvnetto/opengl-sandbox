@@ -47,3 +47,15 @@ public:
 	MouseButtonReleasedEvent(int button) : MouseButtonEvent(button) {}
 	virtual std::string GetName() { return "MouseButtonReleased"; }
 };
+
+
+class KeyPressedEvent : public Event {
+public:
+	KeyPressedEvent(int button) : m_button(button) { }
+	virtual std::string GetName() { return "KeyPressedEvent"; }
+	int GetKey() { return m_button; }
+
+private:
+	int m_button;
+
+};

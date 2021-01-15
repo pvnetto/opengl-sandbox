@@ -4,8 +4,6 @@
 #include "shared/Texture2D.h"
 #include "shared/Window.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -32,7 +30,7 @@ void LOGL_06_MVP::OnUpdate() {
 	m_shader.SetInt("tex", 0);
 	m_shader.SetInt("anotherTex", 1);
 
-	// 3) Creates model matrix
+	// 1) Creates model matrix
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_position);
 	model = glm::rotate(model, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -40,16 +38,16 @@ void LOGL_06_MVP::OnUpdate() {
 	model = glm::rotate(model, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, m_scale);
 
-	// 4) Creates view matrix
+	// 2) Creates view matrix
 	glm::mat4 view(1.0f);
 	view = glm::translate(view, -m_cameraPosition);
 
-	// 5) Creates projection matrix
+	// 3) Creates projection matrix
 	glm::mat4 projection(1.0f);
 	float aspectRatio = Window::Get()->GetWidth() / Window::Get()->GetHeight(), near = 0.1f, far = 100.f;
 	projection = glm::perspective(m_fov, aspectRatio, near, far);
 
-	// 6) Passes MVP matrices as uniforms to shader
+	// 4) Passes MVP matrices as uniforms to shader
 	m_shader.SetMatrix("model", model);
 	m_shader.SetMatrix("view", view);
 	m_shader.SetMatrix("projection", projection);

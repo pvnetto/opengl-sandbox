@@ -12,7 +12,7 @@ struct WindowProps {
 	std::string Title;
 	int Width, Height;
 
-	WindowProps(const std::string &title = "OpenGL Sandbox", int width = 800, int height = 600)
+	WindowProps(const std::string &title = "OpenGL Sandbox", int width = 1280, int height = 720)
 	    : Title(title), Width(width), Height(height) {}
 };
 

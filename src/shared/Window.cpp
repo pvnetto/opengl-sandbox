@@ -90,6 +90,23 @@ void Window::Init(const WindowProps &props) {
 		}
 	});
 
+	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mod) {
+		WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+
+		switch(action) {
+		case GLFW_PRESS:
+			data.EventCallback(KeyPressedEvent(key));
+			break;
+		case GLFW_RELEASE:
+			break;
+		case GLFW_REPEAT:
+			data.EventCallback(KeyPressedEvent(key));
+			break;
+		default:
+			break;
+		}
+	});
+
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize Glad :(\n";
 		return;

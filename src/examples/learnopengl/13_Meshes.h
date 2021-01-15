@@ -14,7 +14,7 @@ public:
     virtual void OnUpdate() override;
 	virtual void OnEvent(Event& evt) override;
 
-	const Camera& GetCamera() { return m_camera; }
+	Camera& GetCamera() { return m_camera; }
 
 protected:
 	Camera m_camera;

@@ -1,11 +1,8 @@
 #include "05_Transform.h"
 
 #include "shared/Texture2D.h"
-
 #include "shared/Primitive.h"
-
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <iostream>
 
 void LOGL_05_Transform::OnAttach() {

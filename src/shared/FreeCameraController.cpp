@@ -5,24 +5,25 @@
 
 FreeCameraController::FreeCameraController(Camera &camera, float speed) : m_camera(&camera), m_moveSpeed(speed) {}
 
-void FreeCameraController::HandleKeyboardInput(float deltaTime) {
+void FreeCameraController::HandleKeyboardInput() {
 	glm::vec3 moveDirection(0, 0, 0);
 
-	// if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-	// 	moveDirection = m_camera->GetForward();
-	// } else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-	// 	moveDirection = -m_camera->GetForward();
-	// } else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-	// 	moveDirection = -m_camera->GetRight();
-	// } else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-	// 	moveDirection = m_camera->GetRight();
-	// } else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-	// 	moveDirection = m_camera->GetUp();
-	// } else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-	// 	moveDirection = -m_camera->GetUp();
-	// }
+	auto window = Window::Get()->GetNativeWindow();
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		moveDirection = m_camera->GetForward();
+	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		moveDirection = -m_camera->GetForward();
+	} else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		moveDirection = -m_camera->GetRight();
+	} else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		moveDirection = m_camera->GetRight();
+	} else if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		moveDirection = m_camera->GetUp();
+	} else if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		moveDirection = -m_camera->GetUp();
+	}
 
-	m_camera->AddPosition(moveDirection * m_moveSpeed * deltaTime);
+	m_camera->AddPosition(moveDirection * m_moveSpeed * Window::Get()->DeltaTime());
 }
 
 void FreeCameraController::HandleEvent(Event &evt) {
@@ -36,13 +37,13 @@ void FreeCameraController::HandleEvent(Event &evt) {
 
 		evt.m_handled = true;
 	}
-	if (MouseButtonPressedEvent *pressedEvt = dynamic_cast<MouseButtonPressedEvent *>(&evt)) {
+	else if (MouseButtonPressedEvent *pressedEvt = dynamic_cast<MouseButtonPressedEvent *>(&evt)) {
 		if (pressedEvt->GetMouseButton() == GLFW_MOUSE_BUTTON_2) {
 			m_moving = true;
 			evt.m_handled = true;
 		}
 	}
-	if (MouseButtonReleasedEvent *releasedEvt = dynamic_cast<MouseButtonReleasedEvent *>(&evt)) {
+	else if (MouseButtonReleasedEvent *releasedEvt = dynamic_cast<MouseButtonReleasedEvent *>(&evt)) {
 		if (releasedEvt->GetMouseButton() == GLFW_MOUSE_BUTTON_2) {
 			m_moving = false;
 			evt.m_handled = true;

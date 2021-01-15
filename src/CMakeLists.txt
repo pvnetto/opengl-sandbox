@@ -18,6 +18,9 @@ set(SANDBOX_SOURCES
 		examples/learnopengl/04_Textures.cpp
 		examples/learnopengl/05_Transform.cpp
 		examples/learnopengl/06_MVP.cpp
+		examples/learnopengl/07_Camera.cpp
+		examples/learnopengl/08_Lighting.cpp
+		examples/learnopengl/09_Phong.cpp
 		examples/learnopengl/13_Meshes.cpp)
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})

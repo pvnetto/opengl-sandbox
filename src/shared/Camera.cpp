@@ -37,8 +37,10 @@ glm::vec3 Camera::GetUp() const {
 }
 
 void Camera::SetRotation(glm::vec3 newRotation) {
-	m_rotationEuler = newRotation;
-	UpdateDirection();
+	if(m_rotationEuler != newRotation) {
+		m_rotationEuler = newRotation;
+		UpdateDirection();
+	}
 }
 
 void Camera::AddRotation(glm::vec3 rotationDelta) {
@@ -57,10 +59,17 @@ void Camera::UpdateDirection() {
 	m_forward = glm::normalize(m_forward);
 }
 
-void Camera::SetOrthographic(float width, float height, float near, float far) {
-	m_projection = glm::ortho(glm::radians(0.0f), width, 0.0f, height, near, far);
-}
 
+/// <summary>
+/// Defines a irregular-shaped box frustrum, with sense of depth just like human vision. Check "Basics - Transforms" for more.
+/// </summary>
 void Camera::SetPerspective(float fieldOfView, float aspectRatio, float near, float far) {
 	m_projection = glm::perspective(glm::radians(fieldOfView), aspectRatio, near, far);
+}
+
+/// <summary>
+/// Defines a box-sized frustrum with no sense of depth. Check "Basics - Transforms" for more.
+/// </summary>
+void Camera::SetOrthographic(float sizeX, float sizeY, float near, float far) {
+	m_projection = glm::ortho(-sizeX, sizeX, -sizeY, sizeY, near, far);
 }

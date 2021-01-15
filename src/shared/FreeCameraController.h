@@ -7,10 +7,9 @@ public:
     FreeCameraController() {}
     FreeCameraController(Camera& camera, float speed);
 
-    void HandleKeyboardInput(float deltaTime);
-
     void OnUpdate();
     void HandleEvent(Event& evt);
+    void HandleKeyboardInput();
 
 private:
     Camera* m_camera;
