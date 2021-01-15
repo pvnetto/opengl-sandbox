@@ -12,6 +12,9 @@
 #include "examples/learnopengl/07_Camera.h"
 #include "examples/learnopengl/08_Lighting.h"
 #include "examples/learnopengl/09_Phong.h"
+#include "examples/learnopengl/10_Material.h"
+#include "examples/learnopengl/11_Specular_Map.h"
+#include "examples/learnopengl/11_Emission_Map.h"
 #include "examples/learnopengl/13_Meshes.h"
 #include "shared/Window.h"
 
@@ -36,6 +39,9 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(LearnOpenGL, LOGL_07_Camera, "07 - Camera");
 	ADD_SIMPLE(LearnOpenGL, LOGL_08_Lighting, "08 - Basic Lighting");
 	ADD_SIMPLE(LearnOpenGL, LOGL_09_Phong, "09 - Phong Shading");
+	ADD_SIMPLE(LearnOpenGL, LOGL_10_Material, "10 - Materials");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_SpecularMap, "11 - Specular Map");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_EmissionMap, "11 - Emission Map");
 	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes, "13 - Meshes");
 }
 

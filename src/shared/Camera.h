@@ -3,6 +3,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+struct PerspectiveProps {
+    float FOV = 90.f, Near = 0.1f, Far = 100.f;
+};
+
+struct OrthographicProps {
+    float Near = 0.1f, Far = 100.f, Size = 4.f;
+};
+
 class Camera {
 public:
     Camera() {}
