@@ -1,19 +1,45 @@
 # Iluminação
 
-## Tipos de luz
-
-### Direcional
-
-### Point
-
-### Spotlight
-
-
-## Phong
-Na vida real, um fóton (partícula de luz) ricocheteia numa cena até que seja totalmente absorvido, fazendo com que **atinja vários objetos de forma indireta**. Cada vez que atinge um objeto, este absorve um pouco da luz, o que afeta a forma como nós, humanos, o visualizamos, pois a cor da luz se mistura com a do objeto, e essa mistura depende de vários fatores, como a taxa de absorção/refração do material etc. Esse efeito ricochete é o que torna **difícil um objeto ser totalmente escuro**, pois eventualmente alguns fótons acabam atingindo-o, mesmo que sejam poucos.
+Na iluminação baseada em física, um fóton (partícula de luz) ricocheteia nos objetos até que seja totalmente absorvido, fazendo com que **atinja vários objetos de forma indireta**. Cada vez que atinge um objeto, este absorve um pouco da luz, o que afeta a forma como nós, humanos, o visualizamos, pois a cor da luz se mistura com a do objeto, e essa mistura depende de vários fatores, como a taxa de absorção/refração do material, quais partículas o compõem etc. Esse efeito ricochete é o que torna **difícil um objeto ser totalmente escuro**, pois eventualmente alguns fótons acabam atingindo-o, mesmo que sejam poucos.
 
 Reproduzir esse fenômeno de forma realista é computacionalmente caro, por isso na computação gráfica fazemos **modelos de iluminação**, que são **aproximações do modelo físico da vida real**.
 
+## Tipos de luz
+No mundo real, fontes de luz podem se comportar de forma diferente dependendo do objeto que está emitindo a luz. Apesar da física dos fótons ser igual para toda luz, alguns objetos possuem propriedades especiais que fazem com que eles emitam luz de forma diferente. Ex: O sol é um objeto enorme, muito distante da terra e bastante luminoso, então os raios de luz vindos dele sempre incidem na mesma direção. Já a luz do seu quarto é um objeto pequeno e com alcance limitado, logo os fótons não viajam tanto e a direção dos fótons dependem do objeto iluminado.
+
+Na computação gráfica, essas nuances do mundo real são modeladas por fontes de luz que se comportam de forma diferente, para que a simulação seja mais próxima ao modelo físico realista. Então apesar de todas as fontes de luz contribuírem da mesma forma para a cor final, suas propriedades são simuladas para que os raios de luz se comportem de forma parecida com o mundo real.  
+
+Temos então 3 tipos principais de fontes de luz:
+
+### Direcional
+Todos os raios de luz vindos de uma luz direcional **incidem na mesma direção, independente da posição da fonte de luz ou do observador**, isto é, eles são praticamente paralelos. Esse modelo de fonte de luz é **semelhante ao sol**, isto é, uma **fonte de luz global que ilumina toda a cena**.
+
+
+### Pontual
+A luz pontual é uma fonte de luz que **ilumina em todas as direções a partir de uma posição**. Modela objetos comuns como **lâmpadas, torchas etc**. Diferente da luz direcional que não tem posição, a luz pontual tem algumas complexidades extra, como **atenuação** e **direção dependente do observador**. 
+
+**Atenuação**:
+**Reduz a intensidade da luz dependendo da distância entre a fonte e o objeto iluminado**. A atenuação é dada pela fórmula
+
+```
+attenuation = 1 / kC + kL * d + Kq * d^2
+
+d = distância entre objeto e fonte de luz
+kC = fator constante de atenuação (geralmente tem valor 1)
+kL = fator da distância linear
+Kd = fator da distância quadrática
+```
+
+Isso significa que valores mais altos de kL e Kd farão com que a intensidade da luz diminua mais rápido dependendo da distância. Como kL multiplica o fator linear, em geral a **intensidade será linear para distâncias pequenas até que o fator quadrático supere o linear**, e então a intensidade decairá bem mais rápido.
+
+
+### Spotlight
+Assim como a pontual, **ilumina a partir de uma posição e possui atenuação**. No entanto, **emite luz apenas na direção/raio especificados**, e não em todas as direções. O raio da spotlight geralmente é dado por um ângulo, então **pode ser vista como um cone**. Esse tipo de luz modela objetos como **lanternas, postes de luz, holofotes etc**.
+
+Geralmente objetos que não estão dentro do raio da spotlight não recebem nenhuma luz, o que faz com que as **suas bordas sejam naturalmente mais grosseiras**. Para diminuir esse problema, geralmente **define-se um outro ângulo**, permitindo a definição de um raio exterior, onde **fragmentos tem uma sombra suave**, fazendo um efeito de penumbra.
+
+
+## Phong
 O modelo mais básico de iluminação possui 3 componentes: **ambiente**, **difuso** e **especular**, e é conhecido como **modelo Phong**. Modelos mais complexos possuem mais componentes, porém são mais complexos de implementar e exigem mais poder computacional.
 
 Em geral, esses modelos **são implementados no fragment shader**, porém também é possível fazê-los diretamente no vertex shader. Quando calculado no vertex shader, o modelo deixa de ser Phong e passa a ser chamado de Goraud.
