@@ -70,6 +70,6 @@ void LOGL_08_Lighting::OnImGuiRender() {
 
 
     ImGui::Begin("Info");
-    ImGui::Text("This example contains only solid colors. Object color is multiplied by light color, there are no shadows.");
+    ImGui::TextWrapped("This example contains only solid colors. Object color is multiplied by light color, there are no shadows.");
     ImGui::End();
 }

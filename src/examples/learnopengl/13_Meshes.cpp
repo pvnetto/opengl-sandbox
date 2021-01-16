@@ -28,6 +28,8 @@ void LOGL_13_Meshes::OnAttach() {
 }
 
 void LOGL_13_Meshes::OnUpdate() {
+	m_controller.HandleKeyboardInput();
+
 	PointLight pointLight;
 	pointLight.Position = {0.0f, 2.0f, 7.f};
 	pointLight.Color = {1.f, 0.8f, 0.6f};

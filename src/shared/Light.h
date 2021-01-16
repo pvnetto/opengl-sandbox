@@ -6,6 +6,7 @@ struct DirectionalLight {
 	glm::vec3 Direction;
 	glm::vec3 Color;
 
+	DirectionalLight() = default;
 	DirectionalLight(glm::vec3 direction, glm::vec3 color)
 	    : Direction(direction),
 	      Color(color) {}
@@ -19,7 +20,7 @@ struct PointLight {
 	float LinearAttenuation;
 	float QuadraticAttenuation;
 
-	PointLight() { }
+	PointLight() = default;
 
 	PointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic)
 	    : Position(position),
@@ -41,6 +42,7 @@ struct SpotLight {
 	float CutoffAngle;
 	float ShadowSmoothAngle;
 
+	SpotLight() = default;
 	SpotLight(glm::vec3 position, glm::vec3 direction, glm::vec3 color, float constant, float linear, float quadratic, float cutoff, float smoothing)
 	    : Position(position),
 		  Direction(direction),

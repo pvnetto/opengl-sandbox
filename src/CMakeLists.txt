@@ -24,6 +24,10 @@ set(SANDBOX_SOURCES
 		examples/learnopengl/10_Material.cpp
 		examples/learnopengl/11_Specular_Map.cpp
 		examples/learnopengl/11_Emission_Map.cpp
+		examples/learnopengl/12_DirectionalLight.cpp
+		examples/learnopengl/12_PointLight.cpp
+		examples/learnopengl/12_SpotLight.cpp
+		examples/learnopengl/12_MultipleLights.cpp
 		examples/learnopengl/13_Meshes.cpp)
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
