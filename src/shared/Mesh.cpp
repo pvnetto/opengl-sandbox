@@ -40,6 +40,7 @@ void Mesh::initializeMesh() {
 }
 
 void Mesh::Draw(Shader &shader) {
+    shader.Use();
     // binds textures to uniformes
     // assumes all textures are declared on material struct, with naming convention textureN
     for(int i = 0; i < m_textures.size(); i++) {

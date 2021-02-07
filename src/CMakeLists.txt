@@ -8,6 +8,7 @@ set(SANDBOX_SOURCES
 		shared/Window.cpp
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
+		shared/layers/SandboxLayer.cpp
 		shared/layers/ExampleGUILayer.cpp
 		shared/ImGui/ImGuiLayer.cpp
 		shared/ImGui/ImGuiBuild.cpp

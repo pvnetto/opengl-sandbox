@@ -33,6 +33,7 @@ public:
     inline float DeltaTime() { return m_deltaTime; }
     inline int GetWidth() { return m_windowData.Width; }
     inline int GetHeight() { return m_windowData.Height; }
+    inline glm::vec2 GetSize() { return { m_windowData.Width, m_windowData.Height }; }
 
     GLFWwindow* GetNativeWindow() { return m_window; }
 

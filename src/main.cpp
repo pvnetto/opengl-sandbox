@@ -5,13 +5,12 @@
 #include <iostream>
 
 #include "shared/Window.h"
-#include "examples/learnopengl/02_EBO.h"
-#include "examples/learnopengl/13_Meshes.h"
+#include "shared/layers/SandboxLayer.h"
 
 
 int main() {
 	Window window;
-	window.AttachLayer(new LOGL_02_EBO());
+	window.AttachLayer(new SandboxLayer());
 
 	glViewport(0, 0, window.GetWidth(), window.GetHeight());
 	glEnable(GL_DEPTH_TEST);	// Depth testing should be enabled when rendering 3D objects
