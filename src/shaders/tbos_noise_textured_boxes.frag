@@ -37,18 +37,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 uv = fragCoord/iResolution.xy;
     vec2 p = uv * 32.;
     
-    vec2 S = vec2(0.6, 0.08);
-    S -= noise(p) * 0.02;
-    
-    const int C = 5;
-    float pct = 0.;
-    for(int i = 0; i < C; i++) {
-        float prg = float(i) / float(C);
-        vec2 cpos = uv - vec2(0., 0.5) + prg * vec2(0., 1.2);
-        float cpct = box(cpos, S);
-        
-        pct += cpct;
-    }
+    vec2 S = vec2(0.6, 0.3);
+    S -= noise(p) * 0.08;
+    float pct = box(fract(uv * vec2(1., 6.)), S);
     
     vec3 col = mix(vec3(0.25, 0.25, 0.25), vec3(0.2, 0.7, 0.7), pct);
 
