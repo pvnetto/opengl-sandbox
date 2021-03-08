@@ -29,7 +29,8 @@ float unionOP(float d1, float d2) {
     return min(d1, d2);
 }
 
-// Inspired by: https://www.iquilezles.org/www/articles/smin/smin.htm
+// Inspired by (Media Molecule's polynomial smin implementation):
+// https://www.iquilezles.org/www/articles/smin/smin.htm
 // Returns min(d1, d2) when points are further than 'maxDist' away from each other,
 // otherwise it returns a smooth value between both distances
 float sminOP(float d1, float d2, float maxDist) {
@@ -41,6 +42,16 @@ float sminOP(float d1, float d2, float maxDist) {
     const float isoMax = 0.25;
     
     return min(d1, d2) - distNorm * distNorm * maxDist * isoMax;
+}
+
+// Same as smin but cubic, so it has C2 continuity instead of C1 
+float sminCubicOP(float d1, float d2, float maxDist) {
+    float dist = abs(d1 - d2);
+    float distNorm = max(maxDist - dist, 0.0) / maxDist;
+    
+    // Iso values should be smaller for cubic smin
+    const float isoMax = 1. / 6.;
+    return min(d1, d2) - distNorm * distNorm * distNorm * maxDist * isoMax;
 }
 
 float sceneSDF(vec3 p) {
