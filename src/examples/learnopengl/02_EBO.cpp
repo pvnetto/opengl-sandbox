@@ -5,7 +5,7 @@
 #include <iostream>
 
 void LOGL_02_EBO::OnAttach() {
-    // === 0) Declares VAO and VBOs + attributes
+    // Declares VAO and VBOs + attributes
 	float vertices[] = {
         0.5f, 0.5f, 0.0f,
         0.5f, -0.5f, 0.0f,
@@ -25,8 +25,8 @@ void LOGL_02_EBO::OnAttach() {
 	// Binds VAO, so all subsequent buffers are bound to it
 	glBindVertexArray(vao);
 
-    // Binds VBO after VAO and defines its data
-    // Binding order is important here, the VBO is only associated to the VAO if it's bound after it
+    // Binds VBO and defines its data
+    // Binding order is NOT important here, as VBO is only associated to VAO when vertex attributes are defined
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
 

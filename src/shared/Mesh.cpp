@@ -8,18 +8,18 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 }
 
 void Mesh::initializeMesh() {
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
-	glGenBuffers(1, &m_ebo);
+    // creates/binds vao
+	glCreateVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
 
-	glBindVertexArray(m_vao);
-
-    // binds vbo
+    // creates/binds vbo
+    glCreateBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 
-    // binds ebo
+    // creates/binds ebo
     if(m_indices.size() > 0) {
+        glCreateBuffers(1, &m_ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
     }
@@ -41,7 +41,7 @@ void Mesh::initializeMesh() {
 
 void Mesh::Draw(Shader &shader) {
     shader.Use();
-    // binds textures to uniformes
+    // binds textures to uniforms
     // assumes all textures are declared on material struct, with naming convention textureN
     for(int i = 0; i < m_textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
@@ -56,9 +56,11 @@ void Mesh::Draw(Shader &shader) {
 
     // draws object
     glBindVertexArray(m_vao);
-    if(m_indices.size() == 0)
+    if(glIsBuffer(m_ebo)) {
         glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
-    else
+    }
+    else {
         glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, NULL);
+    }
     glBindVertexArray(0);
 }

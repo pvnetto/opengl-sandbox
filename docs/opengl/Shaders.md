@@ -1,5 +1,190 @@
 # Shaders
 
+
+## Shader types
+
+
+### Vertex shaders
+They're the **only mandatory shader type**, all others are defaulted by GLSL if you don't specify one.
+
+### Tesselation shaders
+
+### Geometry shaders
+
+### Fragment shaders
+
+
+## GLSL
+
+GLSL is an acronym for OpenGL Shading Language, and as the name implies, it's the language we use to define shaders in OpenGL.
+
+It shares many similarities with C-like languages, so you can expect it to work like other languages from this family, that's why I won't go into many details on how to do the basics, and jump to the specifics instead.
+
+
+### Primitive types
+
+- **int**
+- **uint**
+- **float**
+- **double**
+- **bool**
+
+
+### Aggregate types
+- **vec2**, **vec3**, **vec4**
+	- Also has type-specific versions: **ivec** for **int**, **dvec** for **double** etc;
+- **matmxn**: **m**, **n** could be any value between [2, 4];
+
+
+**Swizzling**: Really cool feature for vec types that allows you to mix their values inline
+```glsl
+vec3 color = vec3(1.0, 1.0, 1.0);
+vec3 inverted = color.bgr;
+```
+
+
+### Qualifiers
+
+- **in**: Value is received as parameter from previous shader stage;
+	- **layout (location = n)**: When we declare an **in** variable on a vertex shader, we have to specify its attribute layout location in the vertex buffer;
+
+- **out**: Value is passed to next shader stage;
+
+- **uniform**: Value is received from application. Read-only by default;
+
+- **buffer**: Specifies that a block is a memory buffer shared between application and shader
+	- Shader is allowed to write to this memory block;
+
+- **const**: Same as with any other language, specifies that the value is read-only;
+
+
+### Parameter qualifiers
+
+- **in** (default): Works exactly like pass-by-value;
+- **out**: Specifies a write-only parameter. Works like pass-by-reference, but expects an uninitialized variable;
+- **inout**: Specifies a read/write parameters. Works like pass-by-reference;
+- **const in**: Same as in, but specifies a read-only value;
+
+
+### Special keywords
+
+- **discard**: Discards a fragment and ceases shader execution for it. Only valid for fragment shaders.
+
+
+
+### GL variables
+
+- **gl_Position**: Determines the position of a vertex inside a vertex shader
+
+
+
+### Basic shader layout
+```
+/* Specifies which version of OpenGL this shader uses, and also which mode (usually core). */
+#version 330 core
+
+/* Variable declarations are usually done here. */
+uniform vec3 baseColor;
+
+/* Just like in C, GLSL programs always start from the main function, but in GLSL it's void type and not int. */
+void main() {
+	// shader logic here
+}
+```
+
+
+### Basic vertex shader
+```glsl
+#version 330 core
+
+/* Vertex shaders will receive their inputs directly from buffers, so we need to specify in variables with their layouts. */
+layout (location = 0) in vec3 inPosition;
+
+void main() {
+	/* Vertex shaders must always pass the vertex position to the reserved gl_Position variable. */
+	gl_Position = vec4(inPosition, 1.0);
+}
+```
+
+### Declaring/compiling shaders
+
+Shaders in OpenGL follow a compilation process similar to C/C++, but the GLSL compiler lives inside OpenGL, so you'll use it to read your shader source, compile and link it.
+
+
+1. Create/compile a shader object for each shader you want to use;
+
+```cpp
+int shaderID = glCreateShader(GL_VERTEX_SHADER);
+glShaderSource(shaderID, 1, "#version 330 core ...", NULL);
+glCompileShader
+```
+
+
+2. (OPTIONAL) Check for compiling errors;
+
+```cpp
+int success;
+glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+
+if(!success) {
+    char info[512];
+    glGetShaderInfoLog(shaderID, 512, NULL, info);
+}
+```
+
+
+3. Create a shader program and attach on it all shaders you want to use;
+- This is what you'll use to make your shader pipeline
+
+```cpp
+int program = glCreateProgram();
+glAttachShader(program, shaderID);
+glAttachShader(program, otherShaderID);
+```
+
+
+4. After attaching all shaders, link the program. This is where it gets very similar to C++ compilation;
+
+```cpp
+glLinkProgram(program);
+```
+
+
+5. (OPTIONAL) Check for linking errors;
+
+```cpp
+int linkSuccess;
+glGetProgramiv(program, GL_LINK_STATUS, &linkSuccess);
+
+if(!linkSuccess) {
+    char linkInfo[512];
+    glGetProgramInfoLog(program, 512, NULL, linkInfo);
+}
+```
+
+
+6. Bind the shader to the OpenGL context;
+
+```cpp
+glUseProgram(program);
+```
+
+
+**Other utilities**:
+- **glDetachShader**: Detaches the shader from a program;
+- **glDeleteShader**: You might wanna call this after you're done using the shader;
+
+
+### Using uniforms
+
+```cpp
+/* Gets the location of an uniform within a shader.*/
+int loc = glGetUniformLocation(program);
+
+/* Sets the value of an uniform using its location and a value. */
+glUniform{1/2/3/4}{f/d/i/ui}(loc, value);
+```
+
 - Shader são programas que rodam na GPU
 - Cada shader representa um seção específica do pipeline gráfico
 - Eles não podem comunicar diretamente entre si, exceto por seus inputs e outputs
@@ -24,9 +209,9 @@ out type <out_var_name_1>;
 uniform type <uniform_name>;
 
 void main() {
-    // === Do graphics things ===
+    // === Do graphics stuff ===
     ...
-    // === Do graphics things ===
+    // === Do graphics stuff ===
 
     <out_var_name_1> = <value>;    // Variáveis de saída sempre devem receber um valor
 }
@@ -42,6 +227,7 @@ void main() {
 
 - Não-primitivos:
     - **vec**
+    - **mat**
 
 #### Vectors
 - Pode ter de 1 a 4 dimensões e qualquer um dos tipos primitivos

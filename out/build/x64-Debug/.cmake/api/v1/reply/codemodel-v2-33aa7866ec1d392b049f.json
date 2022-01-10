@@ -1,0 +1,416 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "src",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "vendor",
+					"childIndexes" : 
+					[
+						3,
+						6,
+						7,
+						9,
+						10
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "vendor",
+					"targetIndexes" : 
+					[
+						7
+					]
+				},
+				{
+					"build" : "vendor/glfw",
+					"childIndexes" : 
+					[
+						4,
+						5
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 1,
+					"source" : "vendor/glfw",
+					"targetIndexes" : 
+					[
+						9
+					]
+				},
+				{
+					"build" : "vendor/glfw/src",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 1,
+					"source" : "vendor/glfw/src",
+					"targetIndexes" : 
+					[
+						6
+					]
+				},
+				{
+					"build" : "vendor/glfw/docs",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 3,
+					"projectIndex" : 1,
+					"source" : "vendor/glfw/docs",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "vendor/glad",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 2,
+					"source" : "vendor/glad",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "vendor/glm",
+					"childIndexes" : 
+					[
+						8
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 3,
+					"source" : "vendor/glm"
+				},
+				{
+					"build" : "vendor/glm/glm",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.2"
+					},
+					"parentIndex" : 7,
+					"projectIndex" : 3,
+					"source" : "vendor/glm/glm"
+				},
+				{
+					"build" : "vendor/stb",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 0,
+					"source" : "vendor/stb",
+					"targetIndexes" : 
+					[
+						8
+					]
+				},
+				{
+					"build" : "vendor/assimp",
+					"childIndexes" : 
+					[
+						11,
+						12,
+						13
+					],
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 2,
+					"projectIndex" : 4,
+					"source" : "vendor/assimp",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "vendor/assimp/code",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 10,
+					"projectIndex" : 4,
+					"source" : "vendor/assimp/code",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "vendor/assimp/tools/assimp_cmd",
+					"hasInstallRule" : true,
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 10,
+					"projectIndex" : 4,
+					"source" : "vendor/assimp/tools/assimp_cmd",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "vendor/assimp/test",
+					"childIndexes" : 
+					[
+						14
+					],
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 10,
+					"projectIndex" : 4,
+					"source" : "vendor/assimp/test",
+					"targetIndexes" : 
+					[
+						10
+					]
+				},
+				{
+					"build" : "vendor/assimp/test/headercheck",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 13,
+					"projectIndex" : 4,
+					"source" : "vendor/assimp/test/headercheck"
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4
+					],
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						9
+					],
+					"name" : "OpenGL Sandbox",
+					"targetIndexes" : 
+					[
+						0,
+						7,
+						8
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						3,
+						4,
+						5
+					],
+					"name" : "GLFW",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						4,
+						6,
+						9
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						6
+					],
+					"name" : "Glad",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						7,
+						8
+					],
+					"name" : "glm",
+					"parentIndex" : 0
+				},
+				{
+					"directoryIndexes" : 
+					[
+						10,
+						11,
+						12,
+						13,
+						14
+					],
+					"name" : "Assimp",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3,
+						10
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 1,
+					"id" : "Sandbox::@145eef247bfb46b6828c",
+					"jsonFile" : "target-Sandbox-Debug-80a98fab1b8d5c283af0.json",
+					"name" : "Sandbox",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 10,
+					"id" : "UpdateAssimpLibsDebugSymbolsAndDLLs::@c4807781decb42661c27",
+					"jsonFile" : "target-UpdateAssimpLibsDebugSymbolsAndDLLs-Debug-49139841f3223b30d1d3.json",
+					"name" : "UpdateAssimpLibsDebugSymbolsAndDLLs",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 11,
+					"id" : "assimp::@73aa4729bf46b0baaf8e",
+					"jsonFile" : "target-assimp-Debug-e8a4f01eb02bc2477300.json",
+					"name" : "assimp",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 12,
+					"id" : "assimp_cmd::@9f48dd2d3edd74acbc4b",
+					"jsonFile" : "target-assimp_cmd-Debug-d1145db4427e87c64203.json",
+					"name" : "assimp_cmd",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "docs::@e20363e25641143920c9",
+					"jsonFile" : "target-docs-Debug-ec014724a69416b85659.json",
+					"name" : "docs",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 6,
+					"id" : "glad::@fd4c13af0d758e03700b",
+					"jsonFile" : "target-glad-Debug-982268459f503b1443cb.json",
+					"name" : "glad",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "glfw::@31bd9730e6b8c71cc656",
+					"jsonFile" : "target-glfw-Debug-e61005c116aad8f5955a.json",
+					"name" : "glfw",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "imgui::@af9395fb4c239a7adf53",
+					"jsonFile" : "target-imgui-Debug-f6de620bc04da4ab236c.json",
+					"name" : "imgui",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 9,
+					"id" : "stb::@28ad7a6a0e7192490019",
+					"jsonFile" : "target-stb-Debug-c12c2fdcb137433207e4.json",
+					"name" : "stb",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "uninstall::@0e1c3310cc3779ba9d9b",
+					"jsonFile" : "target-uninstall-Debug-d40f7582ef7e8589ea33.json",
+					"name" : "uninstall",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 13,
+					"id" : "unit::@e249f26fae82ad9754c3",
+					"jsonFile" : "target-unit-Debug-a23b63f32e1de44deb5b.json",
+					"name" : "unit",
+					"projectIndex" : 4
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/out/build/x64-Debug",
+		"source" : "C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 2
+	}
+}

@@ -30,7 +30,7 @@ Uma boa referência para visualizar como as rotações funcionam é [nesse video
     - dir = vec3(cosα, senα, 0)
 
 ### Hierarquia
-Apesar de não existe ordem correta para rotação, essa ordem importa, pois quando usamos ângulos de euler, **cada rotação pode influenciar nos outros eixos de rotação**. Quando um eixo é influenciado isso significa que ele é rotacionado.
+Apesar de não existir ordem correta para rotação, essa ordem importa, pois quando usamos ângulos de euler, **cada rotação pode influenciar nos outros eixos de rotação**. Quando um eixo é influenciado isso significa que ele é rotacionado.
 
 Ex: Se rotacionarmos um objeto 45 graus ao redor de Y, os eixos de rotação de X e Z serão rotacionados em 45 graus, logo rotações ao redor de X ou Z não irão considerar o eixo perpendicular a origem, mas sim o eixo rotacionado.
 

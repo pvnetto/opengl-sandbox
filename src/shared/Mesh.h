@@ -31,6 +31,6 @@ public:
     void Draw(Shader& shader);
 
 private:
-    unsigned int m_vao, m_vbo, m_ebo;
+    unsigned int m_vao = 0, m_vbo = 0, m_ebo = 0;
     void initializeMesh();
 };

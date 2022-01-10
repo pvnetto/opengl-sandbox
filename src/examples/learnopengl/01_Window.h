@@ -10,9 +10,12 @@ int window_imp() {
 	// Step 1) Initialize window
 	glfwInit();
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // OpenGL version 4.6
+	// OpenGL version 4.6
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Specifies that OpenGL is using Core profile, instead of Immediate
+
+	// Specifies that OpenGL is using Core profile, instead of Immediate
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL); // Creates window
 	if (!window) {
@@ -36,7 +39,8 @@ int window_imp() {
 	}
 
 	// Step 4) Use OpenGL :)
-	// Before making any calls to OpenGL, the viewport must be initialized
+	// Viewport is initialized to window size, but it's good practice to call it anyway
+	// right after initializing the window.
 	glViewport(0, 0, width, height);
 
 	while (!glfwWindowShouldClose(window)) {

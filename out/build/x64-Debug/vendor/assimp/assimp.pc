@@ -1,0 +1,9 @@
+libdir=C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/out/install/x64-Debug/lib
+includedir=C:/Users/USUARIO/Desktop/Projects/Study/opengl-sandbox/out/install/x64-Debug/include
+
+Name: OpenGL Sandbox
+Description: Import various well-known 3D model formats in an uniform manner.
+Version: 5.0.1
+Libs: -L${libdir} -lassimp
+Libs.private:  -lz
+Cflags: -I${includedir}

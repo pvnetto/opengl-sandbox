@@ -43,7 +43,7 @@ Texture TextureLoader::LoadTexture(const std::string& path, const int index) {
 
 	stbi_image_free(texData);
 
-	Texture texture {tex, path};
+	Texture texture { tex, path };
 	s_loadedTextures.push_back(texture);
 
 	return texture;
