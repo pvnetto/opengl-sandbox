@@ -50,10 +50,8 @@ target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include
-)
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include)
 
 set_target_properties(Sandbox PROPERTIES
                       RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/bin/debug
-                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release
-)
+                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release)
