@@ -11,7 +11,7 @@ void LOGL_05_Transform::OnAttach() {
 	    TextureLoader::LoadTexture("../../src/assets/yps.png", 1),
 	};
 
-	m_cube = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), textures};
+	m_cube = Mesh{PrimitiveShape::Cube(), {}, textures};
     m_shader = Shader("../../src/shaders/04_vertex_transform.vert", "../../src/shaders/03_frag_tex.frag");
 
     // 1) Enables depth test, so vertices are stored on a z-buffer before drawing. This is required for 3D objects

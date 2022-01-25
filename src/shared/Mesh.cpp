@@ -56,7 +56,7 @@ void Mesh::Draw(Shader &shader) {
 
     // draws object
     glBindVertexArray(m_vao);
-    if(glIsBuffer(m_ebo)) {
+    if(m_indices.size() == 0) {
         glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
     }
     else {

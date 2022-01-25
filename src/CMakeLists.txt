@@ -6,6 +6,7 @@ set(SANDBOX_SOURCES
 		shared/Mesh.cpp
 		shared/Model.cpp
 		shared/Window.cpp
+		shared/SimpleRenderer.cpp
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
 		shared/layers/SandboxLayer.cpp
