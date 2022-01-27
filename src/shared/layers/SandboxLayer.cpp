@@ -1,6 +1,7 @@
 #include "SandboxLayer.h"
 
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
+#include <GLFW/glfw3.h>
 
 void SandboxLayer::OnAttach() {
     m_shader = Shader("../../src/shaders/sandbox_vertex.vert", "../../src/shaders/sandbox_fragment.frag");
@@ -9,7 +10,7 @@ void SandboxLayer::OnAttach() {
 
 void SandboxLayer::OnUpdate() {
     m_shader.SetFloat("iTime", (float) glfwGetTime());
-    m_shader.SetVector2("iResolution", Window::Get()->GetSize());
+    m_shader.SetVector2("iResolution", spr::getWindowSize());
     m_quad.Draw(m_shader);
 }
 

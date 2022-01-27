@@ -1,10 +1,8 @@
 #include "10_Material.h"
 
 #include "shared/Primitive.h"
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -28,9 +26,9 @@ void LOGL_10_Material::OnAttach() {
 
 void LOGL_10_Material::OnUpdate() {
 	m_controller.HandleKeyboardInput();
-	glm::vec3 lightSourcePos = glm::vec3(std::cos((float)glfwGetTime()),
-	                                     std::cos((float)glfwGetTime()) * std::sin((float)glfwGetTime()),
-	                                     std::sin((float)glfwGetTime()) * 2.f);
+	glm::vec3 lightSourcePos = glm::vec3(std::cos(spr::runtime::getTime()),
+	                                     std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
+	                                     std::sin(spr::runtime::getTime()) * 2.f);
 
 	glm::mat4 sourceModel(1.0f);
 	sourceModel = glm::translate(sourceModel, lightSourcePos);
@@ -44,8 +42,8 @@ void LOGL_10_Material::OnUpdate() {
 	m_lightSourceMesh.Draw(m_lightSourceShader);
 
 	glm::mat4 litModel(1.0f);
-	litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	litModel = glm::rotate(litModel, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	litModel = glm::rotate(litModel, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	m_phongShader.Use();
 	m_phongShader.SetMatrix("model", litModel);

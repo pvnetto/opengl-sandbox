@@ -2,10 +2,8 @@
 
 #include "shared/Primitive.h"
 #include "shared/Texture2D.h"
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -34,7 +32,7 @@ void LOGL_12_PointLight::OnUpdate() {
 	m_controller.HandleKeyboardInput();
 
 	glm::mat4 sourceModel(1.0f);
-	glm::vec3 lightSourcePos{0.f, 0.f, glm::cos((float)glfwGetTime() * 1.5f) * -3.f};
+	glm::vec3 lightSourcePos{0.f, 0.f, glm::cos(spr::runtime::getTime() * 1.5f) * -3.f};
     if(m_static)
         lightSourcePos = m_light.Position;
 	sourceModel = glm::translate(sourceModel, lightSourcePos);
@@ -63,7 +61,7 @@ void LOGL_12_PointLight::OnUpdate() {
 	m_phongShader.SetFloat("light.quadraticAttenuation", m_light.QuadraticAttenuation);
 
 	m_phongShader.SetVector3("viewPos", m_camera.GetPosition());
-	m_phongShader.SetFloat("time", (float)glfwGetTime());
+	m_phongShader.SetFloat("time", spr::runtime::getTime());
 
 	glm::mat4 litModel(1.0f);
 	litModel = glm::translate(litModel, glm::vec3(2.0f, 0.0f, 0.0f));

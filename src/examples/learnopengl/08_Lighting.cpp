@@ -1,10 +1,8 @@
 #include "08_Lighting.h"
 
 #include "shared/Primitive.h"
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -29,9 +27,9 @@ void LOGL_08_Lighting::OnAttach() {
 void LOGL_08_Lighting::OnUpdate() {
 	// 1) Draws light source
 	glm::vec3 orbitPosition = glm::vec3(
-	    std::cos((float)glfwGetTime()),
-	    std::cos((float)glfwGetTime()) * std::sin((float)glfwGetTime()),
-	    std::sin((float)glfwGetTime()) * 2.f);
+	    std::cos(spr::runtime::getTime()),
+	    std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
+	    std::sin(spr::runtime::getTime()) * 2.f);
 
 	glm::mat4 sourceModel(1.0f);
 	sourceModel = glm::translate(sourceModel, orbitPosition);

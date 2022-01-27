@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include "shared/SimpleRenderer.h"
+
 #include "examples/learnopengl/02_EBO.h"
 #include "examples/learnopengl/02_VAO.h"
 #include "examples/learnopengl/02_VBO.h"
@@ -20,7 +22,6 @@
 #include "examples/learnopengl/12_SpotLight.h"
 #include "examples/learnopengl/12_MultipleLights.h"
 #include "examples/learnopengl/13_Meshes.h"
-#include "shared/Window.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {BookOfShaders, "Book Of Shaders"}, {Trigonometry, "Trigonometry"}, {Matrices, "Matrices"}};
@@ -56,7 +57,9 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 void ExampleGUILayer::OnImGuiRender() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     float width = 300;
-    ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + Window::Get()->GetWidth() - width, viewport->GetWorkPos().y));
+
+	const glm::vec2 windowSize = spr::getWindowSize();
+    ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + windowSize.x - width, viewport->GetWorkPos().y));
     ImGui::SetNextWindowSize(ImVec2(width, viewport->GetWorkSize().y));
 
 	// ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
@@ -66,7 +69,7 @@ void ExampleGUILayer::OnImGuiRender() {
 			for (auto example : m_examples.at((ExampleCategory)i)) {
 				if (ImGui::Selectable(example->m_name.c_str(), m_selected == example)) {
 					m_selected = example;
-					Window::Get()->ScheduleReset(m_selected->GetLayers());
+					spr::runtime::replaceLayers(m_selected->GetLayers());
 				}
 			}
 		}

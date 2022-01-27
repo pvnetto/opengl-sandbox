@@ -42,6 +42,7 @@ namespace spr {
     }
 
     void shutdown() {
+        glfwTerminate();
         glfwDestroyWindow(s_Window);
         s_Window = nullptr;
     }
@@ -126,6 +127,32 @@ namespace spr {
         }
     }
 
+    void swapBuffers() {
+        glfwPollEvents();
+		glfwSwapBuffers(s_Window);
+    }
+
+    bool isWindowOpen() {
+        if(!s_Window) return false;
+        return !glfwWindowShouldClose(s_Window);
+    }
+
+    GLFWwindow* getWindow() {
+        return s_Window;   
+    }
+
+    glm::vec2 getWindowSize() {
+        return { s_State.Width, s_State.Height };
+    }
+
+    int getWindowWidth() {
+        return s_State.Width;
+    }
+
+    int getWindowHeight() {
+        return s_State.Height;
+    }
+
 }
 
 
@@ -168,10 +195,18 @@ namespace spr { namespace runtime {
         }
     }
 
+    void replaceLayers(std::vector<Layer*> layers) {
+        s_NewLayers = layers;
+    }
+    
     static void initializeLayers() {
         s_InitializedRuntime = true;
+        
         s_ExampleLayer = new ExampleGUILayer();
+        s_ExampleLayer->OnAttach();
+
         s_ImGuiLayer = new ImGuiLayer();
+        s_ImGuiLayer->OnAttach();
 
         attachLayer(new SandboxLayer());
     }
@@ -216,6 +251,15 @@ namespace spr { namespace runtime {
             s_NewLayers.clear();
         }   
     }
+
+    float getTime() {
+        return (float) glfwGetTime();
+    }
+
+    float getDeltaTime() {
+        return s_DeltaTime;
+    }
+
 }
 }
 
@@ -230,3 +274,9 @@ namespace spr {
     }
 
 }
+
+namespace spr { namespace input {
+    bool pressedKey(int key) {
+        return glfwGetKey(s_Window, key);
+    }
+}}

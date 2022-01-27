@@ -2,9 +2,7 @@
 
 #include "shared/Primitive.h"
 #include "shared/Texture2D.h"
-#include "shared/Window.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>

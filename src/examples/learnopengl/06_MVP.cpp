@@ -2,7 +2,7 @@
 
 #include "shared/Primitive.h"
 #include "shared/Texture2D.h"
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
 
 #include <imgui.h>
 #include <iostream>
@@ -33,9 +33,9 @@ void LOGL_06_MVP::OnUpdate() {
 	// 1) Creates model matrix
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_position);
-	model = glm::rotate(model, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, m_scale);
 
 	// 2) Creates view matrix
@@ -44,7 +44,7 @@ void LOGL_06_MVP::OnUpdate() {
 
 	// 3) Creates projection matrix
 	glm::mat4 projection(1.0f);
-	float aspectRatio = Window::Get()->GetWidth() / Window::Get()->GetHeight(), near = 0.1f, far = 100.f;
+	float aspectRatio = spr::getWindowWidth() / spr::getWindowHeight(), near = 0.1f, far = 100.f;
 	projection = glm::perspective(m_fov, aspectRatio, near, far);
 
 	// 4) Passes MVP matrices as uniforms to shader

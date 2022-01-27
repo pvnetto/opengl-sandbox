@@ -2,10 +2,8 @@
 
 #include "shared/Primitive.h"
 #include "shared/Texture2D.h"
-#include "shared/Window.h"
+#include "shared/SimpleRenderer.h"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h>
 #include <imgui.h>
 #include <iostream>
 
@@ -40,7 +38,7 @@ void LOGL_12_DirectionalLight::OnUpdate() {
 	m_phongShader.SetVector3("light.color", m_light.Color);
 	m_phongShader.SetVector3("light.direction", glm::normalize(m_light.Direction));
 	m_phongShader.SetVector3("viewPos", m_camera.GetPosition());
-	m_phongShader.SetFloat("time", (float)glfwGetTime());
+	m_phongShader.SetFloat("time", spr::runtime::getTime());
 
 	glm::mat4 litModel(1.0f);
 	m_phongShader.SetMatrix("model", litModel);
