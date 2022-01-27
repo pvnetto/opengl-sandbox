@@ -8,7 +8,10 @@ public:
 	virtual void OnUpdate() override;
 
 private:
-    unsigned int vao, vbo, ebo;
+    unsigned int m_vao, m_vbo, m_ebo;
     unsigned int m_shaderProgram;
+
+    void DeclareBufferObjects();
+    void DeclareShaderProgram();
 };
 

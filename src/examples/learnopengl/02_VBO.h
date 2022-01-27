@@ -10,4 +10,7 @@ public:
 private:
     unsigned int m_vao, m_vbo;
     unsigned int m_shaderProgram;
+
+    void DeclareBuffers();
+    void DeclareShader();
 };

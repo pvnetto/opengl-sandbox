@@ -10,4 +10,7 @@ public:
 private:
     unsigned int m_vaoA, m_vaoB;
     unsigned int m_shaderProgram, m_yellowShaderProgram;
+
+    void DeclareBuffers();
+    void DeclareShader(unsigned int& shaderId, const char* vertexShaderSource, const char* fragShaderSource);
 };

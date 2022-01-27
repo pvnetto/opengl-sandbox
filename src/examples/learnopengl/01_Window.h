@@ -10,11 +10,11 @@ int window_imp() {
 	// Step 1) Initialize window
 	glfwInit();
 
-	// OpenGL version 4.6
+	// Specifies OpenGL version. In this case 4.6.
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-	// Specifies that OpenGL is using Core profile, instead of Immediate
+	// Specifies OpenGL profile. In this case, we're using Core profile, instead of Immediate.
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow *window = glfwCreateWindow(width, height, "OpenGL Sandbox", NULL, NULL); // Creates window

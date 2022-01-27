@@ -4,55 +4,53 @@
 #include <glad/glad.h>
 #include <iostream>
 
-void LOGL_02_VBO::OnAttach() {
-    // 0) Declares VAO and VBOs + attributes
-	float vertices[] = {
-        // Triangle 1
-        -0.8f, -0.2f, 0.0f,     // left
-	    -0.4f, -0.2f, 0.0f,     // right
-	    -0.6f, 0.2f, 0.0f,      // top
+static constexpr float vertices[] = {
+	// Triangle 1
+	-0.8f, -0.2f, 0.0f,     // left
+	-0.4f, -0.2f, 0.0f,     // right
+	-0.6f, 0.2f, 0.0f,      // top
 
-        // Triangle 2
-        0.0f, -0.2f, 0.0f,     // left
-	    0.4f, -0.2f, 0.0f,     // right
-	    0.2f, 0.2f, 0.0f,      // top
-	};
+	// Triangle 2
+	0.0f, -0.2f, 0.0f,     // left
+	0.4f, -0.2f, 0.0f,     // right
+	0.2f, 0.2f, 0.0f,      // top
+};
 
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &m_vbo);
+static const char* vertexShaderSource = R"(
+#version 330 core
+layout (location = 0) in vec3 aPosition;
+void main() {
+	gl_Position = vec4(aPosition, 1.0f);
+})";
 
-	// Binds VAO, so all subsequent buffers are bound to it
+static const char* fragmentShaderSrc = R"(
+#version 330 core
+out vec4 fragmentColor;
+void main() {
+	fragmentColor = vec4(0.2f, 0.3f, 1.0f, 1.0f);
+})";
+
+void LOGL_02_VBO::DeclareBuffers() {
+	glCreateVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
+	glCreateBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // glVertexAttribPointer should tell the shader how to read buffer data
-    // In this case we are declaring vec3 parameters as subsequent float values in an array,
-    // so size = 3, type = float and stride = 3 * sizeof(float)
-	// Also, Attributes are declared on slot 0, so the shader should use layout = 0 to find them
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
-	// Unbinds buffers so they're not accidentally used
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
 
-	// 1) Declares and compiles vertex shaders
-	std::string vertexShaderSource = "";
-	vertexShaderSource += "#version 330 core\n";
-	vertexShaderSource += "layout (location = 0) in vec3 aPosition;\n";
-	vertexShaderSource += "void main() {\n";
-	vertexShaderSource += "gl_Position = vec4(aPosition, 1.0f);\n";
-	vertexShaderSource += "}\0";
-
-	auto vertexShaderSourceC = vertexShaderSource.c_str();
-
+void LOGL_02_VBO::DeclareShader() {
+	// Creates/compiles vertex shader
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSourceC, NULL);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
 
-	// (OPTIONAL) Checks shader for errors
 	int vertSuccess;
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertSuccess);
 	if (!vertSuccess) {
@@ -62,24 +60,13 @@ void LOGL_02_VBO::OnAttach() {
 		return;
 	}
 
-	// 2) Declares and compiles fragment shaders
-	std::string fragmentShaderSrc = "";
-	fragmentShaderSrc += "#version 330 core\n";
-	fragmentShaderSrc += "out vec4 fragmentColor;\n";
-	fragmentShaderSrc += "void main() {\n";
-	fragmentShaderSrc += "fragmentColor = vec4(0.2f, 0.3f, 1.0f, 1.0f);\n";
-	fragmentShaderSrc += "}\0";
-
-	auto fragmentShaderSrcC = fragmentShaderSrc.c_str();
-
+	// Creates/compiles fragment shader
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSrcC, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
 	glCompileShader(fragmentShader);
 
-	// (OPTIONAL) Checks shader for errors
 	int fragSuccess;
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragSuccess);
-
 	if (!fragSuccess) {
 		char info[512];
 		glGetShaderInfoLog(fragmentShader, 512, NULL, info);
@@ -87,16 +74,14 @@ void LOGL_02_VBO::OnAttach() {
 		return;
 	}
 
-	// 3) Declares shader program
+	// Creates/links shader program
 	m_shaderProgram = glCreateProgram();
 	glAttachShader(m_shaderProgram, vertexShader);
 	glAttachShader(m_shaderProgram, fragmentShader);
 	glLinkProgram(m_shaderProgram);
 
-	// (OPTIONAL) Check for program errors
 	int programSuccess;
 	glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &programSuccess);
-
 	if (!programSuccess) {
 		char info[512];
 		glGetProgramInfoLog(m_shaderProgram, 512, NULL, info);
@@ -104,9 +89,14 @@ void LOGL_02_VBO::OnAttach() {
 		return;
 	}
 
-	// (OPTIONAL) Deletes all shaders included in shader program
+	// Deletes both shaders
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);    
+}
+
+void LOGL_02_VBO::OnAttach() {
+	DeclareBuffers();
+	DeclareShader();
 }
 
 void LOGL_02_VBO::OnUpdate() {
