@@ -1,68 +1,72 @@
 #include "03_Shaders.h"
 
-#include <GLFW/glfw3.h>
+#include "shared/Utils.h"
+
 #include <glad/glad.h>
 #include <iostream>
 
-void LOGL_03_Shaders::OnAttach() {
-	// 0) Declares VAO and VBOs + attributes
-	float verticesA[] = {
-	    // Triangle 1
-	    -0.8f, -0.2f, 0.0f, // left
-	    -0.4f, -0.2f, 0.0f, // right
-	    -0.6f, 0.2f, 0.0f,  // top
-	};
+static const float verticesA[] = {
+	-0.8f, -0.2f, 0.0f, // left
+	-0.4f, -0.2f, 0.0f, // right
+	-0.6f, 0.2f, 0.0f,  // top
+};
 
-	float verticesB[] = {
-	    // Triangle 2
-	    0.0f, -0.2f, 0.0f, // left
-	    0.4f, -0.2f, 0.0f, // right
-	    0.2f, 0.2f, 0.0f,  // top
-	};
+static const float verticesB[] = {
+	0.0f, -0.2f, 0.0f, // left
+	0.4f, -0.2f, 0.0f, // right
+	0.2f, 0.2f, 0.0f,  // top
+};
 
+void LOGL_03_Shaders::DeclareBuffers() {
+	// First VAO
 	unsigned int vboA, vboB;
 	glGenVertexArrays(1, &m_vaoA);
 	glGenBuffers(1, &vboA);
-
-	// Binds VAO, so all subsequent buffers are bound to it
 	glBindVertexArray(m_vaoA);
 
-	// Binds VBO after VAO
 	glBindBuffer(GL_ARRAY_BUFFER, vboA);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesA), verticesA, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
-
-	// glVertexAttribPointer should tell the shader how to read buffer data
-	// In this case we are declaring vec3 parameters as subsequent float values in an array,
-	// so size = 3, type = float and stride = 3 * sizeof(float)
-	// Also, Attributes are declared on slot 0, so the shader should use layout = 0 to find them
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesA), verticesA, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
-	// Unbinds buffers so they're not accidentally used
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	// Sets second VAO
+	// Second VAO
 	glGenVertexArrays(1, &m_vaoB);
 	glGenBuffers(1, &vboB);
 	glBindVertexArray(m_vaoB);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vboB);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesB), verticesB, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesB), verticesB, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+}
 
-	// 3) Declares shader program
-	m_shader = Shader("../../src/shaders/02_vertex_offset.vert", "../../src/shaders/frag_basic.frag");
+void LOGL_03_Shaders::DeclareShader() {
+	std::string vertexSrc = utils::readShaderFile("../../src/shaders/02_vertex_offset.vert");
+	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
+
+	std::string fragSrc = utils::readShaderFile("../../src/shaders/frag_basic.frag");
+	spr::ShaderHandle fragHandle = spr::createShader(SPR_FRAGMENT_SHADER, fragSrc.c_str());
+
+	m_shaderProgramHandle = spr::createProgram(vertexHandle, fragHandle);
+	m_uniformHandle = spr::createUniform("horizontalOffset", spr::UniformType::Float);
+}
+
+
+void LOGL_03_Shaders::OnAttach() {
+	DeclareBuffers();
+	DeclareShader();
 }
 
 void LOGL_03_Shaders::OnUpdate() {
-	// 4) Use shader program, bind VAO and draw the triangle
-	m_shader.Use();
-	m_shader.SetFloat("horizontalOffset", std::sin(glfwGetTime()) * 1.0f);
+	spr::setProgram(m_shaderProgramHandle);
+	// m_shader.SetFloat("horizontalOffset", std::sin(glfwGetTime()) * 1.0f);
+
 	glBindVertexArray(m_vaoA);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 

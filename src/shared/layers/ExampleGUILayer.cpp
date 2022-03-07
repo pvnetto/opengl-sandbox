@@ -2,8 +2,7 @@
 
 #include <imgui.h>
 
-#include "shared/SimpleRenderer.h"
-
+#include "shared/renderer/SimpleRenderer.h"
 #include "examples/learnopengl/02_EBO.h"
 #include "examples/learnopengl/02_VAO.h"
 #include "examples/learnopengl/02_VBO.h"

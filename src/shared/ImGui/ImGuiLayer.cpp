@@ -4,8 +4,7 @@
 #include <glad/glad.h>
 #include <imgui.h>
 
-#include "shared/SimpleRenderer.h"
-
+#include "shared/renderer/SimpleRenderer.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 

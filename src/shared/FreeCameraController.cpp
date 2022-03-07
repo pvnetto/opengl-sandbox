@@ -1,6 +1,5 @@
 #include "FreeCameraController.h"
-#include "shared/SimpleRenderer.h"
-
+#include "shared/renderer/SimpleRenderer.h"
 #define ROTATION_SPEED 6.f
 
 FreeCameraController::FreeCameraController(Camera &camera, float speed) : m_camera(&camera), m_moveSpeed(speed) {}

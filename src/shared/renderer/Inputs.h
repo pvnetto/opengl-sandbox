@@ -1,49 +1,12 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
-#include <vector>
-
-class Layer;
-struct GLFWwindow;
-
-namespace spr {
-
-    void init();
-    void clear();
-    void shutdown();
-
-    void createWindow(const char* windowName, int width, int height);
-    void swapBuffers();
-    bool isWindowOpen();
-
-    GLFWwindow* getWindow();
-    glm::vec2 getWindowSize();
-    int getWindowWidth();
-    int getWindowHeight();
-
-}
-
-namespace spr { namespace runtime {
-
-    void attachLayer(Layer* layer);
-    void dettachLayer(Layer* layer);
-    void replaceLayers(std::vector<Layer*> layers);
-    
-    void update();
-
-    float getTime();
-    float getDeltaTime();
-
-}}
 
 namespace spr { namespace input {
 
     bool pressedKey(int key);
 
 }}
-
-#pragma region Constants
 
 enum SPREvents {
     SPR_RELEASE = GLFW_RELEASE,
@@ -97,5 +60,3 @@ enum SPRKeys {
     SPR_KEY_Y = GLFW_KEY_Y,               
     SPR_KEY_Z = GLFW_KEY_Z,               
 };
-
-#pragma endregion

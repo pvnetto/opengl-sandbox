@@ -5,7 +5,13 @@ set(SANDBOX_SOURCES
 		shared/Texture2D.cpp
 		shared/Mesh.cpp
 		shared/Model.cpp
-		shared/SimpleRenderer.cpp
+		shared/Utils.cpp
+		shared/renderer/Programs.cpp
+		shared/renderer/Uniforms.cpp
+		shared/renderer/Context.cpp
+		shared/renderer/Inputs.cpp
+		shared/renderer/Runtime.cpp
+		shared/renderer/SimpleRenderer.cpp
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
 		shared/layers/SandboxLayer.cpp

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared/layers/Layer.h"
-#include "shared/Shader.h"
+#include "shared/renderer/SimpleRenderer.h"
 
 class LOGL_03_Shaders : public Layer {
 public:
@@ -10,5 +10,9 @@ public:
 
 private:
     unsigned int m_vaoA, m_vaoB;
-    Shader m_shader;
+    spr::ProgramHandle m_shaderProgramHandle;
+    spr::UniformHandle m_uniformHandle;
+
+    void DeclareBuffers();
+    void DeclareShader();
 };

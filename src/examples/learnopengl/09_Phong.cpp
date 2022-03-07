@@ -1,8 +1,7 @@
 #include "09_Phong.h"
 
 #include "shared/Primitive.h"
-#include "shared/SimpleRenderer.h"
-
+#include "shared/renderer/SimpleRenderer.h"
 #include <imgui.h>
 #include <iostream>
 

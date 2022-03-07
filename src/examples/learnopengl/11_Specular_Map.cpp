@@ -2,8 +2,7 @@
 
 #include "shared/Primitive.h"
 #include "shared/Texture2D.h"
-#include "shared/SimpleRenderer.h"
-
+#include "shared/renderer/SimpleRenderer.h"
 #include <imgui.h>
 #include <iostream>
 

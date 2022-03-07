@@ -1,7 +1,6 @@
 #include "SandboxLayer.h"
 
-#include "shared/SimpleRenderer.h"
-#include <GLFW/glfw3.h>
+#include "shared/renderer/SimpleRenderer.h"#include <GLFW/glfw3.h>
 
 void SandboxLayer::OnAttach() {
     m_shader = Shader("../../src/shaders/sandbox_vertex.vert", "../../src/shaders/sandbox_fragment.frag");
