@@ -1,5 +1,6 @@
 #include "Uniforms.h"
 #include "Handles.h"
+#include "Context.h"
 
 #include <unordered_map>
 #include <string>
@@ -8,7 +9,6 @@
 // ========================================
 // ==== Uniforms ==========================
 // ========================================
-
 namespace spr {
 
     #define SPR_MAX_UNIFORM_COUNT 512
@@ -23,10 +23,6 @@ namespace spr {
         UniformType Type;
     };
 
-    struct UniformRegInfo {
-        UniformHandle Handle;
-    };
-
     using UniformHashMap = std::unordered_map<std::string, HandleType>;
 
     class UniformRegistry {
@@ -39,29 +35,28 @@ namespace spr {
 		{
 		}
 
-		const UniformRegInfo* find(const char* name) const
+		const UniformHandle* find(const char* name) const
 		{
             std::string nameStr { name };
 			if (m_uniforms.count(nameStr) > 0)
 			{
                 HandleType index = m_uniforms.at(nameStr);
-				return &m_info[index];
+				return &m_handles[index];
 			}
 
 			return NULL;
 		}
 
-		const UniformRegInfo& add(UniformHandle handle, const char* name)
+		const UniformHandle& add(UniformHandle handle, const char* name)
 		{
 			assert(handle.isValid() && "::ERROR: Uniform handle is invalid!");
 
             m_uniforms.erase({ name });
             m_uniforms[{ name }] = handle.idx;
 
-			UniformRegInfo& info = m_info[handle.idx];
-			info.Handle = handle;
-
-			return info;
+            UniformHandle& outHandle = m_handles[handle.idx];
+            outHandle = handle;
+			return outHandle;
 		}
 
 		void remove(UniformHandle handle)
@@ -76,43 +71,23 @@ namespace spr {
 
 	private:
 		UniformHashMap m_uniforms;
-		UniformRegInfo m_info[SPR_MAX_UNIFORM_COUNT];
+		UniformHandle m_handles[SPR_MAX_UNIFORM_COUNT];
     };
 
-
-    /* Buffer data container. */
-    class SimpleUniformBuffer {
-    public:
-        static SimpleUniformBuffer* alloc(uint32_t size) {
-            SimpleUniformBuffer* newUniformBuffer = new SimpleUniformBuffer();
-            newUniformBuffer->m_bufferData.reserve(size);
-            return newUniformBuffer;
-        }
-
-        static void destroy(SimpleUniformBuffer* buffer) {
-            buffer->m_bufferData.clear();
-            buffer->~SimpleUniformBuffer();
-        }
-
-        static void update(SimpleUniformBuffer* buffer) {
-
-        }
-
-    private:
-        std::vector<char> m_bufferData;
-    };
-
+    // Indexed by handles
     static UniformRef s_Uniforms[SPR_MAX_UNIFORM_COUNT];
+    
     static UniformHashMap s_UniformHashMap;
     static UniformRegistry s_UniformRegistry;
 
-    static void* s_UniformData[SPR_MAX_UNIFORM_COUNT];
+    // Indexed by uniform location. Data in this array persists through frames.
+    static void* s_PersistentUniformData[SPR_MAX_UNIFORM_COUNT];
 }
 
 namespace spr {
 
-    // Brute-force index generator
     static HandleType getAvailableUniformIndex() {
+        // Brute-force index generator
         for(int i = 0; i < SPR_MAX_UNIFORM_COUNT; i++) {
             if(s_Uniforms[i].Name == "") {
                 return i;
@@ -140,15 +115,15 @@ namespace spr {
         }
     }
 
-    static void* allocData(uint32_t size) {
-        char* dataBuffer = new char[size];
-        return static_cast<void*>(dataBuffer);
-    }
-
     static void rendererCreateUniform(UniformHandle handle, const UniformRef& uniformRef) {
         uint32_t size = getUniformSizeByType(uniformRef.Type);
-        void* data = allocData(size);
-        s_UniformData[handle.idx] = data;
+        
+        // Initializes empty block of data
+        void* data = malloc(size);
+        memset(data, 0, size);
+
+        // Registers uniform and its data
+        s_PersistentUniformData[handle.idx] = data;
         s_UniformRegistry.add(handle, uniformRef.Name.c_str());
     }
 
@@ -179,20 +154,57 @@ namespace spr {
     }
 
     void setUniform(const UniformHandle& uniformHandle, const void* data) {
-        assert(uniformHandle.isValid(), "::ERROR: Invalid uniform handle!");
+        assert(uniformHandle.isValid() && "::ERROR: Invalid uniform handle!");
         const UniformRef& uniform = s_Uniforms[uniformHandle.idx];
+        SimpleUniformBufferPtr uniformBuffer = spr::getFrameData().UniformBuffer;
 
-        // TODO: Update uniform buffer
-        // TODO: Write value to uniform buffer
+        // Checks whether the uniform buffer needs a resize to fit the new data
+        uniformBuffer->update();
 
-        // UniformBuffer::update(&m_frame->m_uniformBuffer[m_uniformIdx]);
-        // UniformBuffer* uniformBuffer = m_frame->m_uniformBuffer[m_uniformIdx];
-        // uniformBuffer->writeUniform(_type, _handle.idx, _value, _num);
+        // Writes uniform data to buffer
+        uniformBuffer->write(data, getUniformSizeByType(uniform.Type));
     }
 
-    void destroy(UniformHandle& uniformHandle) {
-
+    void updateUniform(uint32_t location, const void* data, uint32_t size) {
+        memcpy(s_PersistentUniformData[location], data, size);
     }
 
+    void destroyUniform(UniformHandle& uniformHandle) {
+    }
+
+}
+
+
+namespace spr {
+
+    SimpleUniformBuffer::SimpleUniformBuffer(uint32_t size) {
+        m_bufferData.reserve(size);
+    }
+    
+    SimpleUniformBufferPtr SimpleUniformBuffer::alloc(uint32_t size) {
+        return std::make_shared<SimpleUniformBuffer>(size);
+    }
+    
+    // Updates buffer size when remaining space is smaller than a certain threshold
+    void SimpleUniformBuffer::update() {
+        static const uint32_t resizeThreshold = 65536;
+        static const uint32_t growthPerResize = 1 << 20;
+
+        const uint32_t remainingSpace = m_bufferData.size() - m_writePos;
+        if(remainingSpace <= resizeThreshold) {
+            m_bufferData.reserve(m_bufferData.size() + growthPerResize);
+        }
+    }
+
+    void SimpleUniformBuffer::write(const void* data, uint32_t size) {
+        bool dataFitsBuffer = m_writePos + size < m_bufferData.size(); 
+        assert(dataFitsBuffer && "::ERROR: Buffer size is not big enough for this data");
+        
+        if(dataFitsBuffer) {
+            void* bufferDataWritelocation = m_bufferData.data() + m_writePos;
+            memcpy(bufferDataWritelocation, data, size);
+            m_writePos += size;
+        }
+    }
 
 }

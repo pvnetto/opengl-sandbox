@@ -73,6 +73,14 @@
         "stack": "cpp",
         "thread": "cpp",
         "unordered_set": "cpp",
-        "xtree": "cpp"
+        "xtree": "cpp",
+        "atomic": "cpp",
+        "bit": "cpp",
+        "charconv": "cpp",
+        "clocale": "cpp",
+        "compare": "cpp",
+        "format": "cpp",
+        "optional": "cpp",
+        "stop_token": "cpp"
     }
 }

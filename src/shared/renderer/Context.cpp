@@ -18,13 +18,22 @@ namespace spr {
         bool MouseFirstMove = true;
     };
 
+    /* Window state */
     static WindowState s_State;
     static GLFWwindow* s_Window = nullptr;
 
+    /* Context state */
+    static FrameData s_FrameData;
+
 
     void init() {
+        /* Window init */
         const WindowState &state = *(WindowState *)glfwGetWindowUserPointer(s_Window);
 
+        /* Context init */
+        s_FrameData.UniformBuffer = SimpleUniformBuffer::alloc();
+
+        /* Vendor init */
         glViewport(0, 0, state.Width, state.Height);
         glEnable(GL_DEPTH_TEST);
     }
@@ -32,17 +41,36 @@ namespace spr {
     void clear() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // TODO: Move this to a frame cleanup/initialization function
+        s_FrameData.RenderItems.clear();
     }
 
     void submit(ProgramHandle& program) {
-        glUseProgram(program.idx);
-        program.idx = 0;
+        RenderItem renderItem;
+        renderItem.Program = program;
+        s_FrameData.RenderItems.push_back(renderItem);
+    }
+
+    void draw() {
+        for(const RenderItem& renderItem : s_FrameData.RenderItems) {
+            // TODO: Read all uniforms in [RenderItem::UniformStart, RenderItem::UniformEnd] from UniformBuffer
+            // TODO: Copy all read uniforms to persistent uniform data
+            // TODO: Read all uniforms idx, loc from Program.ConstantUniformBuffer
+            // TODO: Set all uniforms with values from persistent uniform data
+
+            glUseProgram(renderItem.Program.idx);
+        }
     }
 
     void shutdown() {
         glfwTerminate();
         glfwDestroyWindow(s_Window);
         s_Window = nullptr;
+    }
+
+    FrameData& getFrameData() {
+        return s_FrameData;
     }
 
 }
