@@ -1,46 +1,33 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <memory>
+#include "Handles.h"
+#include "Utils.h"
+
+namespace spr {
+
+    enum class UniformType;
+    template<typename T> class UniformBuffer;
+    
+    // TODO: Use OOP for this buffer.....It makes no sense not to use it
+    using UniformDataBuffer = Buffer;
+    using UniformInfoBuffer = Buffer;
+    using UniformDataBufferPtr = std::shared_ptr<Buffer>;
+    using UniformInfoBufferPtr = std::shared_ptr<Buffer>;
+}
 
 // ========================================
 // ==== Uniforms ==========================
 // ========================================
 namespace spr {
 
-    struct UniformHandle;
-    enum class UniformType;
-
     UniformHandle createUniform(const char* name, UniformType type);
     void setUniform(const UniformHandle& uniformHandle, const void* data);
-    void updateUniform(uint32_t location, const void* data, uint32_t size);
     void destroyUniform(UniformHandle& uniformHandle);
 
-}
-
-namespace spr {
-
-    /* Buffer data container. */
-    class SimpleUniformBuffer;
-    using SimpleUniformBufferPtr = std::shared_ptr<SimpleUniformBuffer>;
-    class SimpleUniformBuffer {
-    private:
-        uint32_t m_writePos = 0;
-        std::vector<char> m_bufferData;
-
-    public:
-        SimpleUniformBuffer(uint32_t size);
-
-        void write(const void* data, uint32_t size);
-
-        // Updates buffer size when remaining memory is smaller than a certain threshold
-        void update();
-    public:
-        // Allocates buffer
-        static SimpleUniformBufferPtr alloc(uint32_t size = 1 << 20);
-    };
-
+    // Updates uniform data on CPU
+    void updateUniforms(UniformDataBufferPtr uniformBuffer, uint32_t start, uint32_t end);
+    // Sets uniform data in program
+    void rendererSetUniforms(UniformInfoBufferPtr uniformMetadataBuffer);
 }
 
 namespace spr {

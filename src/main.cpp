@@ -1,6 +1,7 @@
 #include <iostream>
 
-#include "shared/renderer/SimpleRenderer.h"#include "shared/layers/SandboxLayer.h"
+#include "shared/renderer/SimpleRenderer.h"
+#include "shared/layers/SandboxLayer.h"
 
 
 int main() {

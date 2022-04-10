@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 #include <cassert>
+#include <glad/glad.h>
 
 // ========================================
 // ==== Uniforms ==========================
@@ -80,7 +81,7 @@ namespace spr {
     static UniformHashMap s_UniformHashMap;
     static UniformRegistry s_UniformRegistry;
 
-    // Indexed by uniform location. Data in this array persists through frames.
+    // Data in this array persists through frames, so constant uniforms can be set only once.
     static void* s_PersistentUniformData[SPR_MAX_UNIFORM_COUNT];
 }
 
@@ -156,54 +157,66 @@ namespace spr {
     void setUniform(const UniformHandle& uniformHandle, const void* data) {
         assert(uniformHandle.isValid() && "::ERROR: Invalid uniform handle!");
         const UniformRef& uniform = s_Uniforms[uniformHandle.idx];
-        SimpleUniformBufferPtr uniformBuffer = spr::getFrameData().UniformBuffer;
-
-        // Checks whether the uniform buffer needs a resize to fit the new data
-        uniformBuffer->update();
+        UniformDataBufferPtr uniformDataBuffer = spr::getFrameData().UniformDataBuffer;
 
         // Writes uniform data to buffer
-        uniformBuffer->write(data, getUniformSizeByType(uniform.Type));
-    }
-
-    void updateUniform(uint32_t location, const void* data, uint32_t size) {
-        memcpy(s_PersistentUniformData[location], data, size);
+        uniformDataBuffer->write(&uniformHandle, sizeof(UniformHandle));
+        uniformDataBuffer->write(&uniform.Type, sizeof(UniformType));
+        uniformDataBuffer->write(data, getUniformSizeByType(uniform.Type));
     }
 
     void destroyUniform(UniformHandle& uniformHandle) {
+        // TODO: Implement destroy uniform
     }
 
-}
-
-
-namespace spr {
-
-    SimpleUniformBuffer::SimpleUniformBuffer(uint32_t size) {
-        m_bufferData.reserve(size);
+    static void updateUniform(uint32_t location, const void* data, uint32_t size) {
+        memcpy(s_PersistentUniformData[location], data, size);
     }
-    
-    SimpleUniformBufferPtr SimpleUniformBuffer::alloc(uint32_t size) {
-        return std::make_shared<SimpleUniformBuffer>(size);
-    }
-    
-    // Updates buffer size when remaining space is smaller than a certain threshold
-    void SimpleUniformBuffer::update() {
-        static const uint32_t resizeThreshold = 65536;
-        static const uint32_t growthPerResize = 1 << 20;
 
-        const uint32_t remainingSpace = m_bufferData.size() - m_writePos;
-        if(remainingSpace <= resizeThreshold) {
-            m_bufferData.reserve(m_bufferData.size() + growthPerResize);
+    void updateUniforms(UniformDataBufferPtr uniformDataBuffer, uint32_t start, uint32_t end)
+    {
+        uniformDataBuffer->reset(start);
+
+        while(uniformDataBuffer->getPos() != end) {
+            UniformHandle handle = uniformDataBuffer->read<UniformHandle>();
+            UniformType type = uniformDataBuffer->read<UniformType>();
+
+            const uint32_t uniformSize = getUniformSizeByType(type);
+            void* data = uniformDataBuffer->read(uniformSize);
+            updateUniform(handle.idx, data, uniformSize);
         }
     }
 
-    void SimpleUniformBuffer::write(const void* data, uint32_t size) {
-        bool dataFitsBuffer = m_writePos + size < m_bufferData.size(); 
-        assert(dataFitsBuffer && "::ERROR: Buffer size is not big enough for this data");
-        
-        if(dataFitsBuffer) {
-            void* bufferDataWritelocation = m_bufferData.data() + m_writePos;
-            memcpy(bufferDataWritelocation, data, size);
-            m_writePos += size;
+    template <typename T>
+    T* getPersistentUniformData(uint32_t location) {
+        return static_cast<T*>(s_PersistentUniformData[location]);
+    }
+
+    void rendererSetUniforms(UniformInfoBufferPtr uniformInfoBuffer) {
+        // Assumes buffer is at end location
+        // TODO: Read all uniforms at once so we don't have to rely on the buffer being at the right state
+        uint32_t bufferEnd = uniformInfoBuffer->getPos();
+        uniformInfoBuffer->reset();
+        while(uniformInfoBuffer->getPos() < bufferEnd) {
+            UniformType type = uniformInfoBuffer->read<UniformType>();
+            uint32_t location = uniformInfoBuffer->read<uint32_t>();
+            switch(type) {
+                case UniformType::Float:
+                    glUniform1fv(location, 1, getPersistentUniformData<float>(location));
+                    break;
+                case UniformType::Integer:
+                    glUniform1iv(location, 1, getPersistentUniformData<int>(location));
+                    break;
+                case UniformType::Vec2:
+                    glUniform2fv(location, 1, getPersistentUniformData<float>(location));
+                    break;
+                case UniformType::Vec3:
+                    glUniform3fv(location, 1, getPersistentUniformData<float>(location));
+                    break;
+                default:
+                    assert(false && "::ERROR: Undefined uniform type");
+                    break;
+            }
         }
     }
 

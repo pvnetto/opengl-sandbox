@@ -11,11 +11,19 @@
 // ===================================================
 namespace spr {
 
+    /* Initializes renderer */
     void init();
-    void clear();
-    void submit(ProgramHandle& program);
-    void draw();
     void shutdown();
+
+    /* Clears framebuffer data */
+    void clear();
+
+    /* Submits data to renderer */
+    void submit(ProgramHandle& program);
+    /* Renders primitives submitted to renderer */
+    void render();
+    /* Cleans current frame data. This should be called after rendering a frame */
+    void cleanup();
 
 }
 
@@ -28,8 +36,10 @@ namespace spr {
     };
 
     struct FrameData {
-        SimpleUniformBufferPtr UniformBuffer;
-        std::vector<RenderItem> RenderItems;    
+        UniformDataBufferPtr UniformDataBuffer;
+        std::vector<RenderItem> RenderItems;
+
+        uint32_t nextRenderItemUniformStart();
     };
 
     FrameData& getFrameData();

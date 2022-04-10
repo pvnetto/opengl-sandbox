@@ -31,28 +31,35 @@ namespace spr {
         const WindowState &state = *(WindowState *)glfwGetWindowUserPointer(s_Window);
 
         /* Context init */
-        s_FrameData.UniformBuffer = SimpleUniformBuffer::alloc();
+        s_FrameData.UniformDataBuffer = UniformDataBuffer::alloc();
 
         /* Vendor init */
         glViewport(0, 0, state.Width, state.Height);
         glEnable(GL_DEPTH_TEST);
     }
 
+    void shutdown() {
+        glfwTerminate();
+        glfwDestroyWindow(s_Window);
+        s_Window = nullptr;
+    }
+
+
     void clear() {
 		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // TODO: Move this to a frame cleanup/initialization function
-        s_FrameData.RenderItems.clear();
     }
 
     void submit(ProgramHandle& program) {
         RenderItem renderItem;
         renderItem.Program = program;
+        renderItem.UniformsStart = s_FrameData.nextRenderItemUniformStart();
+        renderItem.UniformsEnd = s_FrameData.UniformDataBuffer->getPos();
+
         s_FrameData.RenderItems.push_back(renderItem);
     }
 
-    void draw() {
+    void render() {
         for(const RenderItem& renderItem : s_FrameData.RenderItems) {
             // TODO: Read all uniforms in [RenderItem::UniformStart, RenderItem::UniformEnd] from UniformBuffer
             // TODO: Copy all read uniforms to persistent uniform data
@@ -63,18 +70,26 @@ namespace spr {
         }
     }
 
-    void shutdown() {
-        glfwTerminate();
-        glfwDestroyWindow(s_Window);
-        s_Window = nullptr;
+    void cleanup() {
+        s_FrameData.UniformDataBuffer->reset();
+        s_FrameData.RenderItems.clear();
     }
+
+}
+
+
+namespace spr {
 
     FrameData& getFrameData() {
         return s_FrameData;
     }
 
-}
+    uint32_t FrameData::nextRenderItemUniformStart() {
+        if(RenderItems.empty()) return 0;
+        return RenderItems[RenderItems.size() - 1].UniformsEnd;
+    }
 
+}
 
 // ===================================================
 // ==== Windowing ====================================
