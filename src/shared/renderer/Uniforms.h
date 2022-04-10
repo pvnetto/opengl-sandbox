@@ -11,8 +11,8 @@ namespace spr {
     // TODO: Use OOP for this buffer.....It makes no sense not to use it
     using UniformDataBuffer = Buffer;
     using UniformInfoBuffer = Buffer;
-    using UniformDataBufferPtr = std::shared_ptr<Buffer>;
-    using UniformInfoBufferPtr = std::shared_ptr<Buffer>;
+    using UniformDataBufferPtr = std::shared_ptr<UniformDataBuffer>;
+    using UniformInfoBufferPtr = std::shared_ptr<UniformInfoBuffer>;
 }
 
 // ========================================
@@ -22,12 +22,14 @@ namespace spr {
 
     UniformHandle createUniform(const char* name, UniformType type);
     void setUniform(const UniformHandle& uniformHandle, const void* data);
-    void destroyUniform(UniformHandle& uniformHandle);
+    void destroy(UniformHandle& uniformHandle);
 
     // Updates uniform data on CPU
     void updateUniforms(UniformDataBufferPtr uniformBuffer, uint32_t start, uint32_t end);
     // Sets uniform data in program
-    void rendererSetUniforms(UniformInfoBufferPtr uniformMetadataBuffer);
+    void rendererSetUniforms(UniformInfoBufferPtr uniformInfoBuffer);
+
+    UniformHandle getUniformByName(const char* name);
 }
 
 namespace spr {

@@ -25,8 +25,9 @@ namespace spr {
 
     void* Buffer::read(uint32_t size) {
         if(m_pos + size > m_bufferData.capacity()) return nullptr;
+        const uint32_t offset = m_pos;
         m_pos += size;
-        return m_bufferData.data() + m_pos;
+        return m_bufferData.data() + offset;
     }
     
     // Updates buffer size when remaining space is smaller than a certain threshold

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Uniforms.h"
 #include "Handles.h"
 
 namespace spr {
@@ -8,9 +9,10 @@ namespace spr {
     void destroy(ShaderHandle& shaderHandle);
 
     ProgramHandle createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders = true);
-    void setProgram(ProgramHandle& handle);
     void destroy(ProgramHandle& programHandle);
 
+    void setProgram(const ProgramHandle& handle);
+    UniformInfoBufferPtr getProgramUniforms(const ProgramHandle& handle);
 }
 
 

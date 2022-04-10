@@ -38,7 +38,7 @@ namespace spr {
 				return &m_handles[index];
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		const UniformHandle& add(UniformHandle handle, const char* name)
@@ -158,13 +158,14 @@ namespace spr {
         uniformDataBuffer->write(data, getUniformSizeByType(uniform.Type));
     }
 
-    void destroyUniform(UniformHandle& uniformHandle) {
-        // TODO: Implement destroy uniform
+    void destroy(UniformHandle& uniformHandle) {
+        // TODO: Free uniform data from memory
+        s_UniformRegistry.remove(uniformHandle);
         HandleGenerator<UniformHandle>::removeHandle(uniformHandle);
     }
 
-    static void updateUniform(uint32_t location, const void* data, uint32_t size) {
-        memcpy(s_PersistentUniformData[location], data, size);
+    static void updateUniform(const UniformHandle& handle, const void* data, uint32_t size) {
+        memcpy(s_PersistentUniformData[handle.idx], data, size);
     }
 
     void updateUniforms(UniformDataBufferPtr uniformDataBuffer, uint32_t start, uint32_t end)
@@ -177,13 +178,13 @@ namespace spr {
 
             const uint32_t uniformSize = getUniformSizeByType(type);
             void* data = uniformDataBuffer->read(uniformSize);
-            updateUniform(handle.idx, data, uniformSize);
+            updateUniform(handle, data, uniformSize);
         }
     }
 
     template <typename T>
-    T* getPersistentUniformData(uint32_t location) {
-        return static_cast<T*>(s_PersistentUniformData[location]);
+    T* getPersistentUniformData(const UniformHandle& handle) {
+        return static_cast<T*>(s_PersistentUniformData[handle.idx]);
     }
 
     void rendererSetUniforms(UniformInfoBufferPtr uniformInfoBuffer) {
@@ -194,24 +195,33 @@ namespace spr {
         while(uniformInfoBuffer->getPos() < bufferEnd) {
             UniformType type = uniformInfoBuffer->read<UniformType>();
             uint32_t location = uniformInfoBuffer->read<uint32_t>();
+            UniformHandle handle = uniformInfoBuffer->read<UniformHandle>();
             switch(type) {
                 case UniformType::Float:
-                    glUniform1fv(location, 1, getPersistentUniformData<float>(location));
+                    glUniform1fv(location, 1, getPersistentUniformData<float>(handle));
                     break;
                 case UniformType::Integer:
-                    glUniform1iv(location, 1, getPersistentUniformData<int>(location));
+                    glUniform1iv(location, 1, getPersistentUniformData<int>(handle));
                     break;
                 case UniformType::Vec2:
-                    glUniform2fv(location, 1, getPersistentUniformData<float>(location));
+                    glUniform2fv(location, 1, getPersistentUniformData<float>(handle));
                     break;
                 case UniformType::Vec3:
-                    glUniform3fv(location, 1, getPersistentUniformData<float>(location));
+                    glUniform3fv(location, 1, getPersistentUniformData<float>(handle));
                     break;
                 default:
                     assert(false && "::ERROR: Undefined uniform type");
                     break;
             }
         }
+    }
+
+    UniformHandle getUniformByName(const char* name) {
+        if(const UniformHandle* handle = s_UniformRegistry.find(name)) {
+            return *handle;
+        }
+        assert(false && "::ERROR: Uniform doesn't exist. You should call spr::createUniform before calling this.");
+        return { kInvalidHandle };
     }
 
 }

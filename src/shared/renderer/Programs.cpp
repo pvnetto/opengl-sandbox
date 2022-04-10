@@ -1,5 +1,4 @@
 #include "Programs.h"
-#include "Uniforms.h"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -76,15 +75,21 @@ namespace spr {
         return programHandle;
     }
 
-    void setProgram(ProgramHandle& handle) {
-        assert(handle.isValid() && "::ERROR: Invalid program");
-        glUseProgram(s_Programs[handle.idx].ID);
-    }
-
     void destroy(ProgramHandle& handle) {
         s_Programs[handle.idx].destroy();
         HandleGenerator<ProgramHandle>::removeHandle(handle);
     }
+
+    void setProgram(const ProgramHandle& handle) {
+        assert(handle.isValid() && "::ERROR: Invalid program");
+        glUseProgram(s_Programs[handle.idx].ID);
+    }
+
+    UniformInfoBufferPtr getProgramUniforms(const ProgramHandle& handle) {
+        assert(handle.isValid() && "::ERROR: Invalid program");
+        return s_Programs[handle.idx].UniformInfoBuffer;
+    }
+
 
 }
 
@@ -132,6 +137,22 @@ namespace spr {
         findUniforms();
     }
 
+    static UniformType getSPRUniformTypeFromGLType(GLenum type) {
+        switch(type) {
+            case GL_INT:
+                return UniformType::Integer;
+            case GL_FLOAT:
+                return UniformType::Float;
+            case GL_FLOAT_VEC2:
+                return UniformType::Vec2;
+            case GL_FLOAT_VEC3:
+                return UniformType::Vec3;
+            default:
+                assert(false && "::ERROR: Undefined uniform type");
+                return UniformType::Float;
+        }
+    }
+
     void ProgramInstanceGL::findUniforms() {
         UniformInfoBuffer->reset();
 
@@ -147,11 +168,14 @@ namespace spr {
             name.clear();
 
             glGetActiveUniform(ID, i, maxUniformNameLength, NULL, &count, &type, name.data());
-            const char* nameStr = name.c_str();
-            uint32_t location = glGetUniformLocation(ID, nameStr);
+            uint32_t location = glGetUniformLocation(ID, name.c_str());
 
-            UniformInfoBuffer->write(&type, sizeof(GLenum));
+            const UniformHandle handle = getUniformByName(name.c_str());
+            const UniformType sprType = getSPRUniformTypeFromGLType(type);
+
+            UniformInfoBuffer->write(&sprType, sizeof(UniformType));
             UniformInfoBuffer->write(&location, sizeof(uint32_t));
+            UniformInfoBuffer->write(&handle, sizeof(UniformHandle));
         }
     }
 

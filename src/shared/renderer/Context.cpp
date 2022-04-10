@@ -1,5 +1,6 @@
 #include "Context.h"
 #include "Runtime.h"
+#include "Programs.h"
 #include "shared/Event.h"
 
 #include <iostream>
@@ -62,9 +63,8 @@ namespace spr {
     void render() {
         for(const RenderItem& renderItem : s_FrameData.RenderItems) {
             spr::updateUniforms(s_FrameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
-            // spr::rendererSetUniforms()
-
-            glUseProgram(renderItem.Program.idx);
+            spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
+            spr::setProgram(renderItem.Program);
         }
     }
 

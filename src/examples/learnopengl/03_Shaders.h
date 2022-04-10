@@ -7,6 +7,7 @@ class LOGL_03_Shaders : public Layer {
 public:
     virtual void OnAttach() override;
     virtual void OnUpdate() override;
+    virtual void OnDettach() override;
 
 private:
     unsigned int m_vaoA, m_vaoB;
