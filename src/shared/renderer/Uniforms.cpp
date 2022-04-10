@@ -12,13 +12,6 @@
 // ========================================
 namespace spr {
 
-    #define SPR_MAX_UNIFORM_COUNT 512
-
-}
-
-
-namespace spr {
-
     struct UniformRef {
         std::string Name;
         UniformType Type;
@@ -72,17 +65,17 @@ namespace spr {
 
 	private:
 		UniformHashMap m_uniforms;
-		UniformHandle m_handles[SPR_MAX_UNIFORM_COUNT];
+		UniformHandle m_handles[UniformHandle::capacity];
     };
 
     // Indexed by handles
-    static UniformRef s_Uniforms[SPR_MAX_UNIFORM_COUNT];
+    static UniformRef s_Uniforms[UniformHandle::capacity];
     
     static UniformHashMap s_UniformHashMap;
     static UniformRegistry s_UniformRegistry;
 
     // Data in this array persists through frames, so constant uniforms can be set only once.
-    static void* s_PersistentUniformData[SPR_MAX_UNIFORM_COUNT];
+    static void* s_PersistentUniformData[UniformHandle::capacity];
 }
 
 namespace spr {
@@ -140,7 +133,7 @@ namespace spr {
         }
         else {
             // Generates new uniform ref
-            index = getAvailableUniformIndex();
+            index = HandleGenerator<UniformHandle>::allocHandle();
             uniformRef = &s_Uniforms[index];
             uniformRef->Name = name;
             uniformRef->Type = type;
@@ -167,6 +160,7 @@ namespace spr {
 
     void destroyUniform(UniformHandle& uniformHandle) {
         // TODO: Implement destroy uniform
+        HandleGenerator<UniformHandle>::removeHandle(uniformHandle);
     }
 
     static void updateUniform(uint32_t location, const void* data, uint32_t size) {

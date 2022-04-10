@@ -53,7 +53,7 @@ namespace spr {
     void submit(ProgramHandle& program) {
         RenderItem renderItem;
         renderItem.Program = program;
-        renderItem.UniformsStart = s_FrameData.nextRenderItemUniformStart();
+        renderItem.UniformsStart = s_FrameData.lastRenderItemUniformEnd();
         renderItem.UniformsEnd = s_FrameData.UniformDataBuffer->getPos();
 
         s_FrameData.RenderItems.push_back(renderItem);
@@ -61,10 +61,8 @@ namespace spr {
 
     void render() {
         for(const RenderItem& renderItem : s_FrameData.RenderItems) {
-            // TODO: Read all uniforms in [RenderItem::UniformStart, RenderItem::UniformEnd] from UniformBuffer
-            // TODO: Copy all read uniforms to persistent uniform data
-            // TODO: Read all uniforms idx, loc from Program.ConstantUniformBuffer
-            // TODO: Set all uniforms with values from persistent uniform data
+            spr::updateUniforms(s_FrameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
+            // spr::rendererSetUniforms()
 
             glUseProgram(renderItem.Program.idx);
         }
@@ -84,7 +82,7 @@ namespace spr {
         return s_FrameData;
     }
 
-    uint32_t FrameData::nextRenderItemUniformStart() {
+    uint32_t FrameData::lastRenderItemUniformEnd() {
         if(RenderItems.empty()) return 0;
         return RenderItems[RenderItems.size() - 1].UniformsEnd;
     }

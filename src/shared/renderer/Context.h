@@ -39,7 +39,7 @@ namespace spr {
         UniformDataBufferPtr UniformDataBuffer;
         std::vector<RenderItem> RenderItems;
 
-        uint32_t nextRenderItemUniformStart();
+        uint32_t lastRenderItemUniformEnd();
     };
 
     FrameData& getFrameData();

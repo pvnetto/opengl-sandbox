@@ -3,8 +3,37 @@
 #include <cstdint>
 #include <vector>
 #include <memory>
+#include <type_traits>
+
+#include "Handles.h"
 
 namespace spr {
+
+    template <typename T, typename Enable = void>
+    class HandleGenerator {};
+
+    template <typename T>
+    class HandleGenerator <T, std::enable_if_t<is_handle_type<T>::value, void>> {
+    public:
+        static inline bool m_handles[T::capacity] = { false };
+
+    public:
+        // Brute-force index allocator
+        static uint32_t allocHandle() {
+            for(int i = 0; i < T::capacity; i++) {
+                if(m_handles[i]) continue;
+                m_handles[i] = true; 
+                return i;
+            }
+
+            return kInvalidHandle;
+        }
+
+        static void removeHandle(const T& handle) {
+            m_handles[handle.idx] = false;
+        }
+
+    };
 
     /* Buffer data container. */
     class Buffer;

@@ -1,4 +1,5 @@
 #include "Programs.h"
+#include "Uniforms.h"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -7,6 +8,23 @@
 // ========================================
 // ==== Shaders ===========================
 // ========================================
+
+namespace spr {
+
+    struct ShaderInstance {
+        uint32_t ID;
+    };
+
+    struct ProgramInstance {
+        uint32_t ID;
+        UniformInfoBufferPtr UniformInfoBuffer;
+    };
+
+    static ShaderInstance s_Shaders[ShaderHandle::capacity];
+    static ProgramInstance s_Programs[ProgramHandle::capacity];
+
+}
+
 namespace spr {
 
     static GLuint getGLShaderTypeFromSPR(unsigned int sprShaderType) {
@@ -48,6 +66,10 @@ namespace spr {
 namespace spr {
 
     ProgramHandle createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) {
+        // TODO: Generate handle
+        // TODO: Initialize ProgramRef[handle]
+
+        // TODO: Move this to inside
         ProgramHandle programHandle;
         programHandle.idx = glCreateProgram();
         glAttachShader(programHandle.idx, vertexHandle.idx);
@@ -66,6 +88,8 @@ namespace spr {
             destroy(vertexHandle);
             destroy(fragmentHandle);
         }
+
+        // TODO: Initialize ProgramInstance[handle]
 
         return programHandle;
     }

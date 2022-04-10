@@ -43,7 +43,9 @@ void LOGL_06_MVP::OnUpdate() {
 
 	// 3) Creates projection matrix
 	glm::mat4 projection(1.0f);
-	float aspectRatio = spr::getWindowWidth() / spr::getWindowHeight(), near = 0.1f, far = 100.f;
+	const float aspectRatio = (float) (spr::getWindowWidth() / spr::getWindowHeight());
+	const float near = 0.1f;
+	const float far = 100.f;
 	projection = glm::perspective(m_fov, aspectRatio, near, far);
 
 	// 4) Passes MVP matrices as uniforms to shader
