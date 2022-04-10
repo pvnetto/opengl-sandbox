@@ -124,25 +124,25 @@ namespace spr {
     UniformHandle createUniform(const char* name, UniformType type) {
         HandleType index = kInvalidHandle;
         UniformRef* uniformRef = nullptr;
+        UniformHandle handle;
 
         // If index exists in hashmap, just check uniform validity and return a handle
         if(s_UniformHashMap.count({ name }) > 0) {
-            index = s_UniformHashMap[name];
-            uniformRef = &s_Uniforms[index];
+            handle.idx = s_UniformHashMap[name];
+            uniformRef = &s_Uniforms[handle.idx];
             assert(uniformRef->Type == type && "::ERROR: Uniform type mismatch");
         }
         else {
             // Generates new uniform ref
-            index = HandleGenerator<UniformHandle>::allocHandle();
-            uniformRef = &s_Uniforms[index];
+            handle = HandleGenerator<UniformHandle>::allocHandle();
+            uniformRef = &s_Uniforms[handle.idx];
             uniformRef->Name = name;
             uniformRef->Type = type;
 
             // Adds ref index to hashmap
-            s_UniformHashMap[{ name }] = index;
+            s_UniformHashMap[{ name }] = handle.idx;
         }
 
-        UniformHandle handle { index };
         rendererCreateUniform(handle, *uniformRef);
         return handle;
     }

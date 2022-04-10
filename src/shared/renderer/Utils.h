@@ -9,6 +9,7 @@
 
 namespace spr {
 
+    /* Generates valid handles, while keeping track of which handles are busy */
     template <typename T, typename Enable = void>
     class HandleGenerator {};
 
@@ -18,8 +19,7 @@ namespace spr {
         static inline bool m_handles[T::capacity] = { false };
 
     public:
-        // Brute-force index allocator
-        static uint32_t allocHandle() {
+        static T allocHandle() {
             for(int i = 0; i < T::capacity; i++) {
                 if(m_handles[i]) continue;
                 m_handles[i] = true; 
@@ -29,8 +29,9 @@ namespace spr {
             return kInvalidHandle;
         }
 
-        static void removeHandle(const T& handle) {
+        static void removeHandle(T& handle) {
             m_handles[handle.idx] = false;
+            handle = kInvalidHandle;
         }
 
     };

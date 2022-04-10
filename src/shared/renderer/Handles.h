@@ -22,8 +22,10 @@ namespace spr {
 
 #define SPR_DEFINE_HANDLE(name, cap) \
 	struct name##Handle { \
-        static constexpr uint32_t capacity = cap;                     \
-        uint16_t idx;                                                 \
+        static constexpr uint32_t capacity = cap;                           \
+        uint16_t idx;                                                       \
+        name##Handle() = default;                                           \
+        name##Handle(uint32_t handleIdx) : idx(handleIdx) {}                \
 	    inline bool isValid() const { return spr::kInvalidHandle != idx; }  \
     }; \
     template<> struct is_handle_type<name##Handle> : std::true_type {}; 

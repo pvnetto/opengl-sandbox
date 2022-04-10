@@ -13,7 +13,7 @@ namespace spr {
     }
 
     void Buffer::write(const void* data, uint32_t size) {
-        bool dataFitsBuffer = m_pos + size < m_bufferData.size(); 
+        bool dataFitsBuffer = m_pos + size < m_bufferData.capacity(); 
         assert(dataFitsBuffer && "::ERROR: Buffer size is not big enough for this data");
         
         if(dataFitsBuffer) {
@@ -24,7 +24,7 @@ namespace spr {
     }
 
     void* Buffer::read(uint32_t size) {
-        if(m_pos + size > m_bufferData.size()) return nullptr;
+        if(m_pos + size > m_bufferData.capacity()) return nullptr;
         m_pos += size;
         return m_bufferData.data() + m_pos;
     }
@@ -34,9 +34,9 @@ namespace spr {
         static const uint32_t resizeThreshold = 65536;
         static const uint32_t growthPerResize = 1 << 20;
 
-        const uint32_t remainingSpace = m_bufferData.size() - m_pos;
+        const uint32_t remainingSpace = m_bufferData.capacity() - m_pos;
         if(remainingSpace <= resizeThreshold) {
-            m_bufferData.reserve(m_bufferData.size() + growthPerResize);
+            m_bufferData.reserve(m_bufferData.capacity() + growthPerResize);
         }
     }
 

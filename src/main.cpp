@@ -3,6 +3,7 @@
 #include "shared/renderer/SimpleRenderer.h"
 #include "shared/layers/SandboxLayer.h"
 
+#include "shared/renderer/Handles.h"
 
 int main() {
 	spr::createWindow("OpenGL Sandbox", 1280, 720);
