@@ -3,6 +3,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <assert.h>
+#include <unordered_map>
 
 
 // ========================================
@@ -19,11 +20,15 @@ namespace spr {
     };
 
     struct ProgramInstanceGL {
+        using AttributesMap = std::unordered_map<const char*, int>;
+        
         uint32_t ID;
         UniformInfoBufferPtr UniformInfoBuffer;
+        AttributesMap Attributes;
 
         void create(const ShaderInstanceGL& vertexShader, const ShaderInstanceGL& fragmentShader);
         void findUniforms();
+        void findAttributes();
         void destroy();
     };
 
@@ -135,6 +140,7 @@ namespace spr {
         }
 
         findUniforms();
+        findAttributes();
     }
 
     static UniformType getSPRUniformTypeFromGLType(GLenum type) {
@@ -176,6 +182,26 @@ namespace spr {
             UniformInfoBuffer->write(&sprType, sizeof(UniformType));
             UniformInfoBuffer->write(&location, sizeof(uint32_t));
             UniformInfoBuffer->write(&handle, sizeof(UniformHandle));
+        }
+    }
+
+    void ProgramInstanceGL::findAttributes() {
+        Attributes.clear();
+
+        GLint activeAttributesCount, maxAttributeNameLength;
+        glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTES, &activeAttributesCount);
+        glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeNameLength);
+
+        std::string name;
+        name.reserve(maxAttributeNameLength);
+        for(int i = 0; i < activeAttributesCount; i++) {
+            GLenum type;
+            GLint count;
+            name.clear();
+
+            glGetActiveAttrib(ID, i, maxAttributeNameLength, nullptr, &count, &type, name.data());
+            int32_t location = glGetAttribLocation(ID, name.c_str());
+            Attributes.emplace(name.c_str(), location);
         }
     }
 

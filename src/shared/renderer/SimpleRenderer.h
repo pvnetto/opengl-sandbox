@@ -5,3 +5,4 @@
 #include "Inputs.h"
 #include "Programs.h"
 #include "Uniforms.h"
+#include "VertexAttributeLayout.h"

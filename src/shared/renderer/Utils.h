@@ -69,4 +69,23 @@ namespace spr {
         static BufferPtr alloc(uint32_t size = 1 << 20);
     };
 
+
+    //-----------------------------------------------------------------------------
+    // MurmurHash2A, by Austin Appleby
+    // https://github.com/aappleby/smhasher/blob/master/src/MurmurHash2.h
+    //-----------------------------------------------------------------------------
+    uint32_t murmurHash2A(const void* key, int len, uint32_t seed=0xFF22);
+
+    //-----------------------------------------------------------------------------
+    // https://stackoverflow.com/a/38140932
+    //-----------------------------------------------------------------------------
+    inline void hashCombine(std::size_t& seed) { }
+
+    template <typename T, typename... Rest>
+    inline void hashCombine(std::size_t& seed, const T& v, Rest... rest) {
+        std::hash<T> hasher;
+        seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        hashCombine(seed, rest...);
+    }
+
 }

@@ -17,7 +17,13 @@ static const float verticesB[] = {
 	0.2f, 0.2f, 0.0f,  // top
 };
 
+
 void LOGL_03_Shaders::DeclareBuffers() {
+	spr::VertexAttributeLayout layout;
+	layout = layout.begin()
+		.add({ "aPosition", spr::AttributeType::Float, 3 })
+		.end();
+
 	// First VAO
 	unsigned int vboA, vboB;
 	glGenVertexArrays(1, &m_vaoA);
@@ -64,7 +70,7 @@ void LOGL_03_Shaders::OnAttach() {
 }
 
 void LOGL_03_Shaders::OnUpdate() {
-	float horizontalOffset = std::sin(glfwGetTime()) * 1.0f;
+	const float horizontalOffset = (float) std::sin(glfwGetTime()) * 1.0f;
 	spr::setUniform(m_uniformHandle, &horizontalOffset);
 	spr::submit(m_shaderProgramHandle);
 	spr::render();
@@ -74,6 +80,7 @@ void LOGL_03_Shaders::OnUpdate() {
 
 	glBindVertexArray(m_vaoB);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
 	spr::cleanup();
 }
 

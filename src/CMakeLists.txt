@@ -6,6 +6,9 @@ set(SANDBOX_SOURCES
 		shared/Mesh.cpp
 		shared/Model.cpp
 		shared/Utils.cpp
+		shared/renderer/VertexBuffer.cpp
+		shared/renderer/IndexBuffer.cpp
+		shared/renderer/VertexAttributeLayout.cpp
 		shared/renderer/Programs.cpp
 		shared/renderer/Uniforms.cpp
 		shared/renderer/Context.cpp
