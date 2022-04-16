@@ -1,18 +1,30 @@
+#include "Renderer.h"
+
 #include "shared/renderer/Context.h"
 #include "shared/renderer/Programs.h"
 #include "shared/renderer/VertexBuffer.h"
 
+#include <glad/glad.h>
+
 namespace spr {
 
+    static uint32_t s_DefaultVAO = 0;
+
+    void rendererInit() {
+        glCreateVertexArrays(1, &s_DefaultVAO);
+    }
+
     // ------------------======================================
-    // ----- Implements spr::render from Context.h
+    // ----- Implements some functions from Context.h
     // ------------------======================================
     void render() {
         DrawCallData currentDrawCall;
+
+        glBindVertexArray(s_DefaultVAO);
+
         FrameData& frameData = spr::getFrameData();
         for(const DrawCallData& renderItem : frameData.DrawCalls) {
             spr::updateUniforms(frameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
-            spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
 
             bool changedAttributesLayout = false;
             if(currentDrawCall.Program != renderItem.Program) {
@@ -21,6 +33,8 @@ namespace spr {
 
                 spr::useProgram(renderItem.Program);
             }
+
+            spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
 
             if(currentDrawCall.VertexBufferHandle != renderItem.VertexBufferHandle) {
                 currentDrawCall.VertexBufferHandle = renderItem.VertexBufferHandle;
@@ -43,9 +57,17 @@ namespace spr {
                 // TODO: Draw elements (instanced by default? divisor = 0)
             }
             else {
-                // TODO: Draw arrays (instanced by default? divisor = 0)
+                // TODO: Instanced by default? (w/ divisor = 0)
+                const auto& vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertexBufferHandle);
+                const auto& vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
+                const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
+                glDrawArrays(GL_TRIANGLES, 0, vertexCount);
             }
         }
+    }
+
+    void rendererShutdown() {
+        glDeleteVertexArrays(1, &s_DefaultVAO);
     }
 
 }

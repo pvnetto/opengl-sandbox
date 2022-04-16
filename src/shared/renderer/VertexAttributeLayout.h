@@ -19,14 +19,14 @@ namespace spr {
     };
 
     struct VertexAttribute {
-        const char* Name;
+        std::string Name;
         AttributeType Type;
         uint32_t Num;
         bool Normalized;
         uint32_t Offset = 0;
 
         VertexAttribute() = default;
-        VertexAttribute(const char* name, AttributeType type, uint32_t num, bool normalized = false);
+        VertexAttribute(std::string name, AttributeType type, uint32_t num, bool normalized = false);
 
         uint32_t getAttributeSize() const;
     };
@@ -40,11 +40,13 @@ namespace spr {
         uint32_t m_hash = 0;
 
     public:
+        inline uint32_t getStride() const { return m_stride; }
+
         VertexAttributeLayout& begin();
         VertexAttributeLayout& add(VertexAttribute attribute);
         VertexAttributeLayout& end();
 
-        VertexAttribute& getAttribute(int index);
+        const VertexAttribute& getAttribute(int index) const;
 
         inline bool operator==(const VertexAttributeLayout& other) const { return m_hash == other.m_hash; }
         inline bool operator!=(const VertexAttributeLayout& other) const { return !(*this == other); }

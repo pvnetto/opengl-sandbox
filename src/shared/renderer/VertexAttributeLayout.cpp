@@ -54,7 +54,7 @@ namespace spr {
         return *this;
     }
 
-    VertexAttribute& VertexAttributeLayout::getAttribute(int index) {
+    const VertexAttribute& VertexAttributeLayout::getAttribute(int index) const {
 
         if(index >= 0 && index < m_attributes.size()) {
             return m_attributes[index];
@@ -65,7 +65,7 @@ namespace spr {
         return empty;
     }
 
-    VertexAttribute::VertexAttribute(const char* name, AttributeType type, uint32_t num, bool normalized) :
+    VertexAttribute::VertexAttribute(std::string name, AttributeType type, uint32_t num, bool normalized) :
         Name(name), Type(type), Num(num), Normalized(normalized)  { }
 
     static uint32_t getAttributeSizeByType(AttributeType type) {

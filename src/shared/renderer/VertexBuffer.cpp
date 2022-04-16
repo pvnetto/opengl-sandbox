@@ -40,7 +40,7 @@ namespace spr { namespace internal {
 
     void bindVertexBuffer(const VertexBufferHandle& handle) {
         assert(handle.isValid() && "::ERROR: Invalid vertex buffer");
-        glBindBuffer(GL_VERTEX_ARRAY, s_VertexBuffers[handle.idx].ID);
+        glBindBuffer(GL_ARRAY_BUFFER, s_VertexBuffers[handle.idx].ID);
     }
 
 }}
@@ -48,9 +48,11 @@ namespace spr { namespace internal {
 namespace spr {
 
     void VertexBufferInstanceGL::create(const void* data, uint32_t size, const VertexAttributeLayoutHandle& layoutHandle) {
+        Size = size;
+        LayoutHandle = layoutHandle;
+
         glCreateBuffers(1, &ID);
-        glBufferData(GL_VERTEX_ARRAY, size, data, GL_STATIC_DRAW);
-        glBindBuffer(GL_VERTEX_ARRAY, 0);
+        glNamedBufferData(ID, size, data, GL_STATIC_DRAW);
     }
 
     void VertexBufferInstanceGL::destroy() {

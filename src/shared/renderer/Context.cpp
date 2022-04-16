@@ -3,6 +3,8 @@
 #include "Programs.h"
 #include "shared/Event.h"
 
+#include "OpenGL/Renderer.h"
+
 #include <iostream>
 #include <glad/glad.h>
 
@@ -38,12 +40,15 @@ namespace spr {
         /* Vendor init */
         glViewport(0, 0, state.Width, state.Height);
         glEnable(GL_DEPTH_TEST);
+
+        rendererInit();
     }
 
     void shutdown() {
         glfwTerminate();
         glfwDestroyWindow(s_Window);
         s_Window = nullptr;
+        rendererShutdown();
     }
 
 
@@ -62,8 +67,8 @@ namespace spr {
     }
 
     void cleanup() {
-        s_FrameData.UniformDataBuffer->reset();
-        s_FrameData.DrawCalls.clear();
+        s_FrameData.clear();
+        s_CachedDrawCallData.clear();
     }
 
 }

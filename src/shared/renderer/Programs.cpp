@@ -22,7 +22,7 @@ namespace spr {
 
     struct ProgramInstanceGL {
         struct ProgramAttributeGL {
-            const char* Name;
+            std::string Name;
             int Location;
         };
         
@@ -207,7 +207,7 @@ namespace spr {
 
         GLint activeAttributesCount, maxAttributeNameLength;
         glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTES, &activeAttributesCount);
-        Attributes.reserve(activeAttributesCount);
+        Attributes.resize(activeAttributesCount);
 
         glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeNameLength);
         std::string name;
@@ -246,8 +246,8 @@ namespace spr {
     void ProgramInstanceGL::bindVertexAttributeLayout(const VertexAttributeLayoutHandle& layoutHandle) {
         VertexAttributeLayout& layout = spr::getVertexAttributeLayout(layoutHandle);
         for(int i = 0; i < Attributes.size(); i++) {
-            VertexAttribute& layoutAttribute = layout.getAttribute(i);
-            ProgramAttributeGL& programAttribute = Attributes[i];
+            const VertexAttribute& layoutAttribute = layout.getAttribute(i);
+            const ProgramAttributeGL& programAttribute = Attributes[i];
 
             assert(layoutAttribute.Name == programAttribute.Name && "::ERROR: Vertex layout attribute location mismatch");
 
@@ -256,7 +256,7 @@ namespace spr {
                 getGLTypeFromAttributeType(layoutAttribute.Type),
                 getGLBool(layoutAttribute.Normalized),
                 layoutAttribute.getAttributeSize(),
-                (void *) layoutAttribute.Offset);
+                (void *) (layoutAttribute.Offset));
 	        glEnableVertexAttribArray(programAttribute.Location);
         }
     }

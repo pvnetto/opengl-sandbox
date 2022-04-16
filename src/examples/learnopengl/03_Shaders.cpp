@@ -18,7 +18,7 @@ static const float verticesB[] = {
 };
 
 
-void LOGL_03_Shaders::DeclareBuffers() {
+void LOGL_03_Shaders::CreateBuffers() {
 	spr::VertexAttributeLayout layout;
 	layout.begin()
 			.add({ "aPosition", spr::AttributeType::Float, 3 })
@@ -26,36 +26,9 @@ void LOGL_03_Shaders::DeclareBuffers() {
 
 
 	m_triangleVBHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
-
-	// First VAO
-	unsigned int vboA, vboB;
-	glGenVertexArrays(1, &m_vaoA);
-	glGenBuffers(1, &vboA);
-	glBindVertexArray(m_vaoA);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, vboA);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-	// glEnableVertexAttribArray(0);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	// Second VAO
-	// glGenVertexArrays(1, &m_vaoB);
-	// glGenBuffers(1, &vboB);
-	// glBindVertexArray(m_vaoB);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, vboB);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(verticesB), verticesB, GL_STATIC_DRAW);
-	// glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
-	// glEnableVertexAttribArray(0);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, 0);
-	// glBindVertexArray(0);
 }
 
-void LOGL_03_Shaders::DeclareShader() {
+void LOGL_03_Shaders::CreateShaders() {
 	std::string vertexSrc = utils::readShaderFile("../../src/shaders/02_vertex_offset.vert");
 	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
 
@@ -68,8 +41,8 @@ void LOGL_03_Shaders::DeclareShader() {
 
 
 void LOGL_03_Shaders::OnAttach() {
-	DeclareBuffers();
-	DeclareShader();
+	CreateBuffers();
+	CreateShaders();
 }
 
 void LOGL_03_Shaders::OnUpdate() {
@@ -77,14 +50,9 @@ void LOGL_03_Shaders::OnUpdate() {
 	spr::setUniform(m_uniformHandle, &horizontalOffset);
 	spr::setVertexBuffer(m_triangleVBHandle);
 	spr::submit(m_shaderProgramHandle);
+
 	spr::render();
-
-	glBindVertexArray(m_vaoA);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	glBindVertexArray(m_vaoB);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-
+	
 	spr::cleanup();
 }
 
