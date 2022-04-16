@@ -42,6 +42,7 @@ namespace spr {
         Vec4,
         Mat3x3,
         Mat4x4,
+        Sampler,
     };
 
 }

@@ -162,7 +162,6 @@ namespace spr {
 
     static UniformType getSPRUniformTypeFromGLType(GLenum type) {
         switch(type) {
-            case GL_SAMPLER_2D:
             case GL_INT:
                 return UniformType::Integer;
             case GL_FLOAT:
@@ -171,6 +170,8 @@ namespace spr {
                 return UniformType::Vec2;
             case GL_FLOAT_VEC3:
                 return UniformType::Vec3;
+            case GL_SAMPLER_2D:
+                return UniformType::Sampler;
             default:
                 assert(false && "::ERROR: Undefined uniform type");
                 return UniformType::Float;

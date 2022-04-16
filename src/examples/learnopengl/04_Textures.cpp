@@ -28,8 +28,8 @@ void LOGL_04_Textures::OnAttach() {
 		.end();
 
 	// 1. Defines texture uniforms as integers, so we can pass a texture unit index to the shader
-	m_texUniform0 = spr::createUniform("tex", spr::UniformType::Integer);
-	m_texUniform1 = spr::createUniform("anotherTex", spr::UniformType::Integer);
+	m_texUniform0 = spr::createUniform("tex", spr::UniformType::Sampler);
+	m_texUniform1 = spr::createUniform("anotherTex", spr::UniformType::Sampler);
 
 	m_vertexBufferHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
 	m_indexBufferHandle = spr::createIndexBuffer(indices, sizeof(indices));
@@ -56,6 +56,8 @@ void LOGL_04_Textures::OnAttach() {
 
 	unsigned int brickTexture;
 	glGenTextures(1, &brickTexture);
+	
+	// 3. Binds texture to texture unit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, brickTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, brickData);
@@ -68,7 +70,7 @@ void LOGL_04_Textures::OnAttach() {
 	stbi_image_free(brickData);
 
 
-	// 2. (OPTIONAL) Loads another texture
+	// (OPTIONAL) Loads another texture and binds it to texture unit 1
 	int tex2Width, tex2Height, tex2Channels;
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *tex2Data = stbi_load("../../src/assets/yps.png", &tex2Width, &tex2Height, &tex2Channels, 0);
@@ -102,7 +104,4 @@ void LOGL_04_Textures::OnUpdate() {
 	spr::render();
 
 	spr::cleanup();
-
-	// glBindVertexArray(m_vao);
-	// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

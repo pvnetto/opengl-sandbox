@@ -95,6 +95,7 @@ namespace spr {
         switch(type) {
         case UniformType::Float:
             return sizeof(float);
+        case UniformType::Sampler:
         case UniformType::Integer:
             return sizeof(int);
         case UniformType::Vec2:
@@ -201,6 +202,7 @@ namespace spr {
                 case UniformType::Float:
                     glUniform1fv(location, 1, getPersistentUniformData<float>(handle));
                     break;
+                case UniformType::Sampler:
                 case UniformType::Integer:
                     glUniform1iv(location, 1, getPersistentUniformData<int>(handle));
                     break;
