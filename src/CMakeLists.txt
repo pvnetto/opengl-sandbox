@@ -16,6 +16,7 @@ set(SANDBOX_SOURCES
 		shared/renderer/Runtime.cpp
 		shared/renderer/Utils.cpp
 		shared/renderer/SimpleRenderer.cpp
+		shared/renderer/OpenGL/Renderer.cpp
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
 		shared/layers/SandboxLayer.cpp

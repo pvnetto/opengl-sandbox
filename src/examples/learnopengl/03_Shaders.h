@@ -11,8 +11,10 @@ public:
 
 private:
     unsigned int m_vaoA, m_vaoB;
+    
     spr::ProgramHandle m_shaderProgramHandle;
     spr::UniformHandle m_uniformHandle;
+    spr::VertexBufferHandle m_triangleVBHandle;
 
     void DeclareBuffers();
     void DeclareShader();

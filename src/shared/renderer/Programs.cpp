@@ -1,4 +1,5 @@
 #include "Programs.h"
+#include "VertexAttributeLayout.h"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -20,15 +21,19 @@ namespace spr {
     };
 
     struct ProgramInstanceGL {
-        using AttributesMap = std::unordered_map<const char*, int>;
+        struct ProgramAttributeGL {
+            const char* Name;
+            int Location;
+        };
         
         uint32_t ID;
         UniformInfoBufferPtr UniformInfoBuffer;
-        AttributesMap Attributes;
+        std::vector<ProgramAttributeGL> Attributes;
 
         void create(const ShaderInstanceGL& vertexShader, const ShaderInstanceGL& fragmentShader);
         void findUniforms();
         void findAttributes();
+        void bindVertexAttributeLayout(const VertexAttributeLayoutHandle& layoutHandle);
         void destroy();
     };
 
@@ -81,11 +86,12 @@ namespace spr {
     }
 
     void destroy(ProgramHandle& handle) {
+        assert((handle.isValid() && handle.idx < ProgramHandle::capacity) && "::ERROR: Invalid program");
         s_Programs[handle.idx].destroy();
         HandleGenerator<ProgramHandle>::removeHandle(handle);
     }
 
-    void setProgram(const ProgramHandle& handle) {
+    void useProgram(const ProgramHandle& handle) {
         assert(handle.isValid() && "::ERROR: Invalid program");
         glUseProgram(s_Programs[handle.idx].ID);
     }
@@ -95,8 +101,19 @@ namespace spr {
         return s_Programs[handle.idx].UniformInfoBuffer;
     }
 
+    ProgramInstanceGL& getProgramInstanceGL(const ProgramHandle& handle) {
+        assert(handle.isValid() && "::ERROR: Invalid program");
+        return s_Programs[handle.idx];
+    }
 
 }
+
+namespace spr { namespace internal {
+    void bindVertexAttributeLayout(const ProgramHandle& programHandle, const VertexAttributeLayoutHandle& layoutHandle) {
+        assert(programHandle.isValid() && "::ERROR: Invalid program");
+        s_Programs[programHandle.idx].bindVertexAttributeLayout(layoutHandle);
+    }
+}}
 
 namespace spr {
 
@@ -190,8 +207,9 @@ namespace spr {
 
         GLint activeAttributesCount, maxAttributeNameLength;
         glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTES, &activeAttributesCount);
-        glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeNameLength);
+        Attributes.reserve(activeAttributesCount);
 
+        glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeNameLength);
         std::string name;
         name.reserve(maxAttributeNameLength);
         for(int i = 0; i < activeAttributesCount; i++) {
@@ -201,7 +219,45 @@ namespace spr {
 
             glGetActiveAttrib(ID, i, maxAttributeNameLength, nullptr, &count, &type, name.data());
             int32_t location = glGetAttribLocation(ID, name.c_str());
-            Attributes.emplace(name.c_str(), location);
+            Attributes[i].Name = name.c_str();
+            Attributes[i].Location = location;
+        }
+    }
+
+    static GLenum getGLTypeFromAttributeType(AttributeType attributeType) {
+        switch(attributeType) {
+            case AttributeType::Float:
+                return GL_FLOAT;
+            case AttributeType::Int:
+                return GL_INT;
+            case AttributeType::UnsignedInt:
+                return GL_UNSIGNED_INT;
+            default:
+                assert(false && "::ERROR: Undefined attribute type");
+                return GL_FLOAT;
+        }
+    }
+
+    static GLenum getGLBool(bool value) {
+        return value ? GL_TRUE : GL_FALSE;
+    }
+
+    // Assumes list of program attributes has the same order as layout attributes
+    void ProgramInstanceGL::bindVertexAttributeLayout(const VertexAttributeLayoutHandle& layoutHandle) {
+        VertexAttributeLayout& layout = spr::getVertexAttributeLayout(layoutHandle);
+        for(int i = 0; i < Attributes.size(); i++) {
+            VertexAttribute& layoutAttribute = layout.getAttribute(i);
+            ProgramAttributeGL& programAttribute = Attributes[i];
+
+            assert(layoutAttribute.Name == programAttribute.Name && "::ERROR: Vertex layout attribute location mismatch");
+
+            glVertexAttribPointer(programAttribute.Location,
+                layoutAttribute.Num,
+                getGLTypeFromAttributeType(layoutAttribute.Type),
+                getGLBool(layoutAttribute.Normalized),
+                layoutAttribute.getAttributeSize(),
+                (void *) layoutAttribute.Offset);
+	        glEnableVertexAttribArray(programAttribute.Location);
         }
     }
 

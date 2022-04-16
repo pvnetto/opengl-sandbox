@@ -11,10 +11,14 @@ namespace spr {
     ProgramHandle createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders = true);
     void destroy(ProgramHandle& programHandle);
 
-    void setProgram(const ProgramHandle& handle);
+    void useProgram(const ProgramHandle& handle);
     UniformInfoBufferPtr getProgramUniforms(const ProgramHandle& handle);
 }
 
+
+namespace spr { namespace internal {
+    void bindVertexAttributeLayout(const ProgramHandle& programHandle, const VertexAttributeLayoutHandle& layoutHandle);
+}}
 
 enum ShaderType {
     SPR_VERTEX_SHADER = 0,

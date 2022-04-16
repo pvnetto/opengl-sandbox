@@ -18,9 +18,9 @@ namespace spr {
     /* Clears framebuffer data */
     void clear();
 
-    /* Submits data to renderer */
+    /* Submits draw call data to renderer */
     void submit(ProgramHandle& program);
-    /* Renders primitives submitted to renderer */
+    /* Renders all draw calls submitted to renderer */
     void render();
     /* Cleans current frame data. This should be called after rendering a frame */
     void cleanup();
@@ -29,20 +29,27 @@ namespace spr {
 
 namespace spr {
 
-    struct RenderItem {
+    struct DrawCallData {
         ProgramHandle Program;
-        uint32_t UniformsStart = 0;
-        uint32_t UniformsEnd = 0;
+        VertexBufferHandle VertexBufferHandle;
+        IndexBufferHandle IndexBufferHandle;
+
+        uint32_t UniformsStart;
+        uint32_t UniformsEnd;
+
+        void clear();
     };
 
     struct FrameData {
         UniformDataBufferPtr UniformDataBuffer;
-        std::vector<RenderItem> RenderItems;
+        std::vector<DrawCallData> DrawCalls;
 
-        uint32_t lastRenderItemUniformEnd();
+        void clear();
+        uint32_t lastDrawCallUniformEnd();
     };
-
+    
     FrameData& getFrameData();
+    DrawCallData& getCurrentDrawCallData();
 
 }
 

@@ -1,6 +1,14 @@
 #pragma once
 
+#include "Handles.h"
+
 #include <unordered_map> 
+
+namespace spr {
+    class VertexAttributeLayout;
+    VertexAttributeLayoutHandle findOrCreateVertexAttributeLayout(const VertexAttributeLayout& layout);
+    VertexAttributeLayout& getVertexAttributeLayout(const VertexAttributeLayoutHandle& handle);
+}
 
 namespace spr {
 
@@ -36,8 +44,10 @@ namespace spr {
         VertexAttributeLayout& add(VertexAttribute attribute);
         VertexAttributeLayout& end();
 
-        inline bool operator==(const VertexAttributeLayout& other) { return m_hash == other.m_hash; }
-        inline bool operator!=(const VertexAttributeLayout& other) { return !(*this == other); }
+        VertexAttribute& getAttribute(int index);
+
+        inline bool operator==(const VertexAttributeLayout& other) const { return m_hash == other.m_hash; }
+        inline bool operator!=(const VertexAttributeLayout& other) const { return !(*this == other); }
 
     };
 

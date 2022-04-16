@@ -150,7 +150,8 @@ namespace spr {
     void setUniform(const UniformHandle& uniformHandle, const void* data) {
         assert(uniformHandle.isValid() && "::ERROR: Invalid uniform handle!");
         const UniformRef& uniform = s_Uniforms[uniformHandle.idx];
-        UniformDataBufferPtr uniformDataBuffer = spr::getFrameData().UniformDataBuffer;
+        const FrameData& frameData = spr::getFrameData();
+        const UniformDataBufferPtr& uniformDataBuffer = frameData.UniformDataBuffer;
 
         // Writes uniform data to buffer
         uniformDataBuffer->write(&uniformHandle, sizeof(UniformHandle));

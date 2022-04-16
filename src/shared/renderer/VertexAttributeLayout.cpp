@@ -3,6 +3,30 @@
 
 #include <assert.h>
 
+
+namespace spr {
+    static constexpr uint32_t s_NumLayouts = VertexAttributeLayoutHandle::capacity;
+    static VertexAttributeLayout s_VertexAttributeLayouts[s_NumLayouts];
+
+    VertexAttributeLayoutHandle findOrCreateVertexAttributeLayout(const VertexAttributeLayout& layout) {
+        for(int i = 0; i < s_NumLayouts; i++) {
+            if(layout == s_VertexAttributeLayouts[i]) {
+                return i;
+            }
+        }
+
+        VertexAttributeLayoutHandle layoutHandle = HandleGenerator<VertexAttributeLayoutHandle>::allocHandle();
+        s_VertexAttributeLayouts[layoutHandle.idx] = layout;
+        return layoutHandle;
+    }
+
+    VertexAttributeLayout& getVertexAttributeLayout(const VertexAttributeLayoutHandle& handle) {
+        assert(handle.isValid() && "::ERROR: Invalid vertex attribute layout");
+        return s_VertexAttributeLayouts[handle.idx];   
+    }
+}
+
+
 namespace spr {
 
     VertexAttributeLayout& VertexAttributeLayout::begin() {
@@ -28,6 +52,17 @@ namespace spr {
         m_hash = hash;
 
         return *this;
+    }
+
+    VertexAttribute& VertexAttributeLayout::getAttribute(int index) {
+
+        if(index >= 0 && index < m_attributes.size()) {
+            return m_attributes[index];
+        }
+
+        static VertexAttribute empty; 
+        assert(false && "::ERROR: Invalid attribute index");
+        return empty;
     }
 
     VertexAttribute::VertexAttribute(const char* name, AttributeType type, uint32_t num, bool normalized) :

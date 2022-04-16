@@ -25,6 +25,7 @@ namespace spr {
 
     /* Context state */
     static FrameData s_FrameData;
+    static DrawCallData s_CachedDrawCallData;
 
 
     void init() {
@@ -52,25 +53,17 @@ namespace spr {
     }
 
     void submit(ProgramHandle& program) {
-        RenderItem renderItem;
-        renderItem.Program = program;
-        renderItem.UniformsStart = s_FrameData.lastRenderItemUniformEnd();
-        renderItem.UniformsEnd = s_FrameData.UniformDataBuffer->getPos();
+        s_CachedDrawCallData.Program = program;
+        s_CachedDrawCallData.UniformsStart = s_FrameData.lastDrawCallUniformEnd();
+        s_CachedDrawCallData.UniformsEnd = s_FrameData.UniformDataBuffer->getPos();
+        s_FrameData.DrawCalls.push_back(s_CachedDrawCallData);
 
-        s_FrameData.RenderItems.push_back(renderItem);
-    }
-
-    void render() {
-        for(const RenderItem& renderItem : s_FrameData.RenderItems) {
-            spr::updateUniforms(s_FrameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
-            spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
-            spr::setProgram(renderItem.Program);
-        }
+        s_CachedDrawCallData.clear();
     }
 
     void cleanup() {
         s_FrameData.UniformDataBuffer->reset();
-        s_FrameData.RenderItems.clear();
+        s_FrameData.DrawCalls.clear();
     }
 
 }
@@ -82,9 +75,26 @@ namespace spr {
         return s_FrameData;
     }
 
-    uint32_t FrameData::lastRenderItemUniformEnd() {
-        if(RenderItems.empty()) return 0;
-        return RenderItems[RenderItems.size() - 1].UniformsEnd;
+    DrawCallData& getCurrentDrawCallData() {
+        return s_CachedDrawCallData;   
+    }
+
+    void FrameData::clear() {
+        UniformDataBuffer->reset();
+        DrawCalls.clear();
+    }
+
+    uint32_t FrameData::lastDrawCallUniformEnd() {
+        if(DrawCalls.empty()) return 0;
+        return DrawCalls[DrawCalls.size() - 1].UniformsEnd;
+    }
+
+    void DrawCallData::clear() {
+        Program = kInvalidHandle;
+        VertexBufferHandle = kInvalidHandle;
+        IndexBufferHandle = kInvalidHandle;
+        UniformsStart = 0;
+        UniformsEnd = 0;
     }
 
 }
