@@ -3,6 +3,7 @@
 #include "shared/renderer/Context.h"
 #include "shared/renderer/Programs.h"
 #include "shared/renderer/VertexBuffer.h"
+#include "shared/renderer/IndexBuffer.h"
 
 #include <glad/glad.h>
 
@@ -45,7 +46,7 @@ namespace spr {
 
             if(currentDrawCall.IndexBufferHandle != renderItem.IndexBufferHandle) {
                 currentDrawCall.IndexBufferHandle = renderItem.IndexBufferHandle;
-                // TODO: Bind index buffer
+                spr::internal::bindIndexBuffer(renderItem.IndexBufferHandle);
             }
 
             if(changedAttributesLayout) {
@@ -55,6 +56,8 @@ namespace spr {
 
             if(currentDrawCall.IndexBufferHandle.isValid()) {
                 // TODO: Draw elements (instanced by default? divisor = 0)
+                const auto& indexBuffer = spr::internal::getIndexBuffer(currentDrawCall.IndexBufferHandle);
+                glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, nullptr);
             }
             else {
                 // TODO: Instanced by default? (w/ divisor = 0)
