@@ -162,6 +162,7 @@ namespace spr {
 
     static UniformType getSPRUniformTypeFromGLType(GLenum type) {
         switch(type) {
+            case GL_SAMPLER_2D:
             case GL_INT:
                 return UniformType::Integer;
             case GL_FLOAT:
@@ -255,7 +256,7 @@ namespace spr {
                 layoutAttribute.Num,
                 getGLTypeFromAttributeType(layoutAttribute.Type),
                 getGLBool(layoutAttribute.Normalized),
-                layoutAttribute.getAttributeSize(),
+                layout.getStride(),
                 (void *) (layoutAttribute.Offset));
 	        glEnableVertexAttribArray(programAttribute.Location);
         }

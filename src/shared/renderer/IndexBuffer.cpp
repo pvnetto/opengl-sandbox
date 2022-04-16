@@ -7,9 +7,9 @@ namespace spr {
 
     static IndexBufferInstanceGL s_IndexBuffers[IndexBufferHandle::capacity];
 
-    IndexBufferHandle createIndexBuffer(const void* data, uint32_t indexCount) {
+    IndexBufferHandle createIndexBuffer(const void* data, uint32_t size) {
         IndexBufferHandle handle = HandleGenerator<IndexBufferHandle>::allocHandle();
-        s_IndexBuffers[handle.idx].create(data, indexCount);
+        s_IndexBuffers[handle.idx].create(data, size);
         return handle;
     }
 

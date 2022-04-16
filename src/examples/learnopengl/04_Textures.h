@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared/layers/Layer.h"
-#include "shared/Shader.h"
+#include "shared/renderer/SimpleRenderer.h"
 
 class LOGL_04_Textures : public Layer {
 public:
@@ -9,6 +9,10 @@ public:
     virtual void OnUpdate() override;
 
 private:
-    unsigned int m_vao;
-    Shader m_shader;
+    spr::VertexBufferHandle m_vertexBufferHandle;
+    spr::IndexBufferHandle m_indexBufferHandle;
+
+    spr::UniformHandle m_texUniform0;
+    spr::UniformHandle m_texUniform1;
+    spr::ProgramHandle m_shaderHandle;
 };

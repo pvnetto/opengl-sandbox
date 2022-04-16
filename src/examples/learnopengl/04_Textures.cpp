@@ -1,52 +1,52 @@
 #include "04_Textures.h"
+#include "shared/Utils.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <stb_image.h>
 #include <iostream>
 
+static float vertices[] = {
+	// Coordinates              // UVs
+	-0.5f, -0.5f, 0.0f,         0.0f, 0.0f,
+	0.5f, -0.5f, 0.0f,          1.0f, 0.0f,
+	0.5f, 0.5f, 0.0f,           1.0f, 1.0f,
+	-0.5f, 0.5f, 0.0f,          0.0f, 1.0f,
+};
+
+static unsigned int indices[] = {
+	0, 1, 2,
+	2, 3, 0,
+};
+
 void LOGL_04_Textures::OnAttach() {
-	// 0) Declares vertex data with UVs
-	float verticesA[] = {
-	    // Coordinates              // UVs
-	    -0.5f, -0.5f, 0.0f,         0.0f, 0.0f,
-	    0.5f, -0.5f, 0.0f,          1.0f, 0.0f,
-	    0.5f, 0.5f, 0.0f,           1.0f, 1.0f,
-	    -0.5f, 0.5f, 0.0f,          0.0f, 1.0f,
-	};
+	// 0. Declares vertex layout attributes with UVs	
+	spr::VertexAttributeLayout layout;
+	layout.begin()
+		.add({ "aPosition", spr::AttributeType::Float, 3 })
+		.add({ "aUVCoords", spr::AttributeType::Float, 2 })
+		.end();
 
-	unsigned int indices[] = {
-	    0, 1, 2,
-	    2, 3, 0,
-	};
+	// 1. Defines texture uniforms as integers, so we can pass a texture unit index to the shader
+	m_texUniform0 = spr::createUniform("tex", spr::UniformType::Integer);
+	m_texUniform1 = spr::createUniform("anotherTex", spr::UniformType::Integer);
 
-	unsigned int vbo, ebo;
-	glGenVertexArrays(1, &m_vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
+	m_vertexBufferHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
+	m_indexBufferHandle = spr::createIndexBuffer(indices, sizeof(indices));
 
-	glBindVertexArray(m_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesA), verticesA, GL_STATIC_DRAW); // Uses static draw because this is only set once and drawn many times
+	std::string vertexSrc = utils::readShaderFile("../../src/shaders/03_vertex_tex.vert");
+	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
-	glEnableVertexAttribArray(0);
+	std::string fragSrc = utils::readShaderFile("../../src/shaders/03_frag_tex.frag");
+	spr::ShaderHandle fragHandle = spr::createShader(SPR_FRAGMENT_SHADER, fragSrc.c_str());
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	m_shaderHandle = spr::createProgram(vertexHandle, fragHandle);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// Unbinds buffers so they're not accidentally used
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	// 3) Declares shader program
-	m_shader = Shader("../../src/shaders/03_vertex_tex.vert", "../../src/shaders/03_frag_tex.frag");
-
-	// 4) Loads textures
+	// 2. Loads texture from memory and creates OpenGL texture
 	int texWidth, texHeight, numOfChannels;
+
+	// BEWARE: Y coordinates are flipped on OpenGL, so textures must be flipped 
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *brickData = stbi_load("../../src/assets/bricks.jpg", &texWidth, &texHeight, &numOfChannels, 0);
 
@@ -67,9 +67,10 @@ void LOGL_04_Textures::OnAttach() {
 
 	stbi_image_free(brickData);
 
-	// Loads another texture
+
+	// 2. (OPTIONAL) Loads another texture
 	int tex2Width, tex2Height, tex2Channels;
-	stbi_set_flip_vertically_on_load(true);     // BEWARE: Y coordinates are flipped on OpenGL, so textures must be flipped 
+	stbi_set_flip_vertically_on_load(true);
 	unsigned char *tex2Data = stbi_load("../../src/assets/yps.png", &tex2Width, &tex2Height, &tex2Channels, 0);
 
 	if (!tex2Data) {
@@ -90,11 +91,18 @@ void LOGL_04_Textures::OnAttach() {
 	stbi_image_free(tex2Data);
 }
 
-void LOGL_04_Textures::OnUpdate() {
-	m_shader.Use();
-	m_shader.SetInt("tex", 0);
-	m_shader.SetInt("anotherTex", 1);
+void LOGL_04_Textures::OnUpdate() { 
+	const int tex0 = 0, tex1 = 1;
+	spr::setUniform(m_texUniform0, &tex0);
+	spr::setUniform(m_texUniform1, &tex1);
+	spr::setVertexBuffer(m_vertexBufferHandle);
+	spr::setIndexBuffer(m_indexBufferHandle);
 
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
+	spr::submit(m_shaderHandle);
+	spr::render();
+
+	spr::cleanup();
+
+	// glBindVertexArray(m_vao);
+	// glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

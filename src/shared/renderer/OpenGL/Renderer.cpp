@@ -37,16 +37,16 @@ namespace spr {
 
             spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
 
+            if(currentDrawCall.IndexBufferHandle != renderItem.IndexBufferHandle) {
+                currentDrawCall.IndexBufferHandle = renderItem.IndexBufferHandle;
+                spr::internal::bindIndexBuffer(renderItem.IndexBufferHandle);
+            }
+
             if(currentDrawCall.VertexBufferHandle != renderItem.VertexBufferHandle) {
                 currentDrawCall.VertexBufferHandle = renderItem.VertexBufferHandle;
                 changedAttributesLayout = true;
 
                 spr::internal::bindVertexBuffer(renderItem.VertexBufferHandle);
-            }
-
-            if(currentDrawCall.IndexBufferHandle != renderItem.IndexBufferHandle) {
-                currentDrawCall.IndexBufferHandle = renderItem.IndexBufferHandle;
-                spr::internal::bindIndexBuffer(renderItem.IndexBufferHandle);
             }
 
             if(changedAttributesLayout) {
@@ -57,7 +57,7 @@ namespace spr {
             if(currentDrawCall.IndexBufferHandle.isValid()) {
                 // TODO: Draw elements (instanced by default? divisor = 0)
                 const auto& indexBuffer = spr::internal::getIndexBuffer(currentDrawCall.IndexBufferHandle);
-                glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, nullptr);
+                glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
             }
             else {
                 // TODO: Instanced by default? (w/ divisor = 0)

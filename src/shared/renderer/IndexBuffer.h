@@ -8,7 +8,7 @@ namespace spr {
 
 namespace spr {
 
-    IndexBufferHandle createIndexBuffer(const void* data, uint32_t indexCount);
+    IndexBufferHandle createIndexBuffer(const void* data, uint32_t size);
     void setIndexBuffer(const IndexBufferHandle& handle);
     void destroy(IndexBufferHandle& handle);
 
