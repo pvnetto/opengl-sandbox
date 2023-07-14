@@ -37,31 +37,31 @@ namespace spr {
 
             spr::rendererSetUniforms(getProgramUniforms(renderItem.Program));
 
-            if(currentDrawCall.IndexBufferHandle != renderItem.IndexBufferHandle) {
-                currentDrawCall.IndexBufferHandle = renderItem.IndexBufferHandle;
-                spr::internal::bindIndexBuffer(renderItem.IndexBufferHandle);
+            if(currentDrawCall.IndBufferHandle != renderItem.IndBufferHandle) {
+                currentDrawCall.IndBufferHandle = renderItem.IndBufferHandle;
+                spr::internal::bindIndexBuffer(renderItem.IndBufferHandle);
             }
 
-            if(currentDrawCall.VertexBufferHandle != renderItem.VertexBufferHandle) {
-                currentDrawCall.VertexBufferHandle = renderItem.VertexBufferHandle;
+            if(currentDrawCall.VertBufferHandle != renderItem.VertBufferHandle) {
+                currentDrawCall.VertBufferHandle = renderItem.VertBufferHandle;
                 changedAttributesLayout = true;
 
-                spr::internal::bindVertexBuffer(renderItem.VertexBufferHandle);
+                spr::internal::bindVertexBuffer(renderItem.VertBufferHandle);
             }
 
             if(changedAttributesLayout) {
-                const VertexBufferInstanceGL& vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertexBufferHandle);
+                const VertexBufferInstanceGL& vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertBufferHandle);
                 spr::internal::bindVertexAttributeLayout(currentDrawCall.Program, vertexBuffer.LayoutHandle);
             }
 
-            if(currentDrawCall.IndexBufferHandle.isValid()) {
+            if(currentDrawCall.IndBufferHandle.isValid()) {
                 // TODO: Draw elements (instanced by default? divisor = 0)
-                const auto& indexBuffer = spr::internal::getIndexBuffer(currentDrawCall.IndexBufferHandle);
+                const auto& indexBuffer = spr::internal::getIndexBuffer(currentDrawCall.IndBufferHandle);
                 glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
             }
             else {
                 // TODO: Instanced by default? (w/ divisor = 0)
-                const auto& vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertexBufferHandle);
+                const auto& vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertBufferHandle);
                 const auto& vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
                 const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
                 glDrawArrays(GL_TRIANGLES, 0, vertexCount);

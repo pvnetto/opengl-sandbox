@@ -6,6 +6,7 @@
 class LOGL_04_Textures : public Layer {
 public:
     virtual void OnAttach() override;
+    virtual void OnDettach() override;
     virtual void OnUpdate() override;
 
 private:

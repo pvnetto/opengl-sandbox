@@ -199,7 +199,7 @@ Podemos encontrar essas matrizes [nesse guia](https://learnopengl.com/Getting-st
 
 Um dos motivos pelo qual usamos matrizes para fazer essas operações ao invés de apenas aplicá-las individualmente é que **podemos combinar as matrizes**, possibilitando **fazer todas as transformações de uma vez só**. Porém é preciso prestar atenção pois a **ordem que multiplicamos é importante**, não só porque matrizes não são comutativas, mas também porque não queremos transformar as transformações, e sim o vértice.
 
-Ex: Se fizermos `escala * translação` a matriz resultante é uma matriz de translação multiplicada pela escala. Se aplicássemos essa matriz em um vértice, a escala ficaria correto, porém ele seria **transladado por um vetor de translação escalado**, resultando em um **comportamento indesejado**. 
+Ex: Se fizermos `escala * translação` a matriz resultante é uma matriz de translação multiplicada pela escala. Se aplicássemos essa matriz em um vértice, a escala ficaria correta, porém ele seria **transladado por um vetor de translação escalado**, resultando em um **comportamento indesejado**. 
 
 ```
 [s1][0][0][0]   [1][0][0][t1]   [2][0][0][s1 * t1]

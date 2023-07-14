@@ -7,12 +7,12 @@
 
 void LOGL_05_Transform::OnAttach() {
 	std::vector<Texture> textures {
-	    TextureLoader::LoadTexture("../../src/assets/bricks.jpg", 0),
-	    TextureLoader::LoadTexture("../../src/assets/yps.png", 1),
+	    TextureLoader::LoadTexture("assets/bricks.jpg", 0),
+	    TextureLoader::LoadTexture("assets/yps.png", 1),
 	};
 
 	m_cube = Mesh{PrimitiveShape::Cube(), {}, textures};
-    m_shader = Shader("../../src/shaders/04_vertex_transform.vert", "../../src/shaders/03_frag_tex.frag");
+    m_shader = Shader("shaders/04_vertex_transform.vert", "shaders/03_frag_tex.frag");
 
     // 1) Enables depth test, so vertices are stored on a z-buffer before drawing. This is required for 3D objects
 	// glEnable(GL_DEPTH_TEST);

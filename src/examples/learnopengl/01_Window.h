@@ -31,7 +31,7 @@ int window_imp() {
 		glViewport(0, 0, width, height);
 	});
 
-	// Step 3) Load modern OpenGL functions
+	// Step 3) Loads OpenGL functions
 	// Loads Glad by passing the extension loader function as parameter.
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize Glad :(\n";

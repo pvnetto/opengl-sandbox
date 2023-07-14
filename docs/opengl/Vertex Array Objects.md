@@ -1,6 +1,7 @@
 # Vertex Array Objects
 
 - A VAO is an object that **stores all the state** needed to supply vertex data;
+    - i.e., a list of attributes with a buffer reference that can supply their data, and optionally an index buffer;
 - When you bind a VAO to the OpenGL context:
 	- All subsequent **buffer object changes** are **stored** in its state;
 	- All state **already bound** to that VAO is **added** to the **OpenGL context**;
@@ -8,7 +9,7 @@
 
 
 **Caveats**:
-- One important exception in VAOs is that **binding a VBO to GL_ARRAY_BUFFER won't modify the its state**. The state will only be **modified when defining vertex attribute layouts**;
+- One important exception in VAOs is that **binding a VBO to GL_ARRAY_BUFFER won't modify its state**. The state will only be **modified when defining vertex attribute layouts**;
 - VAOs **do NOT store operations**, they're not like macros. So if you: Bind VAO > Bind BO > Unbind VAO > Modify BO, the changes will still show up in the VAO;
 
 
@@ -36,7 +37,6 @@ Vertex layout specifiers (DSA versions):
 **Example:**
 ```cpp
 /* This should work fine, as long as we define vertex attributes after binding the VAO. */
-
 unsigned int vao, vbo;
 
 glCreateVertexArrays(1, &vao);

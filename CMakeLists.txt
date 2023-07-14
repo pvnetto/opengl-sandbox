@@ -9,7 +9,10 @@ project("OpenGL Sandbox"
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${PROJECT_SOURCE_DIR}/src -I${PROJECT_SOURCE_DIR}/src/shared/layers")
+
 
 add_subdirectory(src)
 add_subdirectory(vendor)

@@ -18,18 +18,18 @@ namespace spr {
     
     using HandleType = uint16_t;
 
-    static const HandleType kInvalidHandle = UINT16_MAX;
+    static inline const HandleType kInvalidHandle = UINT16_MAX;
 
     template<class T>
     struct is_handle_type : std::false_type {};
 
 #define SPR_DEFINE_HANDLE(name, cap) \
-	struct name##Handle { \
+    struct name##Handle { \
         static constexpr uint32_t capacity = cap;                           \
         uint16_t idx;                                                       \
         name##Handle() : idx(kInvalidHandle) {};                            \
         name##Handle(uint32_t handleIdx) : idx(handleIdx) {}                \
-	    inline bool isValid() const { return spr::kInvalidHandle != idx; }  \
+	inline bool isValid() const { return spr::kInvalidHandle != idx; }  \
         inline bool operator==(const name##Handle& other) const { return idx == other.idx; }  \
         inline bool operator!=(const name##Handle& other) const { return !(*this == other); } \
     }; \

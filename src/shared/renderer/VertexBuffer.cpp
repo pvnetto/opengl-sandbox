@@ -20,8 +20,8 @@ namespace spr {
     
     void setVertexBuffer(const VertexBufferHandle& handle) {
         DrawCallData& drawCallData = spr::getCurrentDrawCallData();
-        assert(!drawCallData.VertexBufferHandle.isValid() && "::ERROR: Vertex buffer was already set for this frame.");
-        drawCallData.VertexBufferHandle = handle;
+        assert(!drawCallData.VertBufferHandle.isValid() && "::ERROR: Vertex buffer was already set for this frame.");
+        drawCallData.VertBufferHandle = handle;
     }
 
     void destroy(VertexBufferHandle& handle) {

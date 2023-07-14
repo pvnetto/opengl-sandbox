@@ -42,13 +42,19 @@ set(SANDBOX_SOURCES
 		examples/learnopengl/12_MultipleLights.cpp
 		examples/learnopengl/13_Meshes.cpp)
 
+
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
+
+# sets OpenGL policy to prioritize newer versions over legacy when both are found
+cmake_policy(SET CMP0072 NEW)
+# check https://stackoverflow.com/a/67307380
+find_package(OpenGL REQUIRED)
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)
-target_link_libraries(Sandbox opengl32)
+target_link_libraries(Sandbox OpenGL::GL)
 target_link_libraries(Sandbox assimp)
 target_link_libraries(Sandbox stb)
 
@@ -63,6 +69,18 @@ target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include)
 
+# consider hard-coding this or using an environment variable, so we can make it consistent with whatever is on the Python script
+set(SANDBOX_BINARY_DIR "bin/${CMAKE_SYSTEM_NAME}")
+message("::PACKAGING Set binary directory to ${SANDBOX_BINARY_DIR}")
 set_target_properties(Sandbox PROPERTIES
-                      RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/bin/debug
-                      RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin/release)
+					RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/${SANDBOX_BINARY_DIR}
+                    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/${SANDBOX_BINARY_DIR}/debug
+                    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/${SANDBOX_BINARY_DIR}/release)
+
+
+# adds staging step
+include("${CMAKE_SOURCE_DIR}/cmake/staging.cmake")
+add_staging(Sandbox)
+stage_directory(assets)
+stage_directory(shaders)
+

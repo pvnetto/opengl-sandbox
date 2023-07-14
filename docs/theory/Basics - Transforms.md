@@ -19,7 +19,7 @@ O espaço local é o **estado inicial das coordenadas um objeto**, que são calc
 
 
 ### World
-World é o nome dado ao espaço onde as **coordenadas do mundo do jogo ficam**, isto é, a posição do objeto nesse espaço é equivalente a **posição do objeto no mundo do jogo**. Ao importarmos um modelo e o colocarmos na cena, geralmente ele é posicionado na origem do mundo. Então precisamos **utilizar transformações para posicioná-lo em um lugar que faça sentido**.
+World é o nome dado ao espaço onde as **coordenadas do mundo do jogo ficam**, isto é, a posição do objeto nesse espaço é equivalente a **posição do objeto no mundo do jogo**, ou cena. Ao importarmos um modelo e o colocarmos na cena, geralmente ele é posicionado na origem do mundo, que é o ponto `(0, 0, 0)`. Então precisamos **utilizar transformações para posicioná-lo em um lugar que faça sentido**.
 
 A matriz responsável em converter coordenadas do **espaço local para world** é a **matriz model**, que é uma **combinação das matrizes de transformação**, isto é, translação, rotação e escala.
 

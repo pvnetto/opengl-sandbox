@@ -6,7 +6,7 @@
 - They allow you to select which function to use from the application;
 - In order to use them, you must:
 
-0. Define a subroutine signature (just like a prototype);
+0. Define a subroutine signature (just like a function prototype/header);
 ```glsl
 subroutine vec4 LightingFunction(vec3);
 ```

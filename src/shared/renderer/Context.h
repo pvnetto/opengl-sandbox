@@ -31,8 +31,8 @@ namespace spr {
 
     struct DrawCallData {
         ProgramHandle Program;
-        VertexBufferHandle VertexBufferHandle;
-        IndexBufferHandle IndexBufferHandle;
+        VertexBufferHandle VertBufferHandle;
+        IndexBufferHandle IndBufferHandle;
 
         uint32_t UniformsStart;
         uint32_t UniformsEnd;

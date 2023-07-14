@@ -15,8 +15,8 @@ namespace spr {
 
     void setIndexBuffer(const IndexBufferHandle& handle) {
         DrawCallData& DrawCallData = spr::getCurrentDrawCallData();
-        assert(!DrawCallData.IndexBufferHandle.isValid() && "::ERROR: Index buffer was already set in this draw call");
-        DrawCallData.IndexBufferHandle = handle;
+        assert(!DrawCallData.IndBufferHandle.isValid() && "::ERROR: Index buffer was already set in this draw call");
+        DrawCallData.IndBufferHandle = handle;
     }
 
     void destroy(IndexBufferHandle& handle) {

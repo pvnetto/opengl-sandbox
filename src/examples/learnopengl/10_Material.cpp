@@ -17,8 +17,8 @@ void LOGL_10_Material::OnAttach() {
 	m_cubeMesh = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), std::vector<Texture>()};
 	m_lightSourceMesh = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), std::vector<Texture>()};
 
-	m_phongShader = Shader("../../src/shaders/07_phong.vert", "../../src/shaders/08_material.frag");
-	m_lightSourceShader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_light_source.frag");
+	m_phongShader = Shader("shaders/07_phong.vert", "shaders/08_material.frag");
+	m_lightSourceShader = Shader("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 
     m_lightColor = glm::vec3{1.f, 0.8f, 0.6f};
 }

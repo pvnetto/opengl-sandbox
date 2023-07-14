@@ -1,6 +1,7 @@
 #include "Texture2D.h"
 
 #include <iostream>
+#include <cstring>
 #include <glad/glad.h>
 #include "stb_image.h"
 

@@ -58,7 +58,7 @@ glTextureSubImage2D(...);
 // Binds program and binds each texture to a texture unit, so they get picked up by shader uniforms
 glUseProgram(programID);
 glBindTextureUnit(0, textureID);
-glBindTextureUnit(1, anotherTextureI);
+glBindTextureUnit(1, anotherTextureID);
 ```
 
 ```glsl
@@ -263,6 +263,49 @@ glBindTexture(GL_TEXTURE2D, textureID);
 
 ### Cube Maps
 
+##### Creating a Cube Map
+
+```cpp
+// Generates a cube map texture object
+unsigned int textureID;
+glGenTextures(1, &textureID);
+glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+```
+
+##### Populating a Cube Map
+
+A cube 6 faces, so for a cube map, we have to bind one texture for each one of them, that is we have to call glTexImage2D 6 times. OpenGL provides us one texture target for each face, namely:
+
+- GL_TEXTURE_CUBE_MAP_POSITIVE_X
+- GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+- GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+- GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+- GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+- GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+
+And just like many other OpenGL enums, they're ordered, so you can start from GL_TEXTURE_CUBE_MAP_POSITIVE_X and increment it by an integer value.
+
+```cpp
+for(int i = 0; i < 6; i++) {
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, ...);
+}
+```
+
+##### Sampling a Cube Map
+
+To sample a cube map from the fragment shader, you should use a `samplerCube`, instead of the usual `sampler2d`.
+
+```cpp
+// fragment shader
+in vec3 textureCoordinate;
+uniform samplerCube cubeTexture;
+
+void main() {
+	// Also uses the 'texture' method for sampling
+	FragColor = texture(cubeTexture, textureCoordinate);
+}
+```
+
 **Seamless sampling**:
 
 # Texturas
@@ -450,7 +493,7 @@ void main() {
 // frag shader
 #version 330 core
 
-in vec3 vertexUV;
+in vec2 vertexUV;
 
 out vec4 fragmentColor;
 

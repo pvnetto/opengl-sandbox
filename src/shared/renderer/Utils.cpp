@@ -1,6 +1,7 @@
 #include "Utils.h"
 
-#include "assert.h"
+#include <cstring>
+#include <cassert>
 
 namespace spr {
 

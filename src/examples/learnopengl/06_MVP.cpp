@@ -10,12 +10,12 @@
 
 void LOGL_06_MVP::OnAttach() {
 	std::vector<Texture> textures{
-	    TextureLoader::LoadTexture("../../src/assets/bricks.jpg", 0),
-	    TextureLoader::LoadTexture("../../src/assets/yps.png", 1),
+	    TextureLoader::LoadTexture("assets/bricks.jpg", 0),
+	    TextureLoader::LoadTexture("assets/yps.png", 1),
 	};
 
 	m_cube = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), textures};
-	m_shader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/03_frag_tex.frag");
+	m_shader = Shader("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
 
 	m_position = glm::vec3(0.5f, 0.2f, -2.0f);
 	m_scale = glm::vec3(1.2f, 1.2f, 1.2f);

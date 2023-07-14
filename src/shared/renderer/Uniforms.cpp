@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <cstring>
 #include <cassert>
 #include <glad/glad.h>
 

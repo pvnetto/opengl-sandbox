@@ -16,8 +16,8 @@ void LOGL_08_Lighting::OnAttach() {
 	m_cubeMesh = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), std::vector<Texture>()};
 	m_lightSourceMesh = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), std::vector<Texture>()};
 
-	m_litShader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_basic_lighting.frag");
-	m_lightSourceShader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_light_source.frag");
+	m_litShader = Shader("shaders/05_vertex_mvp.vert", "shaders/06_frag_basic_lighting.frag");
+	m_lightSourceShader = Shader("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 
     m_cubeColor = glm::vec3(0.2f, 0.35f, 1.f);
     m_lightColor = glm::vec3{0.8f, 0.8f, 1.f};

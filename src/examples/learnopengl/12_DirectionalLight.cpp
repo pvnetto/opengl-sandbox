@@ -15,11 +15,11 @@ void LOGL_12_DirectionalLight::OnAttach() {
 	m_controller = FreeCameraController(m_camera, 5.f);
 
 	std::vector<Texture> textures = {
-	    TextureLoader::LoadTexture("../../src/assets/container.png"),
-	    TextureLoader::LoadTexture("../../src/assets/container_specular.png")};
+	    TextureLoader::LoadTexture("assets/container.png"),
+	    TextureLoader::LoadTexture("assets/container_specular.png")};
 
 	m_cubeMesh = Mesh(PrimitiveShape::Cube(), std::vector<unsigned int>(), textures);
-	m_phongShader = Shader("../../src/shaders/09_specular_map.vert", "../../src/shaders/10_directional_light.frag");
+	m_phongShader = Shader("shaders/09_specular_map.vert", "shaders/10_directional_light.frag");
 }
 
 void LOGL_12_DirectionalLight::OnUpdate() {

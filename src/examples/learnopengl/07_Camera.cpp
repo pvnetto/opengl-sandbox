@@ -16,12 +16,12 @@ void LOGL_07_Camera::OnAttach() {
 	    glm::vec3(0.f, 1.f, 0.f));
 
 	std::vector<Texture> textures{
-	    TextureLoader::LoadTexture("../../src/assets/bricks.jpg", 0),
-	    TextureLoader::LoadTexture("../../src/assets/yps.png", 1),
+	    TextureLoader::LoadTexture("assets/bricks.jpg", 0),
+	    TextureLoader::LoadTexture("assets/yps.png", 1),
 	};
 
 	m_cube = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), textures};
-	m_shader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/03_frag_tex.frag");
+	m_shader = Shader("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
 	m_cameraRotation = m_camera.GetRotationEuler();
 	m_projectionType = 0;
 }

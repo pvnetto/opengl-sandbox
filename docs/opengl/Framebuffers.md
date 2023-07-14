@@ -1,10 +1,6 @@
 # Framebuffers
 
-
 **Questions**
-- What happens if I enable depth/stencil but don't specify an attachment for them?
-**Questions**
-
 
 - After fragment shader is executed, the result is written to a **color buffer**;
 - This buffer represents each pixel that will be shown on the screen, so it usually has the dimensions as the screen;

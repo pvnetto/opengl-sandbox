@@ -25,13 +25,15 @@ void Mesh::initializeMesh() {
     }
 
     // initializes vertex attributes
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
+    const int stride = 8 * sizeof(float);
+    	// attr - position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void *)0);
 	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)offsetof(Vertex, UV));
+	// attr- uv
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(Vertex, UV));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)offsetof(Vertex, Normal));
+	// attr - normal
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(Vertex, Normal));
 	glEnableVertexAttribArray(2);
 
     // unbinds vao and vbo

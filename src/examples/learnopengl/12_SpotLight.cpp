@@ -16,14 +16,14 @@ void LOGL_12_SpotLight::OnAttach() {
 	m_controller = FreeCameraController(m_camera, 5.f);
 
 	std::vector<Texture> textures = {
-	    TextureLoader::LoadTexture("../../src/assets/container.png"),
-	    TextureLoader::LoadTexture("../../src/assets/container_specular.png")};
+	    TextureLoader::LoadTexture("assets/container.png"),
+	    TextureLoader::LoadTexture("assets/container_specular.png")};
 
 	m_cubeMesh = Mesh(PrimitiveShape::Cube(), std::vector<unsigned int>(), textures);
 	m_lightSourceMesh = Mesh(PrimitiveShape::Cube(), std::vector<unsigned int>(), std::vector<Texture>());
 
-	m_phongShader = Shader("../../src/shaders/09_specular_map.vert", "../../src/shaders/10_spotlight.frag");
-	m_lightSourceShader = Shader("../../src/shaders/05_vertex_mvp.vert", "../../src/shaders/06_frag_light_source.frag");
+	m_phongShader = Shader("shaders/09_specular_map.vert", "shaders/10_spotlight.frag");
+	m_lightSourceShader = Shader("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 }
 
 void LOGL_12_SpotLight::OnUpdate() {

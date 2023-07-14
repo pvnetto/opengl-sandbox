@@ -1,19 +1,5 @@
 # Shaders
 
-
-## Shader types
-
-
-### Vertex shaders
-They're the **only mandatory shader type**, all others are defaulted by GLSL if you don't specify one.
-
-### Tesselation shaders
-
-### Geometry shaders
-
-### Fragment shaders
-
-
 ## GLSL
 
 GLSL is an acronym for OpenGL Shading Language, and as the name implies, it's the language we use to define shaders in OpenGL.
