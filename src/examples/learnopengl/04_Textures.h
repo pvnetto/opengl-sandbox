@@ -16,4 +16,7 @@ private:
     spr::UniformHandle m_texUniform0;
     spr::UniformHandle m_texUniform1;
     spr::ProgramHandle m_shaderHandle;
+
+	unsigned int m_brickTexture, m_otherTexture;
+	unsigned int m_otherTextureSampler;
 };

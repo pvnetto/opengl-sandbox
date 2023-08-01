@@ -1,5 +1,6 @@
 #include "04_Textures.h"
 #include "shared/Utils.h"
+#include "shared/renderer/OpenGL/Helpers.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -30,6 +31,12 @@ void LOGL_04_Textures::OnAttach() {
 	    .end();
 
 	// 1. Defines texture as integer uniforms, so we can pass a texture unit index to the shader
+	m_texUniform0 = spr::createUniform("tex", spr::UniformType::Sampler);
+	m_texUniform1 = spr::createUniform("anotherTex", spr::UniformType::Sampler);
+
+	m_vertexBufferHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
+	m_indexBufferHandle = spr::createIndexBuffer(indices, sizeof(indices));
+
 	std::string vertexSrc = utils::readShaderFile("shaders/03_vertex_tex.vert");
 	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
 
@@ -38,7 +45,11 @@ void LOGL_04_Textures::OnAttach() {
 
 	m_shaderHandle = spr::createProgram(vertexHandle, fragHandle);
 
-	// 2. Loads texture from memory and creates OpenGL texture
+	// (OPTIONAL) Checks if immutable storage is enabled
+	bool hasTextureStorage = isGLExtensionSupported("GL_ARB_texture_storage");
+	std::cout << "Texture storage status: " << (hasTextureStorage ? "true" : "false") << "\n";
+
+	// 2. Loads image from disk
 	// BEWARE: Y coordinates are flipped on OpenGL, so textures must be flipped
 	stbi_set_flip_vertically_on_load(true);
 
@@ -48,21 +59,27 @@ void LOGL_04_Textures::OnAttach() {
 		std::cout << "Couldn't load texture\n";
 	}
 
-	// 3. Creates OpenGL texture
-	unsigned int brickTexture;
-	glGenTextures(1, &brickTexture);
+	// 3. Creates OpenGL Texture Object
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_brickTexture);
 
-	// 4. Binds texture to texture unit 0
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, brickTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, brickData);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(brickTexture);
+	// 4. Sets Texture Object data (immutable storage)
+	glTextureStorage2D(m_brickTexture, 1, GL_RGB8, texWidth, texHeight);
+	glTextureSubImage2D(m_brickTexture, 0, 0, 0, texWidth, texHeight, GL_RGB, GL_UNSIGNED_BYTE, brickData);
+
+	// 5. Sets Texture Object sampling parameters
+	glTextureParameteri(m_brickTexture, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(m_brickTexture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTextureParameteri(m_brickTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(m_brickTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	// (OPTIONAL) Generates other mipmap levels automatically
+	glGenerateTextureMipmap(m_brickTexture);
+
+	// 6. Binds Texture Object to Texture Unit
+	glBindTextureUnit(0, m_brickTexture);
 
 	stbi_image_free(brickData);
+
 
 	// (OPTIONAL) Loads another texture and binds it to texture unit 1
 	int tex2Width, tex2Height, tex2Channels;
@@ -71,16 +88,21 @@ void LOGL_04_Textures::OnAttach() {
 		std::cout << "Couldn't load texture\n";
 	}
 
-	unsigned int tex2;
-	glGenTextures(1, &tex2);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, tex2);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex2Width, tex2Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex2Data);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glGenerateMipmap(tex2);
+	glCreateTextures(GL_TEXTURE_2D, 1, &m_otherTexture);
+	glTextureStorage2D(m_otherTexture, 1, GL_RGBA8, tex2Width, tex2Height);
+	glTextureSubImage2D(m_otherTexture, 0, 0, 0, tex2Width, tex2Height, GL_RGBA, GL_UNSIGNED_BYTE, tex2Data);
+	glGenerateTextureMipmap(m_otherTexture);
+
+	// (OPTIONAL, RECOMMENDED) Uses a Sampler Object instead of setting sampling parameters directly on the Texture
+	// NOTE: This is more modern, and also recommended because that's how it works on the GPU
+	glCreateSamplers(1, &m_otherTextureSampler);
+	glSamplerParameteri(m_otherTextureSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glSamplerParameteri(m_otherTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glSamplerParameteri(m_otherTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glSamplerParameteri(m_otherTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBindTextureUnit(1, m_otherTexture);
+	glBindSampler(1, m_otherTextureSampler);
 
 	stbi_image_free(tex2Data);
 }
@@ -104,5 +126,9 @@ void LOGL_04_Textures::OnDettach() {
 	spr::destroy(m_shaderHandle);
 	spr::destroy(m_vertexBufferHandle);
 	spr::destroy(m_indexBufferHandle);
-}
 
+	// 7. Deletes textures/samplers after they're used
+	glDeleteTextures(1, &m_brickTexture);
+	glDeleteTextures(1, &m_otherTexture);
+	glDeleteSamplers(1, &m_otherTextureSampler);
+}

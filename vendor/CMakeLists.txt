@@ -1,11 +1,10 @@
-SET ( ASSIMP_BUILD_TESTS
-  OFF
-)
-
 add_subdirectory(glfw)
 add_subdirectory(glad)
 add_subdirectory(glm)
 add_subdirectory(stb)
+
+set(ASSIMP_BUILD_TESTS off)
+set(ASSIMP_WARNINGS_AS_ERRORS off)
 add_subdirectory(assimp)
 
 # Builds imgui library

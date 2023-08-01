@@ -29,7 +29,7 @@ def run_executable():
     # TODO: Move Sandbox to shared config file (something equivalent to .uproject)
     # TODO: Add flag that toggles running after building
     os.chdir(get_bin_folder())
-    subprocess.run([f'./Sandbox'])
+    subprocess.run([f'./Sandbox'], capture_output=True)
 
 def run_cmake_build():
     try:
