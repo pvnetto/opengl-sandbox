@@ -6,24 +6,33 @@ set(SANDBOX_SOURCES
 		shared/Mesh.cpp
 		shared/Model.cpp
 		shared/Utils.cpp
+
+		shared/renderer/SimpleRenderer.cpp
+		shared/renderer/Context.cpp
+		shared/renderer/FrameDataManager.cpp
 		shared/renderer/VertexBuffer.cpp
-		shared/renderer/IndexBuffer.cpp
 		shared/renderer/VertexAttributeLayout.cpp
 		shared/renderer/Programs.cpp
-		shared/renderer/Uniforms.cpp
-		shared/renderer/Context.cpp
 		shared/renderer/Inputs.cpp
 		shared/renderer/Runtime.cpp
 		shared/renderer/Utils.cpp
-		shared/renderer/SimpleRenderer.cpp
-		shared/renderer/OpenGL/Renderer.cpp
+		shared/renderer/ResourceManager/ResourceManager.cpp
+		shared/renderer/ResourceManager/UniformManager.cpp
+
+		shared/renderer/OpenGL/RendererContext.cpp
 		shared/renderer/OpenGL/Helpers.cpp
+		shared/renderer/OpenGL/ResourceManager/ResourceManagerGL.cpp
+		shared/renderer/OpenGL/ResourceManager/IndexBufferManagerGL.cpp
+		shared/renderer/OpenGL/ResourceManager/UniformManagerGL.cpp
+
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
 		shared/layers/SandboxLayer.cpp
 		shared/layers/ExampleGUILayer.cpp
+
 		shared/ImGui/ImGuiLayer.cpp
 		shared/ImGui/ImGuiBuild.cpp
+
 		examples/learnopengl/02_VBO.cpp
 		examples/learnopengl/02_EBO.cpp
 		examples/learnopengl/02_VAO.cpp
@@ -48,8 +57,7 @@ add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 # sets OpenGL policy to prioritize newer versions over legacy when both are found
 cmake_policy(SET CMP0072 NEW)
-# check https://stackoverflow.com/a/67307380
-find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED)			# check https://stackoverflow.com/a/67307380
 
 target_link_libraries(Sandbox glfw)
 target_link_libraries(Sandbox glad)
@@ -79,7 +87,7 @@ set_target_properties(Sandbox PROPERTIES
                     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/${SANDBOX_BINARY_DIR}/release)
 
 
-# adds staging step
+# adds staging step to Sandbox target
 include("${CMAKE_SOURCE_DIR}/cmake/staging.cmake")
 add_staging(Sandbox)
 stage_directory(assets)

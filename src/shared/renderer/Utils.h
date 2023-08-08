@@ -16,21 +16,21 @@ namespace spr {
     template <typename T>
     class HandleGenerator <T, std::enable_if_t<is_handle_type<T>::value, void>> {
     public:
-        static inline bool m_handles[T::capacity] = { false };
+        bool m_Handles[T::capacity] = { false };
 
     public:
-        static T allocHandle() {
+        T allocHandle() {
             for(int i = 0; i < T::capacity; i++) {
-                if(m_handles[i]) continue;
-                m_handles[i] = true; 
+                if(m_Handles[i]) continue;
+                m_Handles[i] = true; 
                 return i;
             }
 
             return kInvalidHandle;
         }
 
-        static void removeHandle(T& handle) {
-            m_handles[handle.idx] = false;
+        void removeHandle(T& handle) {
+            m_Handles[handle.idx] = false;
             handle = kInvalidHandle;
         }
 

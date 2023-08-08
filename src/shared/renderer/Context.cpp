@@ -1,16 +1,13 @@
 #include "Context.h"
+
 #include "Programs.h"
 #include "Runtime.h"
 #include "shared/Event.h"
-
-#include "OpenGL/Renderer.h"
+#include "shared/renderer/OpenGL/RendererContext.h"
 
 #include <glad/glad.h>
 #include <iostream>
 
-// ===================================================
-// ==== Renderer =====================================
-// ===================================================
 namespace spr {
 
 	struct WindowState {
@@ -25,78 +22,21 @@ namespace spr {
 	static WindowState s_State;
 	static GLFWwindow *s_Window = nullptr;
 
-	/* Context state */
-	static FrameData s_FrameData;
-	static DrawCallData s_CachedDrawCallData;
+	void Context::init() {
+		m_FrameDataManager.init(this);
+		m_ResourceManager.init(this);
 
-	void init() {
-		/* Window init */
+		// TODO: Use swapchain to handle viewport size (??), resize according to framebuffer size
 		const WindowState &state = *(WindowState *)glfwGetWindowUserPointer(s_Window);
-
-		/* Context init */
-		s_FrameData.UniformDataBuffer = UniformDataBuffer::alloc();
-
-		/* Vendor init */
 		glViewport(0, 0, state.Width, state.Height);
-		glEnable(GL_DEPTH_TEST);
-
-		rendererInit();
+		m_RendererContext.init();
 	}
 
-	void shutdown() {
+	void Context::shutdown() {
 		glfwTerminate();
 		glfwDestroyWindow(s_Window);
 		s_Window = nullptr;
-		rendererShutdown();
-	}
-
-	void clear() {
-		glClearColor(0.1f, 0.1f, 0.12f, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
-	void submit(ProgramHandle &program) {
-		s_CachedDrawCallData.Program = program;
-		s_CachedDrawCallData.UniformsStart = s_FrameData.lastDrawCallUniformEnd();
-		s_CachedDrawCallData.UniformsEnd = s_FrameData.UniformDataBuffer->getPos();
-		s_FrameData.DrawCalls.push_back(s_CachedDrawCallData);
-
-		s_CachedDrawCallData.clear();
-	}
-
-	void cleanup() {
-		s_FrameData.clear();
-		s_CachedDrawCallData.clear();
-	}
-
-}
-
-namespace spr {
-
-	FrameData &getFrameData() {
-		return s_FrameData;
-	}
-
-	DrawCallData &getCurrentDrawCallData() {
-		return s_CachedDrawCallData;
-	}
-
-	void FrameData::clear() {
-		UniformDataBuffer->reset();
-		DrawCalls.clear();
-	}
-
-	uint32_t FrameData::lastDrawCallUniformEnd() {
-		if (DrawCalls.empty()) return 0;
-		return DrawCalls[DrawCalls.size() - 1].UniformsEnd;
-	}
-
-	void DrawCallData::clear() {
-		Program = kInvalidHandle;
-		VertBufferHandle = kInvalidHandle;
-		IndBufferHandle = kInvalidHandle;
-		UniformsStart = 0;
-		UniformsEnd = 0;
+		m_RendererContext.shutdown();
 	}
 
 }
@@ -115,18 +55,16 @@ namespace spr {
 		s_State.Height = height;
 
 		if (!glfwInit()) {
-			std::cout << "::ERROR: Could not initialize GLFW"
-			          << "\n";
+			std::cout << "::ERROR: Could not initialize GLFW" << "\n";
 		}
 
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 		s_Window = glfwCreateWindow(width, height, windowName, NULL, NULL);
 		if (!s_Window) {
-			std::cout << "::ERROR: Could not initialize window"
-			          << "\n";
+			std::cout << "::ERROR: Could not initialize window" << "\n";
 		}
 
 		glfwMakeContextCurrent(s_Window);
@@ -198,8 +136,9 @@ namespace spr {
 			}
 		});
 
-		bool bGladResult = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		std::cout << "::DISPLAY:GLFW: glad initialization result: " << (bGladResult ? "success" : "failure") << "\n";
+		if (bool bGladSuccess = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); !bGladSuccess) {
+			std::cout << "::ERROR: Failed to load GL" << "\n";	
+		}
 
 		printf("%s\n", glGetString(GL_VERSION));
 	}

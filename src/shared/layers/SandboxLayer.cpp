@@ -5,7 +5,7 @@
 
 void SandboxLayer::OnAttach() {
     m_shader = Shader("shaders/sandbox_vertex.vert", "shaders/sandbox_fragment.frag");
-    m_quad = Model("assets/quad/quad.obj");
+    m_quad = Model("assets/quad.obj");
 }
 
 void SandboxLayer::OnUpdate() {

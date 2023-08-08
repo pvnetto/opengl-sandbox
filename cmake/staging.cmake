@@ -1,10 +1,17 @@
-function(add_staging deps)
-	add_custom_target(Staging
-		DEPENDS "${deps}")
+function(add_staging dependency)
+	add_custom_target(Staging DEPENDS "${dependency}")
 	
-	get_target_property(DEPS_RUNTIME_OUTPUT_DIR "${deps}" RUNTIME_OUTPUT_DIRECTORY)
-	set_target_properties(Staging PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY "${DEPS_RUNTIME_OUTPUT_DIR}")
+
+	# Now you can use CMAKE_RUNTIME_OUTPUT_DIRECTORY_<CONFIG> to determine the output directory
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		get_target_property(CURRENT_RUNTIME_OUTPUT_DIRECTORY "${dependency}" RUNTIME_OUTPUT_DIRECTORY_DEBUG)
+	elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+		get_target_property(CURRENT_RUNTIME_OUTPUT_DIRECTORY "${dependency}" RUNTIME_OUTPUT_DIRECTORY_RELEASE)
+	else()
+		get_target_property(CURRENT_RUNTIME_OUTPUT_DIRECTORY "${dependency}" RUNTIME_OUTPUT_DIRECTORY)
+	endif()
+
+	set_target_properties(Staging PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CURRENT_RUNTIME_OUTPUT_DIRECTORY}")
 endfunction()
 
 function(stage_directory relative_path)

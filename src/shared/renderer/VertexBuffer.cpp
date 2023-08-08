@@ -7,26 +7,21 @@
 
 namespace spr {
 
+    static HandleGenerator<VertexBufferHandle> s_VertexBufferHandles;
     VertexBufferInstanceGL s_VertexBuffers[VertexBufferHandle::capacity];
 
     VertexBufferHandle createVertexBuffer(const void* data, uint32_t size, const VertexAttributeLayout& layout) {
-        VertexBufferHandle handle = HandleGenerator<VertexBufferHandle>::allocHandle();
+		VertexBufferHandle handle = s_VertexBufferHandles.allocHandle();
 
         VertexAttributeLayoutHandle layoutHandle = findOrCreateVertexAttributeLayout(layout);
         s_VertexBuffers[handle.idx].create(data, size, layoutHandle);
 
         return handle;
     }
-    
-    void setVertexBuffer(const VertexBufferHandle& handle) {
-        DrawCallData& drawCallData = spr::getCurrentDrawCallData();
-        assert(!drawCallData.VertBufferHandle.isValid() && "::ERROR: Vertex buffer was already set for this frame.");
-        drawCallData.VertBufferHandle = handle;
-    }
 
     void destroy(VertexBufferHandle& handle) {
         s_VertexBuffers[handle.idx].destroy();
-        HandleGenerator<VertexBufferHandle>::removeHandle(handle);
+		s_VertexBufferHandles.removeHandle(handle);
     }
 
 }

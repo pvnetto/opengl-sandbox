@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Uniforms.h"
 #include "Handles.h"
+#include "ResourceManager/UniformManager.h"
 
 namespace spr {
 

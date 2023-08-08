@@ -1,5 +1,8 @@
 #include "Programs.h"
+
+#include "SimpleRenderer.h"
 #include "VertexAttributeLayout.h"
+#include "shared/renderer/ResourceManager/ResourceManager.h"
 
 #include <iostream>
 #include <glad/glad.h>
@@ -44,6 +47,8 @@ namespace spr {
 
 namespace spr {
 
+    static HandleGenerator<ShaderHandle> s_ShaderHandles;
+
     static GLuint getGLShaderTypeFromSPR(unsigned int sprShaderType) {
         if(sprShaderType == SPR_VERTEX_SHADER) return GL_VERTEX_SHADER;
         if(sprShaderType == SPR_FRAGMENT_SHADER) return GL_FRAGMENT_SHADER;
@@ -53,14 +58,14 @@ namespace spr {
     }
     
     ShaderHandle createShader(unsigned int shaderType, const char* shaderSrc) {
-        ShaderHandle shaderHandle = HandleGenerator<ShaderHandle>::allocHandle();
+		ShaderHandle shaderHandle = s_ShaderHandles.allocHandle();
         s_Shaders[shaderHandle.idx].create(shaderType, shaderSrc);
         return shaderHandle;
     }
 
     void destroy(ShaderHandle& shaderHandle) {
         s_Shaders[shaderHandle.idx].destroy();
-        HandleGenerator<ShaderHandle>::removeHandle(shaderHandle);
+		s_ShaderHandles.removeHandle(shaderHandle);
     }
 }
 
@@ -70,9 +75,11 @@ namespace spr {
 // ========================================
 namespace spr {
 
+    static HandleGenerator<ProgramHandle> s_ProgramHandles;
+
     ProgramHandle createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) {
         assert((vertexHandle.isValid() && fragmentHandle.isValid()) && "::ERROR: Invalid shader");
-        ProgramHandle programHandle = HandleGenerator<ProgramHandle>::allocHandle();
+		ProgramHandle programHandle = s_ProgramHandles.allocHandle();
         s_Programs[programHandle.idx].create(
             s_Shaders[vertexHandle.idx],
             s_Shaders[fragmentHandle.idx]);
@@ -88,7 +95,7 @@ namespace spr {
     void destroy(ProgramHandle& handle) {
         assert((handle.isValid() && handle.idx < ProgramHandle::capacity) && "::ERROR: Invalid program");
         s_Programs[handle.idx].destroy();
-        HandleGenerator<ProgramHandle>::removeHandle(handle);
+		s_ProgramHandles.removeHandle(handle);
     }
 
     void useProgram(const ProgramHandle& handle) {
@@ -195,7 +202,9 @@ namespace spr {
             glGetActiveUniform(ID, i, maxUniformNameLength, NULL, &count, &type, name.data());
             uint32_t location = glGetUniformLocation(ID, name.c_str());
 
-            const UniformHandle handle = getUniformByName(name.c_str());
+            const auto &ctx = spr::getContext();
+			const auto &uniformManager = ctx->getResourceManager().getUniformManager();
+			const UniformHandle handle = uniformManager.getUniformByName(name.c_str());
             const UniformType sprType = getSPRUniformTypeFromGLType(type);
 
             UniformInfoBuffer->write(&sprType, sizeof(UniformType));

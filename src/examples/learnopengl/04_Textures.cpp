@@ -115,9 +115,9 @@ void LOGL_04_Textures::OnUpdate() {
 	spr::setIndexBuffer(m_indexBufferHandle);
 
 	spr::submit(m_shaderHandle);
-	spr::render();
 
-	spr::cleanup();
+	spr::render();
+	spr::clean();
 }
 
 void LOGL_04_Textures::OnDettach() {

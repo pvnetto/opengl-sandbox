@@ -6,6 +6,7 @@
 
 namespace spr {
     static constexpr uint32_t s_NumLayouts = VertexAttributeLayoutHandle::capacity;
+	static HandleGenerator<VertexAttributeLayoutHandle> s_AttributeLayoutHandles;
     static VertexAttributeLayout s_VertexAttributeLayouts[s_NumLayouts];
 
     VertexAttributeLayoutHandle findOrCreateVertexAttributeLayout(const VertexAttributeLayout& layout) {
@@ -15,7 +16,7 @@ namespace spr {
             }
         }
 
-        VertexAttributeLayoutHandle layoutHandle = HandleGenerator<VertexAttributeLayoutHandle>::allocHandle();
+        VertexAttributeLayoutHandle layoutHandle = s_AttributeLayoutHandles.allocHandle();
         s_VertexAttributeLayouts[layoutHandle.idx] = layout;
         return layoutHandle;
     }

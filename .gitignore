@@ -45,6 +45,7 @@ Generated\ Files/
 
 # VSCode files
 .vscode/
+CMakeSettings.json
 
 # MSTest test Results
 [Tt]est[Rr]esult*/

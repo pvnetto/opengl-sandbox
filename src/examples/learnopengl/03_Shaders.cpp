@@ -53,7 +53,7 @@ void LOGL_03_Shaders::OnUpdate() {
 
 	spr::render();
 	
-	spr::cleanup();
+	spr::clean();
 }
 
 void LOGL_03_Shaders::OnDettach() {

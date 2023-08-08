@@ -1,56 +1,30 @@
 #pragma once
 
-#include "Uniforms.h"
 #include "Handles.h"
+#include "FrameDataManager.h"
+
+#include "OpenGL/RendererContext.h"
+#include "ResourceManager/ResourceManager.h"
+
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 
-
-// ===================================================
-// ==== Renderer =====================================
-// ===================================================
 namespace spr {
+    class Context {
+	public:
+		void init();
+		void shutdown();
 
-    /* Initializes renderer */
-    void init();
-    void shutdown();
+		inline FrameDataManager &getFrameDataManager() { return m_FrameDataManager; }
+		inline ResourceManager &getResourceManager() { return m_ResourceManager; }
+		inline RendererContextGL &getRendererContext() { return m_RendererContext; }
 
-    /* Clears framebuffer data */
-    void clear();
+    private:
+		FrameDataManager m_FrameDataManager;
+		ResourceManager m_ResourceManager;
 
-    /* Submits draw call data to renderer */
-    void submit(ProgramHandle& program);
-    /* Renders all draw calls submitted to renderer */
-    void render();
-    /* Cleans current frame data. This should be called after rendering a frame */
-    void cleanup();
-
-}
-
-namespace spr {
-
-    struct DrawCallData {
-        ProgramHandle Program;
-        VertexBufferHandle VertBufferHandle;
-        IndexBufferHandle IndBufferHandle;
-
-        uint32_t UniformsStart;
-        uint32_t UniformsEnd;
-
-        void clear();
+		RendererContextGL m_RendererContext;
     };
-
-    struct FrameData {
-        UniformDataBufferPtr UniformDataBuffer;
-        std::vector<DrawCallData> DrawCalls;
-
-        void clear();
-        uint32_t lastDrawCallUniformEnd();
-    };
-    
-    FrameData& getFrameData();
-    DrawCallData& getCurrentDrawCallData();
-
 }
 
 // ===================================================
