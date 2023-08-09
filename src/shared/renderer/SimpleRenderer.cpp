@@ -74,6 +74,22 @@ namespace spr {
 		s_Context.getResourceManager().destroy(uniformHandle);
 	}
 
+	ShaderHandle createShader(unsigned int shaderType, const char* shaderSrc) {
+		return s_Context.getResourceManager().createShader(shaderType, shaderSrc);
+	}
+
+	void destroy(ShaderHandle& handle) {
+		s_Context.getResourceManager().destroy(handle);
+	}
+
+	ProgramHandle createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) {
+		return s_Context.getResourceManager().createProgram(vertexHandle, fragmentHandle, destroyShaders);
+	}
+
+	void destroy(ProgramHandle& handle) {
+		s_Context.getResourceManager().destroy(handle);
+	}
+
 }
 
 

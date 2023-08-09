@@ -1,6 +1,5 @@
 #include "Context.h"
 
-#include "Programs.h"
 #include "Runtime.h"
 #include "shared/Event.h"
 #include "shared/renderer/OpenGL/RendererContext.h"
@@ -23,13 +22,15 @@ namespace spr {
 	static GLFWwindow *s_Window = nullptr;
 
 	void Context::init() {
+		// TODO: Do we really need to pass Context down, or should we keep the global getter?
+		// If we intend to keep Context as a singleton, the global getter makes sense, otherwise we should send it down
 		m_FrameDataManager.init(this);
 		m_ResourceManager.init(this);
 
 		// TODO: Use swapchain to handle viewport size (??), resize according to framebuffer size
 		const WindowState &state = *(WindowState *)glfwGetWindowUserPointer(s_Window);
 		glViewport(0, 0, state.Width, state.Height);
-		m_RendererContext.init();
+		m_RendererContext.init(this);
 	}
 
 	void Context::shutdown() {

@@ -21,7 +21,13 @@ namespace spr {
 		void destroy(IndexBufferHandle &handle);
 
 		UniformHandle createUniform(const char *name, UniformType type);
-		void destroy(UniformHandle &uniformHandle);
+		void destroy(UniformHandle &handle);
+
+		ShaderHandle createShader(unsigned int shaderType, const char *shaderSrc);
+		void destroy(ShaderHandle &handle);
+
+		ProgramHandle createProgram(ShaderHandle &vertexHandle, ShaderHandle &fragmentHandle, bool destroyShaders = true);
+		void destroy(ProgramHandle &handle);
 
 	public:
 		inline const UniformManager &getUniformManager() const { return m_UniformManager; }
@@ -31,6 +37,8 @@ namespace spr {
 
 		HandleGenerator<VertexBufferHandle> m_VertexBufferHandles;
 		HandleGenerator<IndexBufferHandle> m_IndexBufferHandles;
+		HandleGenerator<ShaderHandle> m_ShaderHandles;
+		HandleGenerator<ProgramHandle> m_ProgramHandles;
 		
 		UniformManager m_UniformManager;
 	};

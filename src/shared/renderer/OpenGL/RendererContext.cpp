@@ -1,12 +1,13 @@
 #include "RendererContext.h"
 
 #include "shared/renderer/Context.h"
-#include "shared/renderer/Programs.h"
 
 #include <glad/glad.h>
 
 namespace spr {
-	void RendererContextGL::init() {
+
+	void RendererContextGL::init(Context* context) {
+		m_ResourceManager.init(context);
 		glCreateVertexArrays(1, &m_DefaultVAO);
 	}
 
@@ -26,18 +27,20 @@ namespace spr {
 
 		DrawCallData currentDrawCall;
 		for (const DrawCallData &renderItem : frameData.DrawCalls) {
-			auto &uniformManager = m_ResourceManager.getUniformManager();
+			UniformManagerGL &uniformManager = m_ResourceManager.getUniformManager();
 			uniformManager.setUniformValues(frameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
 
+			const ProgramManagerGL& programManager = m_ResourceManager.getProgramManager();
 			bool changedAttributesLayout = false;
 			if (currentDrawCall.Program != renderItem.Program) {
 				currentDrawCall.Program = renderItem.Program;
 				changedAttributesLayout = true;
 
-				spr::useProgram(renderItem.Program);
+				programManager.getProgram(currentDrawCall.Program).use();
 			}
 
-			setUniforms(getProgramUniforms(renderItem.Program));
+			const ProgramInstanceGL &currentProgram = programManager.getProgram(currentDrawCall.Program);
+			setUniforms(currentProgram.UniformInfoBuffer);
 
 			if (currentDrawCall.IndexBuffer != renderItem.IndexBuffer) {
 				currentDrawCall.IndexBuffer = renderItem.IndexBuffer;
@@ -57,7 +60,7 @@ namespace spr {
 
 			if (changedAttributesLayout) {
 				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
-				spr::internal::bindVertexAttributeLayout(currentDrawCall.Program, vertexBuffer.LayoutHandle);
+				currentProgram.bindAttributes(m_DefaultVAO, vertexBuffer);
 			}
 
 			if (currentDrawCall.IndexBuffer.isValid()) {

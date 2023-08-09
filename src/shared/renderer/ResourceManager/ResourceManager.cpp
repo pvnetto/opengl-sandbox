@@ -44,4 +44,35 @@ namespace spr {
 		m_UniformManager.destroy(uniformHandle);
 	}
 
+	ShaderHandle ResourceManager::createShader(unsigned int shaderType, const char *shaderSrc) {
+		ShaderHandle handle = m_ShaderHandles.allocHandle();
+		auto& rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createShader(handle, shaderType, shaderSrc);
+		return handle;
+	}
+
+	void ResourceManager::destroy(ShaderHandle &handle) {
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.destroy(handle);
+		m_ShaderHandles.removeHandle(handle);
+	}
+
+	ProgramHandle ResourceManager::createProgram(ShaderHandle& vertexHandle, ShaderHandle& fragmentHandle, bool destroyShaders) {
+		ProgramHandle handle = m_ProgramHandles.allocHandle();
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createProgram(handle, vertexHandle, fragmentHandle);
+
+		if (destroyShaders) {
+			destroy(vertexHandle);
+			destroy(fragmentHandle);
+		}
+		return handle;
+	}
+
+	void ResourceManager::destroy(ProgramHandle& handle) {
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.destroy(handle);
+		m_ProgramHandles.removeHandle(handle);
+	}
+
 }

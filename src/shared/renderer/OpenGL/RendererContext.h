@@ -9,7 +9,7 @@ namespace spr {
 
 	class RendererContextGL {
 	public:
-		void init();
+		void init(Context *context);
 		void shutdown();
 
 		void clear();

@@ -5,8 +5,9 @@
 #include "Handles.h"
 #include "Runtime.h"
 #include "Inputs.h"
-#include "Programs.h"
 #include "VertexAttributeLayout.h"
+
+#include "ResourceManager/ShaderType.h"
 
 // TODO: Once everything is refactored, remove this!!
 namespace spr {
@@ -44,5 +45,11 @@ namespace spr {
 
 	UniformHandle createUniform(const char *name, UniformType type);
 	void destroy(UniformHandle &uniformHandle);
+
+	ShaderHandle createShader(unsigned int shaderType, const char *shaderSrc);
+	void destroy(ShaderHandle &handle);
+
+	ProgramHandle createProgram(ShaderHandle &vertexHandle, ShaderHandle &fragmentHandle, bool destroyShaders = true);
+	void destroy(ProgramHandle &handle);
 
 }
