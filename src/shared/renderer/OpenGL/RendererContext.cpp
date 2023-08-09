@@ -2,7 +2,6 @@
 
 #include "shared/renderer/Context.h"
 #include "shared/renderer/Programs.h"
-#include "shared/renderer/VertexBuffer.h"
 
 #include <glad/glad.h>
 
@@ -42,20 +41,22 @@ namespace spr {
 
 			if (currentDrawCall.IndexBuffer != renderItem.IndexBuffer) {
 				currentDrawCall.IndexBuffer = renderItem.IndexBuffer;
-				const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
-				const auto &indexBuffer = indexBufferManager.getIndexBuffer(currentDrawCall.IndexBuffer);
+				const IndexBufferManagerGL& indexBufferManager = m_ResourceManager.getIndexBufferManager();
+				const IndexBufferInstanceGL& indexBuffer = indexBufferManager.getIndexBuffer(currentDrawCall.IndexBuffer);
 				indexBuffer.bind(m_DefaultVAO);
 			}
 
+			const VertexBufferManagerGL& vertexBufferManager = m_ResourceManager.getVertexBufferManager();
 			if (currentDrawCall.VertexBuffer != renderItem.VertexBuffer) {
 				currentDrawCall.VertexBuffer = renderItem.VertexBuffer;
 				changedAttributesLayout = true;
 
-				spr::internal::bindVertexBuffer(renderItem.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
+				vertexBuffer.bind();
 			}
 
 			if (changedAttributesLayout) {
-				const VertexBufferInstanceGL &vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
 				spr::internal::bindVertexAttributeLayout(currentDrawCall.Program, vertexBuffer.LayoutHandle);
 			}
 
@@ -65,7 +66,7 @@ namespace spr {
 				glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
 			}
 			else {
-				const auto &vertexBuffer = spr::internal::getVertexBuffer(currentDrawCall.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
 				const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
 				const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
 				glDrawArrays(GL_TRIANGLES, 0, vertexCount);

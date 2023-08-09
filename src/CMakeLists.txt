@@ -10,7 +10,7 @@ set(SANDBOX_SOURCES
 		shared/renderer/SimpleRenderer.cpp
 		shared/renderer/Context.cpp
 		shared/renderer/FrameDataManager.cpp
-		shared/renderer/VertexBuffer.cpp
+		
 		shared/renderer/VertexAttributeLayout.cpp
 		shared/renderer/Programs.cpp
 		shared/renderer/Inputs.cpp
@@ -22,6 +22,7 @@ set(SANDBOX_SOURCES
 		shared/renderer/OpenGL/RendererContext.cpp
 		shared/renderer/OpenGL/Helpers.cpp
 		shared/renderer/OpenGL/ResourceManager/ResourceManagerGL.cpp
+		shared/renderer/OpenGL/ResourceManager/VertexBufferManagerGL.cpp
 		shared/renderer/OpenGL/ResourceManager/IndexBufferManagerGL.cpp
 		shared/renderer/OpenGL/ResourceManager/UniformManagerGL.cpp
 

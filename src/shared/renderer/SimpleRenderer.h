@@ -6,7 +6,6 @@
 #include "Runtime.h"
 #include "Inputs.h"
 #include "Programs.h"
-#include "VertexBuffer.h"
 #include "VertexAttributeLayout.h"
 
 // TODO: Once everything is refactored, remove this!!
@@ -36,6 +35,9 @@ namespace spr {
 	void setVertexBuffer(const VertexBufferHandle &handle);
 	void setIndexBuffer(const IndexBufferHandle &handle);
 	void setUniform(const UniformHandle &uniformHandle, const void *data);
+
+    VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);
+	void destroy(VertexBufferHandle &handle);
 
     IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);
 	void destroy(IndexBufferHandle &handle);

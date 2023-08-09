@@ -2,6 +2,14 @@
 
 namespace spr {
 
+	void ResourceManagerGL::createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {
+		m_VertexBufferManager.createVertexBuffer(handle, data, size, layout);
+	}
+
+	void ResourceManagerGL::destroy(VertexBufferHandle &handle) {
+		m_VertexBufferManager.destroy(handle);
+	}
+
 	void ResourceManagerGL::createIndexBuffer(const IndexBufferHandle &handle, const void *data, uint32_t size) {
 		m_IndexBufferManager.createIndexBuffer(handle, data, size);
 	}

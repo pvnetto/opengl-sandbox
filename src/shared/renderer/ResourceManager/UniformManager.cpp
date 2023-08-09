@@ -19,13 +19,11 @@ namespace spr {
 		UniformRef *uniformRef = nullptr;
 		UniformHandle handle;
 
-		// If the index exists in the hashmap, just check uniform validity and return a handle
 		if (m_UniformHashMap.count({name}) > 0) {
 			handle.idx = m_UniformHashMap[name];
 			uniformRef = &m_Uniforms[handle.idx];
 			assert(uniformRef->Type == type && "::ERROR: Uniform type mismatch");
 		}
-		// Otherwise, generates new uniform ref
 		else {
 			handle = m_UniformHandles.allocHandle();
 			uniformRef = &m_Uniforms[handle.idx];

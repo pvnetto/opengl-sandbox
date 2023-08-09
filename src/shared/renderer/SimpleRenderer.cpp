@@ -50,6 +50,14 @@ namespace spr {
 		s_Context.getFrameDataManager().setUniform(uniformHandle, data);
 	}
 
+	VertexBufferHandle createVertexBuffer(const void* data, uint32_t size, const VertexAttributeLayout& layout) {
+		return s_Context.getResourceManager().createVertexBuffer(data, size, layout);
+	}
+	
+	void destroy(VertexBufferHandle& handle) {
+		s_Context.getResourceManager().destroy(handle);
+	}
+
 	IndexBufferHandle createIndexBuffer(const void* data, uint32_t size) {
 		return s_Context.getResourceManager().createIndexBuffer(data, size);
 	}

@@ -41,6 +41,8 @@ namespace spr {
 		HandleGenerator<UniformHandle> m_UniformHandles;
 
 		UniformRef m_Uniforms[UniformHandle::capacity];
+
+		/* Optimizes Uniform lookup by caching them in a hashmap. */
 		UniformHashMap m_UniformHashMap;
 
 	private:
