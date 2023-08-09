@@ -11,6 +11,7 @@ namespace spr {
 	IndexBufferHandle ResourceManager::createIndexBuffer(const void *data, uint32_t size) {
 		IndexBufferHandle handle = m_IndexBufferHandles.allocHandle();
 		auto& rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createIndexBuffer(handle, data, size);
 		return handle;
 	}
 

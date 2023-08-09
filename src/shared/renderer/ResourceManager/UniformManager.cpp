@@ -46,6 +46,9 @@ namespace spr {
 		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
 		auto &rendererUniformManager = rendererResourceManager.getUniformManager();
 		rendererUniformManager.destroy(uniformHandle);
+		
+		const UniformRef &uniform = m_Uniforms[uniformHandle.idx];
+		m_UniformHashMap.erase(uniform.Name);
 		m_UniformHandles.removeHandle(uniformHandle);
 	}
 
