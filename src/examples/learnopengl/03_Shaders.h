@@ -7,7 +7,7 @@ class LOGL_03_Shaders : public Layer {
 public:
     virtual void OnAttach() override;
     virtual void OnUpdate() override;
-    virtual void OnDettach() override;
+    virtual void OnDetach() override;
 
 private:
     spr::ProgramHandle m_shaderProgramHandle;

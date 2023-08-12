@@ -6,17 +6,17 @@
 class LOGL_04_Textures : public Layer {
 public:
     virtual void OnAttach() override;
-    virtual void OnDettach() override;
+    virtual void OnDetach() override;
     virtual void OnUpdate() override;
 
 private:
-    spr::VertexBufferHandle m_vertexBufferHandle;
-    spr::IndexBufferHandle m_indexBufferHandle;
+    spr::VertexBufferHandle m_VertexBufferHandle;
+    spr::IndexBufferHandle m_IndexBufferHandle;
 
-    spr::UniformHandle m_texUniform0;
-    spr::UniformHandle m_texUniform1;
-    spr::ProgramHandle m_shaderHandle;
+    spr::UniformHandle m_TexUniform0;
+    spr::UniformHandle m_TexUniform1;
+    spr::ProgramHandle m_ShaderHandle;
 
-	unsigned int m_brickTexture, m_otherTexture;
-	unsigned int m_otherTextureSampler;
+	unsigned int m_BrickTexture, m_OtherTexture;
+	unsigned int m_OtherTextureSampler;
 };

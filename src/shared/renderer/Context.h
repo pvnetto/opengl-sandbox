@@ -3,7 +3,7 @@
 #include "Handles.h"
 #include "FrameDataManager.h"
 
-#include "OpenGL/RendererContext.h"
+#include "OpenGL/RendererContextGL.h"
 #include "ResourceManager/ResourceManager.h"
 
 #include <glm/glm.hpp>

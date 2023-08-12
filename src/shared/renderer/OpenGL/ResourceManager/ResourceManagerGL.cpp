@@ -50,4 +50,12 @@ namespace spr {
 		m_ProgramManager.destroy(programHandle);
 	}
 
+	void ResourceManagerGL::createTexture(const TextureHandle &handle, const struct TextureInfo &textureInfo, const void *data) {
+		m_TextureManager.createTexture(handle, textureInfo, data);
+	}
+
+	void ResourceManagerGL::destroy(TextureHandle &handle) {
+		m_TextureManager.destroy(handle);
+	}
+
 }

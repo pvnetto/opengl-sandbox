@@ -5,22 +5,15 @@
 #include "Handles.h"
 #include "Runtime.h"
 #include "Inputs.h"
-#include "VertexAttributeLayout.h"
+#include "ResourceManager/VertexAttributeLayout.h"
 
 #include "ResourceManager/ShaderType.h"
-
-// TODO: Once everything is refactored, remove this!!
-namespace spr {
-
-	Context *getContext();
-
-}
+#include "ResourceManager/TextureInfo.h"
 
 namespace spr {
 	struct ProgramHandle;
 	struct IndexBufferHandle;
 }
-
 
 namespace spr {
 
@@ -36,6 +29,7 @@ namespace spr {
 	void setVertexBuffer(const VertexBufferHandle &handle);
 	void setIndexBuffer(const IndexBufferHandle &handle);
 	void setUniform(const UniformHandle &uniformHandle, const void *data);
+	void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo);
 
     VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);
 	void destroy(VertexBufferHandle &handle);
@@ -51,5 +45,8 @@ namespace spr {
 
 	ProgramHandle createProgram(ShaderHandle &vertexHandle, ShaderHandle &fragmentHandle, bool destroyShaders = true);
 	void destroy(ProgramHandle &handle);
+
+	TextureHandle createTexture(const struct TextureInfo &textureInfo, const void *data);
+	void destroy(TextureHandle &handle);
 
 }

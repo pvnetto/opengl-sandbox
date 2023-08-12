@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/renderer/VertexAttributeLayout.h"
+#include "shared/renderer/ResourceManager/VertexAttributeLayout.h"
 
 namespace spr {
 

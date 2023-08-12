@@ -1,6 +1,7 @@
 #include "FrameDataManager.h"
 
 #include "shared/renderer/Context.h"
+#include "shared/renderer/ResourceManager/SamplerInfo.h"
 
 #include <cassert>
 
@@ -22,6 +23,7 @@ namespace spr {
 		IndexBuffer = kInvalidHandle;
 		UniformsStart = 0;
 		UniformsEnd = 0;
+		TextureBindings.empty();
 	}
 
 	void FrameDataManager::init(Context* owner) {
@@ -63,6 +65,13 @@ namespace spr {
 		uniformDataBuffer->write(&uniformHandle, sizeof(UniformHandle));
 		uniformDataBuffer->write(&uniform.Type, sizeof(UniformType));
 		uniformDataBuffer->write(data, spr::getUniformSizeByType(uniform.Type));
+	}
+
+	void FrameDataManager::setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo) {
+		TextureBinding binding;
+		binding.Texture = textureHandle;
+		binding.Sampler = samplerInfo;
+		m_CurrentDrawCall.TextureBindings.emplace(unit, binding);
 	}
 
 }

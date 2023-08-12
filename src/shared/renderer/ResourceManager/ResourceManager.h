@@ -29,6 +29,9 @@ namespace spr {
 		ProgramHandle createProgram(ShaderHandle &vertexHandle, ShaderHandle &fragmentHandle, bool destroyShaders = true);
 		void destroy(ProgramHandle &handle);
 
+		TextureHandle createTexture(const struct TextureInfo& textureInfo, const void *data);
+		void destroy(TextureHandle &handle);
+
 	public:
 		inline const UniformManager &getUniformManager() const { return m_UniformManager; }
 
@@ -39,6 +42,7 @@ namespace spr {
 		HandleGenerator<IndexBufferHandle> m_IndexBufferHandles;
 		HandleGenerator<ShaderHandle> m_ShaderHandles;
 		HandleGenerator<ProgramHandle> m_ProgramHandles;
+		HandleGenerator<TextureHandle> m_TextureHandles;
 		
 		UniformManager m_UniformManager;
 	};

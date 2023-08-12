@@ -1,6 +1,6 @@
 #include "ProgramManagerGL.h"
 
-#include "shared/renderer/VertexAttributeLayout.h"
+#include "shared/renderer/ResourceManager/VertexAttributeLayout.h"
 #include "shared/renderer/ResourceManager/UniformManager.h"
 #include "shared/renderer/OpenGL/ResourceManager/ShaderManagerGL.h"
 #include "shared/renderer/OpenGL/ResourceManager/VertexBufferManagerGL.h"
@@ -145,6 +145,8 @@ namespace spr {
 				return UniformType::Vec3;
 			case GL_SAMPLER_2D:
 				return UniformType::Sampler;
+			case GL_FLOAT_MAT4:
+				return UniformType::Mat4x4;
 			default:
 				assert(false && "::ERROR: Undefined uniform type");
 				return UniformType::Float;

@@ -36,7 +36,7 @@ namespace spr { namespace runtime {
         auto it = std::find(s_Layers.begin(), s_Layers.end(), layer);
         if (it != s_Layers.end()) {
             Layer *dettached = *it;
-            (dettached)->OnDettach();
+            (dettached)->OnDetach();
             s_Layers.erase(it);
 
             delete dettached;

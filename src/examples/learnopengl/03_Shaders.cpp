@@ -56,7 +56,7 @@ void LOGL_03_Shaders::OnUpdate() {
 	spr::clean();
 }
 
-void LOGL_03_Shaders::OnDettach() {
+void LOGL_03_Shaders::OnDetach() {
 	spr::destroy(m_shaderProgramHandle);
 	spr::destroy(m_uniformHandle);
 	spr::destroy(m_triangleVBHandle);

@@ -2,7 +2,7 @@
 
 #include "Runtime.h"
 #include "shared/Event.h"
-#include "shared/renderer/OpenGL/RendererContext.h"
+#include "shared/renderer/OpenGL/RendererContextGL.h"
 
 #include <glad/glad.h>
 #include <iostream>
@@ -42,9 +42,7 @@ namespace spr {
 
 }
 
-// ===================================================
-// ==== Windowing ====================================
-// ===================================================
+// TODO: Move Windowing methods to its own module
 namespace spr {
 
 	void createWindow(const char *windowName, int width, int height) {

@@ -1,4 +1,4 @@
-#include "RendererContext.h"
+#include "RendererContextGL.h"
 
 #include "shared/renderer/Context.h"
 
@@ -25,51 +25,61 @@ namespace spr {
 
 		glEnable(GL_DEPTH_TEST);
 
-		DrawCallData currentDrawCall;
-		for (const DrawCallData &renderItem : frameData.DrawCalls) {
+		DrawCallData cachedDrawCall;
+		for (const DrawCallData &drawCall : frameData.DrawCalls) {
 			UniformManagerGL &uniformManager = m_ResourceManager.getUniformManager();
-			uniformManager.setUniformValues(frameData.UniformDataBuffer, renderItem.UniformsStart, renderItem.UniformsEnd);
+			uniformManager.setUniformValues(frameData.UniformDataBuffer, drawCall.UniformsStart, drawCall.UniformsEnd);
 
 			const ProgramManagerGL& programManager = m_ResourceManager.getProgramManager();
 			bool changedAttributesLayout = false;
-			if (currentDrawCall.Program != renderItem.Program) {
-				currentDrawCall.Program = renderItem.Program;
+			if (cachedDrawCall.Program != drawCall.Program) {
+				cachedDrawCall.Program = drawCall.Program;
 				changedAttributesLayout = true;
 
-				programManager.getProgram(currentDrawCall.Program).use();
+				programManager.getProgram(cachedDrawCall.Program).use();
 			}
 
-			const ProgramInstanceGL &currentProgram = programManager.getProgram(currentDrawCall.Program);
+			const ProgramInstanceGL &currentProgram = programManager.getProgram(cachedDrawCall.Program);
 			setUniforms(currentProgram.UniformInfoBuffer);
 
-			if (currentDrawCall.IndexBuffer != renderItem.IndexBuffer) {
-				currentDrawCall.IndexBuffer = renderItem.IndexBuffer;
+			// TODO: We could probably cache these as well, and avoid binding samplers every frame
+			TextureManagerGL &textureManager = m_ResourceManager.getTextureManager();
+			for (const auto &[textureUnit, textureBinding] : drawCall.TextureBindings) {
+				const TextureInstanceGL& texture = textureManager.getTexture(textureBinding.Texture);
+				texture.bind(textureUnit);
+
+				const SamplerInstanceGL &sampler = textureManager.findOrCreateSampler(textureBinding.Sampler);
+				sampler.bind(textureUnit);
+			}
+
+			if (cachedDrawCall.IndexBuffer != drawCall.IndexBuffer) {
+				cachedDrawCall.IndexBuffer = drawCall.IndexBuffer;
 				const IndexBufferManagerGL& indexBufferManager = m_ResourceManager.getIndexBufferManager();
-				const IndexBufferInstanceGL& indexBuffer = indexBufferManager.getIndexBuffer(currentDrawCall.IndexBuffer);
+				const IndexBufferInstanceGL& indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
 				indexBuffer.bind(m_DefaultVAO);
 			}
 
 			const VertexBufferManagerGL& vertexBufferManager = m_ResourceManager.getVertexBufferManager();
-			if (currentDrawCall.VertexBuffer != renderItem.VertexBuffer) {
-				currentDrawCall.VertexBuffer = renderItem.VertexBuffer;
+			if (cachedDrawCall.VertexBuffer != drawCall.VertexBuffer) {
+				cachedDrawCall.VertexBuffer = drawCall.VertexBuffer;
 				changedAttributesLayout = true;
 
-				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
 				vertexBuffer.bind();
 			}
 
 			if (changedAttributesLayout) {
-				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
 				currentProgram.bindAttributes(m_DefaultVAO, vertexBuffer);
 			}
 
-			if (currentDrawCall.IndexBuffer.isValid()) {
+			if (cachedDrawCall.IndexBuffer.isValid()) {
 				const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
-				const auto &indexBuffer = indexBufferManager.getIndexBuffer(currentDrawCall.IndexBuffer);
+				const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
 				glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
 			}
 			else {
-				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(currentDrawCall.VertexBuffer);
+				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
 				const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
 				const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
 				glDrawArrays(GL_TRIANGLES, 0, vertexCount);
@@ -101,6 +111,9 @@ namespace spr {
 				break;
 			case UniformType::Vec3:
 				glUniform3fv(location, 1, uniformManager.getUniformValue<float>(handle));
+				break;
+			case UniformType::Mat4x4:
+				glUniformMatrix4fv(location, 1, GL_FALSE, uniformManager.getUniformValue<float>(handle));
 				break;
 			default:
 				assert(false && "::ERROR: Undefined uniform type");

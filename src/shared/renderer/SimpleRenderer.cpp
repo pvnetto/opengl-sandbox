@@ -1,17 +1,8 @@
 #include "SimpleRenderer.h"
 
-// TODO: Once everything is refactored, remove this getter!!
 namespace spr {
 
 	static Context s_Context;
-
-	Context* getContext() {
-		return &s_Context;
-	}
-
-}
-
-namespace spr {
 
 	void init() {
 		s_Context.init();
@@ -48,6 +39,10 @@ namespace spr {
 
 	void setUniform(const UniformHandle& uniformHandle, const void* data) {
 		s_Context.getFrameDataManager().setUniform(uniformHandle, data);
+	}
+
+	void setTexture(TextureUnitType unit, const TextureHandle& textureHandle, const struct SamplerInfo& samplerInfo) {
+		s_Context.getFrameDataManager().setTexture(unit, textureHandle, samplerInfo);
 	}
 
 	VertexBufferHandle createVertexBuffer(const void* data, uint32_t size, const VertexAttributeLayout& layout) {
@@ -87,6 +82,14 @@ namespace spr {
 	}
 
 	void destroy(ProgramHandle& handle) {
+		s_Context.getResourceManager().destroy(handle);
+	}
+
+	TextureHandle createTexture(const struct TextureInfo& textureInfo, const void* data) {
+		return s_Context.getResourceManager().createTexture(textureInfo, data);
+	}
+
+	void destroy(TextureHandle& handle) {
 		s_Context.getResourceManager().destroy(handle);
 	}
 

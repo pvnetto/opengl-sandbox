@@ -5,6 +5,7 @@
 #include "UniformManagerGL.h"
 #include "ShaderManagerGL.h"
 #include "ProgramManagerGL.h"
+#include "TextureManagerGL.h"
 
 namespace spr {
 
@@ -27,6 +28,9 @@ namespace spr {
 		void createProgram(const ProgramHandle& programHandle, ShaderHandle &vertexHandle, ShaderHandle &fragmentHandle);
 		void destroy(ProgramHandle &programHandle);
 
+		void createTexture(const TextureHandle &handle, const struct TextureInfo &textureInfo, const void *data);
+		void destroy(TextureHandle &handle);
+
 	public:
 		inline const VertexBufferManagerGL &getVertexBufferManager() const { return m_VertexBufferManager; }
 		inline const IndexBufferManagerGL &getIndexBufferManager() const { return m_IndexBufferManager; }
@@ -34,6 +38,8 @@ namespace spr {
 		inline UniformManagerGL &getUniformManager() { return m_UniformManager; }
 		inline const ShaderManagerGL& getShaderManager() const { return m_ShaderManager; }
 		inline const ProgramManagerGL& getProgramManager() const { return m_ProgramManager; }
+		inline const TextureManagerGL& getTextureManager() const { return m_TextureManager; }
+		inline TextureManagerGL& getTextureManager() { return m_TextureManager; }
 
 	private:
 		VertexBufferManagerGL m_VertexBufferManager;
@@ -41,6 +47,7 @@ namespace spr {
 		UniformManagerGL m_UniformManager;
 		ShaderManagerGL m_ShaderManager;
 		ProgramManagerGL m_ProgramManager;
+		TextureManagerGL m_TextureManager;
 
 	private:
 		Context *m_Owner = nullptr;

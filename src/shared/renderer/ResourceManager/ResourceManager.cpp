@@ -1,6 +1,6 @@
 #include "ResourceManager.h"
 #include "shared/renderer/Context.h"
-#include "shared/renderer/VertexAttributeLayout.h"
+#include "shared/renderer/ResourceManager/VertexAttributeLayout.h"
 
 namespace spr {
 
@@ -73,6 +73,19 @@ namespace spr {
 		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
 		rendererResourceManager.destroy(handle);
 		m_ProgramHandles.removeHandle(handle);
+	}
+
+	TextureHandle ResourceManager::createTexture(const struct TextureInfo &textureInfo, const void *data) {
+		TextureHandle handle = m_TextureHandles.allocHandle();
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createTexture(handle, textureInfo, data);
+		return handle;
+	}
+
+	void ResourceManager::destroy(TextureHandle &handle) {
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.destroy(handle);
+		m_TextureHandles.removeHandle(handle);
 	}
 
 }

@@ -10,16 +10,15 @@ set(SANDBOX_SOURCES
 		shared/renderer/SimpleRenderer.cpp
 		shared/renderer/Context.cpp
 		shared/renderer/FrameDataManager.cpp
-		
-		shared/renderer/VertexAttributeLayout.cpp
-		
+				
 		shared/renderer/Inputs.cpp
 		shared/renderer/Runtime.cpp
 		shared/renderer/Utils.cpp
 		shared/renderer/ResourceManager/ResourceManager.cpp
 		shared/renderer/ResourceManager/UniformManager.cpp
+		shared/renderer/ResourceManager/VertexAttributeLayout.cpp
 
-		shared/renderer/OpenGL/RendererContext.cpp
+		shared/renderer/OpenGL/RendererContextGL.cpp
 		shared/renderer/OpenGL/Helpers.cpp
 		shared/renderer/OpenGL/ResourceManager/ResourceManagerGL.cpp
 		shared/renderer/OpenGL/ResourceManager/VertexBufferManagerGL.cpp
@@ -27,6 +26,8 @@ set(SANDBOX_SOURCES
 		shared/renderer/OpenGL/ResourceManager/UniformManagerGL.cpp
 		shared/renderer/OpenGL/ResourceManager/ShaderManagerGL.cpp
 		shared/renderer/OpenGL/ResourceManager/ProgramManagerGL.cpp
+		shared/renderer/OpenGL/ResourceManager/TextureManagerGL.cpp
+		shared/renderer/OpenGL/ResourceManager/TextureUtilsGL.cpp
 
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
