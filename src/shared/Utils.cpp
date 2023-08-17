@@ -4,9 +4,9 @@
 #include <iostream>
 #include <sstream>
 
-namespace utils {
+namespace Utils {
 
-    std::string readShaderFile(const char* path) {
+    std::string ReadShaderFile(const char* path) {
         std::string shaderCode;
     
         std::ifstream shaderFile;

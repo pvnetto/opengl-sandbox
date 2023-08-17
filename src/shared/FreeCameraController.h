@@ -12,7 +12,7 @@ public:
     void HandleKeyboardInput();
 
 private:
-    Camera* m_camera;
+    Camera* m_Camera;
     float m_moveSpeed;
 
     bool m_moving = false;

@@ -1,34 +1,55 @@
 #include "13_Meshes.h"
 
 #include "shared/Light.h"
-#include "shared/Primitive.h"
 
 #include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
 
 LOGL_13_Meshes::LOGL_13_Meshes() : Layer("Learn OpenGL 13 - Meshes") {
-	m_camera = Camera(glm::vec3(-3.8f, 1.3f, 6.2f),
+	m_Camera = Camera(glm::vec3(-3.8f, 1.3f, 6.2f),
 	                  glm::vec3(-8.f, -46.5f, 0.f),
 	                  glm::vec3(0.f, 1.f, 0.f));
-	m_controller = FreeCameraController(m_camera, 4.5f);
+	m_Controller = FreeCameraController(m_Camera, 4.5f);
 }
 
 LOGL_13_Meshes::~LOGL_13_Meshes() {
 }
 
 void LOGL_13_Meshes::OnAttach() {
-	std::vector<Texture> textures = {
-	    TextureLoader::LoadTexture("assets/container.png", 0),
-	    TextureLoader::LoadTexture("assets/container_specular.png", 1)};
+	m_BackpackModel = Utils::LoadModel("assets/backpack/backpack.obj");
+	m_CubeVertexBuffer = Utils::LoadCube();
 
-	m_cubeMesh = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), textures};
-	m_backpackModel = Model{"assets/backpack/backpack.obj"};
+	m_ContainerTexture = Utils::LoadTexture("assets/container.png");
+	m_ContainerSpecularTexture = Utils::LoadTexture("assets/container_specular.png");
 
-	m_phongShader = Shader("shaders/09_specular_map.vert", "shaders/12_default.frag");
-	m_lightSourceShader = Shader("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
+	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
+	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
+	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
+
+	m_LightSourceColorUniform = spr::createUniform("lightColor", spr::UniformType::Vec3);
+	m_ViewPositionUniform = spr::createUniform("viewPos", spr::UniformType::Vec3);
+
+	m_LightColorUniform = spr::createUniform("light.color", spr::UniformType::Vec3);
+	m_LightPositionUniform = spr::createUniform("light.position", spr::UniformType::Vec3);
+	m_LightConstantAttenuationUniform = spr::createUniform("light.constantAttenuation", spr::UniformType::Float);
+	m_LightLinearAttenuationUniform = spr::createUniform("light.linearAttenuation", spr::UniformType::Float);
+	m_LightQuadraticAttenuationUniform = spr::createUniform("light.quadraticAttenuation", spr::UniformType::Float);
+
+	m_MaterialAmbientStrengthUniform = spr::createUniform("material.ambientStrength", spr::UniformType::Float);
+	m_MaterialDiffuseStrengthUniform = spr::createUniform("material.diffuseStrength", spr::UniformType::Float);
+	m_MaterialSpecularStrengthUniform = spr::createUniform("material.specularStrength", spr::UniformType::Float);
+	m_MaterialShininessUniform = spr::createUniform("material.shininess", spr::UniformType::Float);
+	m_MaterialDiffuseMapUniform = spr::createUniform("material.diffuseMap", spr::UniformType::Sampler);
+	m_MaterialSpecularMapUniform = spr::createUniform("material.specularMap", spr::UniformType::Sampler);
+
+	m_TimeUniform = spr::createUniform("time", spr::UniformType::Float);
+
+	m_PhongShaderProgram = Utils::LoadShaderProgram("shaders/09_specular_map.vert", "shaders/12_default.frag");
+	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 }
 
 void LOGL_13_Meshes::OnUpdate() {
-	m_controller.HandleKeyboardInput();
+	m_Controller.HandleKeyboardInput();
 
 	PointLight pointLight;
 	pointLight.Position = {0.0f, 2.0f, 7.f};
@@ -41,38 +62,79 @@ void LOGL_13_Meshes::OnUpdate() {
 	pointLightModel = glm::translate(pointLightModel, pointLight.Position);
 	pointLightModel = glm::scale(pointLightModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
-	m_lightSourceShader.Use();
-	m_lightSourceShader.SetMatrix("model", pointLightModel);
-	m_lightSourceShader.SetMatrix("view", GetCamera().GetView());
-	m_lightSourceShader.SetMatrix("projection", GetCamera().GetProjection());
-	m_lightSourceShader.SetVector3("lightColor", pointLight.Color);
-	m_cubeMesh.Draw(m_lightSourceShader);
+	{
+		spr::setVertexBuffer(m_CubeVertexBuffer);
+		spr::setUniform(m_ModelUniform, glm::value_ptr(pointLightModel));
+		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
+		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
+		spr::setUniform(m_LightSourceColorUniform, glm::value_ptr(pointLight.Color));
+		spr::submit(m_LightSourceShaderProgram);
+	}
+
 
 	glm::mat4 model{1.0f};
 	model = glm::translate(model, glm::vec3(0.0f, 0.f, 3.f));
-	m_phongShader.Use();
-	m_phongShader.SetMatrix("model", model);
-	m_phongShader.SetMatrix("view", GetCamera().GetView());
-	m_phongShader.SetMatrix("projection", GetCamera().GetProjection());
-	m_phongShader.SetInt("material.diffuseMap", 0);
-	m_phongShader.SetInt("material.specularMap", 1);
-	m_phongShader.SetFloat("material.ambientStrength", 0.1f);
-	m_phongShader.SetFloat("material.diffuseStrength", 0.5f);
-	m_phongShader.SetFloat("material.specularStrength", 1.f);
-	m_phongShader.SetFloat("material.shininess", 32.f);
+	for (const auto &mesh : m_BackpackModel.Meshes) {
+		spr::setVertexBuffer(mesh.VertexBuffer);
+		spr::setIndexBuffer(mesh.IndexBuffer);
+		
+		if (mesh.Textures.size() > 0) {
+			spr::setTexture(0, mesh.Textures[0]);
+		}
+		if (mesh.Textures.size() > 1) {
+			spr::setTexture(0, mesh.Textures[1]);
+		}
 
-	m_phongShader.SetVector3("pointLight.color", pointLight.Color);
-	m_phongShader.SetVector3("pointLight.position", pointLight.Position);
-	m_phongShader.SetFloat("pointLight.constantAttenuation", pointLight.ConstantAttenuation);
-	m_phongShader.SetFloat("pointLight.linearAttenuation", pointLight.LinearAttenuation);
-	m_phongShader.SetFloat("pointLight.quadraticAttenuation", pointLight.QuadraticAttenuation);
+		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;
+		const float time = spr::runtime::getTime();
+		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
+		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
+		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
+		spr::setUniform(m_ViewPositionUniform, glm::value_ptr(m_Camera.GetPosition()));
+		spr::setUniform(m_LightColorUniform, glm::value_ptr(pointLight.Color));
+		spr::setUniform(m_LightPositionUniform, glm::value_ptr(pointLight.Position));
+		spr::setUniform(m_LightConstantAttenuationUniform, &pointLight.ConstantAttenuation);
+		spr::setUniform(m_LightLinearAttenuationUniform, &pointLight.LinearAttenuation);
+		spr::setUniform(m_LightQuadraticAttenuationUniform, &pointLight.QuadraticAttenuation);
+		spr::setUniform(m_MaterialAmbientStrengthUniform, &ambientStrength);
+		spr::setUniform(m_MaterialDiffuseStrengthUniform, &diffuseStrength);
+		spr::setUniform(m_MaterialSpecularStrengthUniform, &specularStrength);
+		spr::setUniform(m_MaterialShininessUniform, &shininess);
+		spr::setUniform(m_TimeUniform, &time);
 
-	m_phongShader.SetVector3("viewPos", GetCamera().GetPosition());
-	m_phongShader.SetFloat("time", (float)glfwGetTime());
+		spr::submit(m_PhongShaderProgram);
+	}
 
-	m_backpackModel.Draw(m_phongShader);
+	spr::render();
+	spr::clean();
+}
+
+void LOGL_13_Meshes::OnDetach() {
+	Utils::UnloadModel(m_BackpackModel);
+	spr::destroy(m_CubeVertexBuffer);
+	spr::destroy(m_PhongShaderProgram);
+	spr::destroy(m_LightSourceShaderProgram);
+	spr::destroy(m_ContainerTexture);
+	spr::destroy(m_ContainerSpecularTexture);
+	spr::destroy(m_ModelUniform);
+	spr::destroy(m_ViewUniform);
+	spr::destroy(m_ProjectionUniform);
+	spr::destroy(m_LightSourceColorUniform);
+	spr::destroy(m_ViewPositionUniform);
+	spr::destroy(m_LightColorUniform);
+	spr::destroy(m_LightPositionUniform);
+	spr::destroy(m_LightConstantAttenuationUniform);
+	spr::destroy(m_LightLinearAttenuationUniform);
+	spr::destroy(m_LightQuadraticAttenuationUniform);
+	spr::destroy(m_MaterialDiffuseMapUniform);
+	spr::destroy(m_MaterialSpecularMapUniform);
+	spr::destroy(m_MaterialAmbientStrengthUniform);
+	spr::destroy(m_MaterialDiffuseStrengthUniform);
+	spr::destroy(m_MaterialSpecularStrengthUniform);
+	spr::destroy(m_MaterialShininessUniform);
+	spr::destroy(m_TimeUniform);
 }
 
 void LOGL_13_Meshes::OnEvent(Event &evt) {
-	m_controller.HandleEvent(evt);
+	m_Controller.HandleEvent(evt);
 }

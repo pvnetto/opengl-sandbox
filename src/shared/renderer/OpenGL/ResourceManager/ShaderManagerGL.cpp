@@ -43,6 +43,7 @@ namespace spr {
 		if (!success) {
 			char info[512];
 			glGetShaderInfoLog(ID, 512, NULL, info);
+			assert(false && "::ERROR: Failed to compile shader");
 			std::cout << "::ERROR: Failed to compile shader:: " << info << "\n";
 		}
 	}

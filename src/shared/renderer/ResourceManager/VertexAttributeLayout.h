@@ -21,14 +21,14 @@ namespace spr {
     };
 
     struct VertexAttribute {
-        std::string Name;
-        AttributeType Type;
-        uint32_t Num;
-        bool Normalized;
-        uint32_t Offset = 0;
+		std::string Name = "";
+		AttributeType Type = AttributeType::Float;
+		uint32_t Num = 0;
+		bool Normalized = false;
+		uint32_t Offset = 0;
 
         VertexAttribute() = default;
-        VertexAttribute(std::string name, AttributeType type, uint32_t num, bool normalized = false);
+        VertexAttribute(const std::string& name, AttributeType type, uint32_t num, bool normalized = false);
 
         uint32_t getAttributeSize() const;
     };

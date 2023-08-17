@@ -18,5 +18,5 @@ void main() {
     vec3 color = vec3(r, g, b);
     
     // Output to screen
-    fragColor = vec4(color, 1.0);
+    fragColor = vec4(color.xyz, 1.0);
 }

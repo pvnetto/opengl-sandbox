@@ -16,7 +16,7 @@ namespace spr {
 
 		uint32_t ID;
 		UniformInfoBufferPtr UniformInfoBuffer;
-		std::vector<ProgramAttributeGL> Attributes;
+		mutable std::vector<ProgramAttributeGL> Attributes;
 
 		void create(const ShaderInstanceGL &vertexShader, const ShaderInstanceGL &fragmentShader, const UniformManager &uniformManager);
 		void destroy();

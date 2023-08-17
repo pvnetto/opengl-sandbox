@@ -20,10 +20,12 @@ namespace spr {
 
 	using SamplerHashType = std::size_t;
 	struct SamplerInfo {
-		FilterMethod MagnificationFilter;
-		FilterMethod MinificationFilter;
-		WrappingMethod WrappingHorizontal;
-		WrappingMethod WrappingVertical;
+		FilterMethod MagnificationFilter = FilterMethod::Point;
+		FilterMethod MinificationFilter = FilterMethod::Point;
+		WrappingMethod WrappingHorizontal = WrappingMethod::Repeat;
+		WrappingMethod WrappingVertical = WrappingMethod::Repeat;
+
+		static SamplerInfo Default;
 
 		SamplerHashType GetHash() const {
 			SamplerHashType hash = 0;

@@ -41,6 +41,8 @@ namespace spr {
 		if (!linkSuccess) {
 			char linkInfo[512];
 			glGetProgramInfoLog(ID, 512, NULL, linkInfo);
+
+			assert(false && "::ERROR: Failed to link shader");
 			std::cout << "::ERROR: Failed to link shader " << linkInfo << "\n";
 		}
 
@@ -69,17 +71,18 @@ namespace spr {
 		static constexpr uint32_t bufferBindingPoint = 0;
 		glVertexArrayVertexBuffer(vaoId, bufferBindingPoint, vertexBuffer.ID, NULL, layout.getStride());
 		for (int i = 0; i < Attributes.size(); i++) {
-			const VertexAttribute &layoutAttribute = layout.getAttribute(i);
 			const ProgramAttributeGL &programAttribute = Attributes[i];
+			const int attributeLocation = programAttribute.Location;
+			const VertexAttribute &layoutAttribute = layout.getAttribute(attributeLocation);
 
 			assert(layoutAttribute.Name == programAttribute.Name && "::ERROR: Vertex layout attribute location mismatch");
-			glVertexArrayAttribFormat(vaoId, i,
+			glVertexArrayAttribFormat(vaoId, attributeLocation,
 			                          layoutAttribute.Num,
 			                          getGLTypeFromAttributeType(layoutAttribute.Type),
 			                          getGLBool(layoutAttribute.Normalized),
 			                          layoutAttribute.Offset);
-			glEnableVertexArrayAttrib(vaoId, i);
-			glVertexArrayAttribBinding(vaoId, i, bufferBindingPoint);
+			glEnableVertexArrayAttrib(vaoId, attributeLocation);
+			glVertexArrayAttribBinding(vaoId, attributeLocation, bufferBindingPoint);
 		}
 	}
 	

@@ -66,8 +66,8 @@ namespace spr {
         return empty;
     }
 
-    VertexAttribute::VertexAttribute(std::string name, AttributeType type, uint32_t num, bool normalized) :
-        Name(name), Type(type), Num(num), Normalized(normalized)  { }
+    VertexAttribute::VertexAttribute(const std::string& name, AttributeType type, uint32_t num, bool normalized) :
+        Name(name), Type(type), Num(num), Normalized(normalized) {}
 
     static uint32_t getAttributeSizeByType(AttributeType type) {
         switch (type)

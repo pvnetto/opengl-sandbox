@@ -2,8 +2,8 @@
 
 #include <string>
 
-namespace utils {
+namespace Utils {
 
-    std::string readShaderFile(const char* path);
+    std::string ReadShaderFile(const char* path);
 
 }

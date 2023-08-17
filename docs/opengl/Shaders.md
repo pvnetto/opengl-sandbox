@@ -255,7 +255,7 @@ out vec4 fragColor;
     - **location**: Índice do vertex attrib pointer desejado
 
 ```
-layout (location = 0) in vec3 aPosition;
+layout (location = 0) in vec3 inPosition;
 layout (location = 1) in vec4 aColor;
 ```
 

@@ -29,7 +29,7 @@ namespace spr {
 	void setVertexBuffer(const VertexBufferHandle &handle);
 	void setIndexBuffer(const IndexBufferHandle &handle);
 	void setUniform(const UniformHandle &uniformHandle, const void *data);
-	void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo);
+	void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo = SamplerInfo::Default);
 
     VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);
 	void destroy(VertexBufferHandle &handle);

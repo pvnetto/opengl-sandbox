@@ -1,59 +1,89 @@
 #include "06_MVP.h"
 
-#include "shared/Primitive.h"
-#include "shared/Texture2D.h"
+#include "shared/RenderUtils.h"
 #include "shared/renderer/SimpleRenderer.h"
+
 #include <imgui.h>
 #include <iostream>
 
 #include <glm/gtc/type_ptr.hpp>
+#include <glad/glad.h>
+
+static spr::SamplerInfo GetDefaultSamplerInfo() {
+	static spr::SamplerInfo defaultSampler;
+	return defaultSampler;
+}
 
 void LOGL_06_MVP::OnAttach() {
-	std::vector<Texture> textures{
-	    TextureLoader::LoadTexture("assets/bricks.jpg", 0),
-	    TextureLoader::LoadTexture("assets/yps.png", 1),
-	};
+	spr::VertexAttributeLayout layout;
+	layout.begin()
+	    .add({"inPosition", spr::AttributeType::Float, 3})
+	    .add({"inUV", spr::AttributeType::Float, 2})
+	    .add({"inNormal", spr::AttributeType::Float, 3})		// Unused in this example
+	    .end();
 
-	m_cube = Mesh{PrimitiveShape::Cube(), std::vector<unsigned int>(), textures};
-	m_shader = Shader("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
+	Utils::PrimitiveData cube = Utils::GetCubeData();
+	m_CubeVertexBuffer = spr::createVertexBuffer(cube.Vertices, cube.NumVertices, layout);
 
-	m_position = glm::vec3(0.5f, 0.2f, -2.0f);
-	m_scale = glm::vec3(1.2f, 1.2f, 1.2f);
-	m_cameraPosition = glm::vec3(0, 0, 0);
+	// 0. Declares the Uniforms in the renderer, so that we can pass data to it later on
+	m_TexUniform = spr::createUniform("tex", spr::UniformType::Sampler);
+	m_AnotherTexUniform = spr::createUniform("anotherTex", spr::UniformType::Sampler);
+	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
+	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
+	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
+	
+	m_ShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
+	m_BrickTexture = Utils::LoadTexture("assets/bricks.jpg");
+	m_LadybugTexture = Utils::LoadTexture("assets/yps.png");
 
-    m_fov = 90.f;
+	m_Position = glm::vec3(0.5f, 0.2f, -2.0f);
+	m_Scale = glm::vec3(1.2f, 1.2f, 1.2f);
+	m_CamerinPosition = glm::vec3(0, 0, 0);
+
+    m_FieldOfView = 90.f;
 }
 
 void LOGL_06_MVP::OnUpdate() {
-	m_shader.Use();
-	m_shader.SetInt("tex", 0);
-	m_shader.SetInt("anotherTex", 1);
+	// TODO: Move to spr
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// 1) Creates model matrix
+	// 1. Creates Model matrix
 	glm::mat4 model(1.0f);
-	model = glm::translate(model, m_position);
+	model = glm::translate(model, m_Position);
 	model = glm::rotate(model, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
 	model = glm::rotate(model, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, m_scale);
+	model = glm::scale(model, m_Scale);
 
-	// 2) Creates view matrix
+	// 2. Creates View matrix
 	glm::mat4 view(1.0f);
-	view = glm::translate(view, -m_cameraPosition);
+	view = glm::translate(view, -m_CamerinPosition);
 
-	// 3) Creates projection matrix
+	// 3. Creates Projection matrix
 	glm::mat4 projection(1.0f);
 	const float aspectRatio = (float) (spr::getWindowWidth() / spr::getWindowHeight());
 	const float near = 0.1f;
 	const float far = 100.f;
-	projection = glm::perspective(m_fov, aspectRatio, near, far);
+	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
 
-	// 4) Passes MVP matrices as uniforms to shader
-	m_shader.SetMatrix("model", model);
-	m_shader.SetMatrix("view", view);
-	m_shader.SetMatrix("projection", projection);
+	// 4. Passes the matrices as Uniforms to the Shader Program
+	const int texUnit = 0, anotherTexUnit = 1;
+	spr::setUniform(m_TexUniform, &texUnit);
+	spr::setUniform(m_AnotherTexUniform, &anotherTexUnit);
+	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
+	spr::setUniform(m_ViewUniform, glm::value_ptr(view));
+	spr::setUniform(m_ProjectionUniform, glm::value_ptr(projection));
 
-	m_cube.Draw(m_shader);
+	spr::setTexture(0, m_BrickTexture, GetDefaultSamplerInfo());
+	spr::setTexture(1, m_LadybugTexture, GetDefaultSamplerInfo());
+
+	spr::setVertexBuffer(m_CubeVertexBuffer);
+
+	spr::submit(m_ShaderProgram);
+
+	spr::render();
+	spr::clean();
 }
 
 void LOGL_06_MVP::OnImGuiRender() {
@@ -61,14 +91,26 @@ void LOGL_06_MVP::OnImGuiRender() {
     ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiCond_FirstUseEver);
     ImGui::Begin("06 - MVP");
 	if (ImGui::CollapsingHeader("Cube")) {
-		ImGui::InputFloat3("Position", glm::value_ptr(m_position));
-		ImGui::InputFloat3("Scale", glm::value_ptr(m_scale));
+		ImGui::InputFloat3("Position", glm::value_ptr(m_Position));
+		ImGui::InputFloat3("Scale", glm::value_ptr(m_Scale));
 	}
 
 	ImGui::Separator();
 	if (ImGui::CollapsingHeader("Camera")) {
-		ImGui::InputFloat3("Position", glm::value_ptr(m_cameraPosition));
-        ImGui::InputFloat("Field of View", &m_fov);
+		ImGui::InputFloat3("Position", glm::value_ptr(m_CamerinPosition));
+        ImGui::InputFloat("Field of View", &m_FieldOfView);
 	}
     ImGui::End();
+}
+
+void LOGL_06_MVP::OnDetach() {
+	spr::destroy(m_CubeVertexBuffer);
+	spr::destroy(m_BrickTexture);
+	spr::destroy(m_LadybugTexture);
+	spr::destroy(m_ShaderProgram);
+	spr::destroy(m_TexUniform);
+	spr::destroy(m_AnotherTexUniform);
+	spr::destroy(m_ModelUniform);
+	spr::destroy(m_ViewUniform);
+	spr::destroy(m_ProjectionUniform);
 }

@@ -21,7 +21,7 @@ static const float verticesB[] = {
 void LOGL_03_Shaders::CreateBuffers() {
 	spr::VertexAttributeLayout layout;
 	layout.begin()
-			.add({ "aPosition", spr::AttributeType::Float, 3 })
+			.add({ "inPosition", spr::AttributeType::Float, 3 })
 			.end();
 
 
@@ -29,10 +29,10 @@ void LOGL_03_Shaders::CreateBuffers() {
 }
 
 void LOGL_03_Shaders::CreateShaders() {
-	std::string vertexSrc = utils::readShaderFile("shaders/02_vertex_offset.vert");
+	std::string vertexSrc = Utils::ReadShaderFile("shaders/02_vertex_offset.vert");
 	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
 
-	std::string fragSrc = utils::readShaderFile("shaders/frag_basic.frag");
+	std::string fragSrc = Utils::ReadShaderFile("shaders/frag_basic.frag");
 	spr::ShaderHandle fragHandle = spr::createShader(SPR_FRAGMENT_SHADER, fragSrc.c_str());
 
 	m_uniformHandle = spr::createUniform("horizontalOffset", spr::UniformType::Float);

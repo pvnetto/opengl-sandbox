@@ -27,8 +27,8 @@ void LOGL_04_Textures::OnAttach() {
 	// 0. Declares UVs in vertex layout attributes
 	spr::VertexAttributeLayout layout;
 	layout.begin()
-	    .add({"aPosition", spr::AttributeType::Float, 3})
-	    .add({"aUVCoords", spr::AttributeType::Float, 2})
+	    .add({"inPosition", spr::AttributeType::Float, 3})
+	    .add({"inUV", spr::AttributeType::Float, 2})
 	    .end();
 
 	// 1. Defines texture as integer uniforms, so we can pass a texture unit index to the shader
@@ -38,10 +38,10 @@ void LOGL_04_Textures::OnAttach() {
 	m_VertexBufferHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
 	m_IndexBufferHandle = spr::createIndexBuffer(indices, sizeof(indices));
 
-	std::string vertexSrc = utils::readShaderFile("shaders/03_vertex_tex.vert");
+	std::string vertexSrc = Utils::ReadShaderFile("shaders/03_vertex_tex.vert");
 	spr::ShaderHandle vertexHandle = spr::createShader(SPR_VERTEX_SHADER, vertexSrc.c_str());
 
-	std::string fragSrc = utils::readShaderFile("shaders/03_frag_tex.frag");
+	std::string fragSrc = Utils::ReadShaderFile("shaders/03_frag_tex.frag");
 	spr::ShaderHandle fragHandle = spr::createShader(SPR_FRAGMENT_SHADER, fragSrc.c_str());
 
 	m_ShaderHandle = spr::createProgram(vertexHandle, fragHandle);

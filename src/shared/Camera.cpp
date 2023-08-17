@@ -22,10 +22,10 @@ glm::mat4 Camera::GetView() const {
 	basis = glm::transpose(basis);
 
 	glm::mat4 translation(1.0f);
-	translation = glm::translate(translation, -m_position);
+	translation = glm::translate(translation, -m_Position);
 
 	return basis * translation;
-	// return glm::lookAt(m_position, m_position + m_forward, m_worldUp);
+	// return glm::lookAt(m_Position, m_Position + m_forward, m_worldUp);
 }
 
 glm::vec3 Camera::GetRight() const {

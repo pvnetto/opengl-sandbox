@@ -1,8 +1,8 @@
 #version 330 core
 
 struct Material {
-    sampler2D texture0;
-    sampler2D texture1;
+    sampler2D diffuseMap;
+    sampler2D specularMap;
 
     float ambientStrength;
     float diffuseStrength;
@@ -10,8 +10,6 @@ struct Material {
     float shininess;
 };
 
-// texture loader assumes all textures are named textureN, so those aliases to make it easier to read
-#define DIFFUSE_MAP material.texture0
 #define SPECULAR_MAP material.texture1
 
 struct PointLight {
@@ -34,7 +32,7 @@ uniform PointLight pointLight;
 uniform vec3 viewPos;
 
 void main() {
-    vec3 diffuseSample = vec3(texture(DIFFUSE_MAP, uvCoords));
+    vec3 diffuseSample = vec3(texture(diffuseMap, uvCoords));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * pointLight.color * diffuseSample;
@@ -48,7 +46,7 @@ void main() {
     vec3 viewDir = normalize(viewPos - worldPosition);
     float specularIntensity = max(dot(lightDirReflected, viewDir), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(DIFFUSE_MAP, uvCoords));
+    vec3 specularSample = vec3(texture(diffuseMap, uvCoords));
     vec3 specular = specularIntensity * material.specularStrength * pointLight.color * specularSample;
 
     // calculates final color
