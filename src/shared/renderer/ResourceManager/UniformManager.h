@@ -16,22 +16,21 @@ namespace spr {
 	class UniformBuffer;
 
 	using UniformDataBuffer = Buffer;
-	using UniformInfoBuffer = Buffer;
 	using UniformDataBufferPtr = std::shared_ptr<UniformDataBuffer>;
-	using UniformInfoBufferPtr = std::shared_ptr<UniformInfoBuffer>;
 
 	using UniformHashMap = std::unordered_map<std::string, HandleType>;
 
 	struct UniformRef {
 		std::string Name;
 		UniformType Type;
+		uint32_t Count;
 	};
 
 	class UniformManager {
 	public:
 		void init(Context *context);
 
-		UniformHandle createUniform(const char *name, UniformType type);
+		UniformHandle createUniform(const char *name, UniformType type, uint32_t count);
 		void destroy(UniformHandle &uniformHandle);
 
 		const UniformRef &getUniform(const UniformHandle &handle) const;

@@ -14,7 +14,7 @@ namespace spr {
 		m_Owner = context;
 	}
 
-	UniformHandle UniformManager::createUniform(const char* name, UniformType type) {
+	UniformHandle UniformManager::createUniform(const char *name, UniformType type, uint32_t count) {
 		HandleType index = kInvalidHandle;
 		UniformRef *uniformRef = nullptr;
 		UniformHandle handle;
@@ -29,6 +29,9 @@ namespace spr {
 			uniformRef = &m_Uniforms[handle.idx];
 			uniformRef->Name = name;
 			uniformRef->Type = type;
+			uniformRef->Count = count;
+
+			assert(count > 0 && "::ERROR: Make sure uniform count is > 0");
 
 			// Adds ref index to hashmap
 			m_UniformHashMap[{name}] = handle.idx;
@@ -57,6 +60,8 @@ namespace spr {
 
 	// TODO: Worst case here is terrible. Maybe we should use UniformReg to handle this (check UniformManagerGL)
 	UniformHandle UniformManager::getUniformByName(const char *name) const {
+		assert(name != NULL && name[0] != '\0' && "::ERROR: Invalid uniform name");
+
 		for (uint32_t i = 0; i < UniformHandle::capacity; i++) {
 			if (m_Uniforms[i].Name == name) {
 				return { i };

@@ -46,6 +46,7 @@ in vec2 uvCoords;
 #define NUM_LIGHTS 4
 uniform Material material;
 uniform DirectionalLight directionalLights[NUM_LIGHTS];
+uniform int enabledDirectionalLights;
 uniform PointLight pointLight;
 uniform SpotLight spotlight;
 uniform vec3 viewPos;
@@ -145,7 +146,7 @@ vec3 CalculateSpotLight(SpotLight light, Material material, vec3 viewPos) {
 void main() {
     vec3 result = vec3(0.0);
 
-    for(int i = 0; i < NUM_LIGHTS; i++) {
+    for(int i = 0; i < enabledDirectionalLights; i++) {
         result += CalculateDirectionalLight(directionalLights[i], material, viewPos);
     }
 

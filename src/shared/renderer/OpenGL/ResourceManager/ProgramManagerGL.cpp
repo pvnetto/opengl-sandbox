@@ -85,6 +85,19 @@ namespace spr {
 			glVertexArrayAttribBinding(vaoId, attributeLocation, bufferBindingPoint);
 		}
 	}
+
+	static void parseUniformName(const char* inName, std::string& outName, uint8_t& outIndex) {
+		outName = inName;
+		outIndex = 0;
+
+		std::size_t bracketStart = outName.find_first_of('[');
+		std::size_t bracketEnd = outName.find_first_of(']');
+		if (bracketStart != std::string::npos && bracketEnd != std::string::npos) {
+			std::string indexStr = outName.substr(bracketStart + 1, (bracketEnd - bracketStart - 1));
+			outIndex = std::stoi(indexStr);
+			outName.erase(bracketStart, indexStr.size() + 2);
+		}
+	}
 	
 	void ProgramInstanceGL::findUniforms(const UniformManager& uniformManager) {
 		UniformInfoBuffer->reset();
@@ -93,23 +106,29 @@ namespace spr {
 		glGetProgramiv(ID, GL_ACTIVE_UNIFORMS, &activeUniformCount);
 		glGetProgramiv(ID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformNameLength);
 
-		std::string name;
-		name.reserve(maxUniformNameLength);
+		char *name = new char[maxUniformNameLength];
 		for (int i = 0; i < activeUniformCount; i++) {
 			GLenum type;
 			GLint count;
-			name.clear();
 
-			glGetActiveUniform(ID, i, maxUniformNameLength, NULL, &count, &type, name.data());
-			uint32_t location = glGetUniformLocation(ID, name.c_str());
+			memset(name, 0, maxUniformNameLength);
+			glGetActiveUniform(ID, i, maxUniformNameLength, NULL, &count, &type, name);
 
-			const UniformHandle handle = uniformManager.getUniformByName(name.c_str());
-			const UniformType sprType = getSPRUniformTypeFromGLType(type);
+			assert(count == 1 && "::ERROR: Count != 1, this case is not handled");
 
-			UniformInfoBuffer->write(&sprType, sizeof(UniformType));
-			UniformInfoBuffer->write(&location, sizeof(uint32_t));
-			UniformInfoBuffer->write(&handle, sizeof(UniformHandle));
+			std::string ìnternalName = "";
+			uint8_t uniformIndex = 0;
+			parseUniformName(name, ìnternalName, uniformIndex);
+
+			ProgramUniformInfoGL uniformInfo;
+			uniformInfo.Location = glGetUniformLocation(ID, name);
+			uniformInfo.Handle = uniformManager.getUniformByName(ìnternalName.c_str());
+			uniformInfo.Type = getSPRUniformTypeFromGLType(type);
+			uniformInfo.Index = uniformIndex;
+
+			UniformInfoBuffer->write(&uniformInfo, sizeof(ProgramUniformInfoGL));
 		}
+		delete[] name;
 	}
 
 	void ProgramInstanceGL::findAttributes() {

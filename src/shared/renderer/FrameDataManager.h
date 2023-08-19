@@ -50,7 +50,7 @@ namespace spr {
 
 		void setVertexBuffer(const VertexBufferHandle &handle);
 		void setIndexBuffer(const IndexBufferHandle &handle);
-		void setUniform(const UniformHandle &uniformHandle, const void *data);
+		void setUniform(const UniformHandle &uniformHandle, const void *data, uint8_t count);
 		void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo);
 
 	public:

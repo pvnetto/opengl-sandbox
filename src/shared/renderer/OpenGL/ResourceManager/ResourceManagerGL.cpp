@@ -6,6 +6,7 @@ namespace spr {
 
 	void ResourceManagerGL::init(Context* owner) {
 		m_Owner = owner;
+		m_UniformManager.init(owner);
 	}
 
 	void ResourceManagerGL::createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {

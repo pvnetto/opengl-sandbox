@@ -8,6 +8,9 @@ namespace spr {
 	struct ShaderInstanceGL;
 	class UniformManager;
 
+	using UniformInfoBuffer = Buffer;
+	using UniformInfoBufferPtr = std::shared_ptr<UniformInfoBuffer>;
+
     struct ProgramInstanceGL {
 		struct ProgramAttributeGL {
 			std::string Name;
@@ -25,6 +28,14 @@ namespace spr {
 
 		void findUniforms(const UniformManager &uniformManager);
 		void findAttributes();
+	};
+
+	struct ProgramUniformInfoGL
+	{
+		uint32_t Location;
+		UniformHandle Handle;
+		uint8_t Index;
+		UniformType Type;
 	};
 
 	class ProgramManagerGL {

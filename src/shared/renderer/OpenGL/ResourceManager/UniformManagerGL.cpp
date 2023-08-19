@@ -9,8 +9,12 @@
 
 namespace spr {
 
+	void UniformManagerGL::init(Context* owner) {
+		m_Owner = owner;
+	}
+
 	void UniformManagerGL::createUniform(const UniformHandle& handle, const UniformRef &uniformRef) {
-		uint32_t size = spr::getUniformSizeByType(uniformRef.Type);
+		uint32_t size = spr::getUniformSizeByType(uniformRef.Type) * uniformRef.Count;
 
 		// Initializes empty block of data
 		void *data = malloc(size);
@@ -21,9 +25,10 @@ namespace spr {
 		m_UniformRegistry.add(handle, uniformRef.Name.c_str());
 	}
 
-	void UniformManagerGL::destroy(UniformHandle &uniformHandle) {
-		// TODO: Free uniform data from memory
-		m_UniformRegistry.remove(uniformHandle);
+	void UniformManagerGL::destroy(UniformHandle &handle) {
+		void *data = m_UniformValues[handle.idx];
+		free(data);
+		m_UniformRegistry.remove(handle);
 	}
 
 	void UniformManagerGL::setUniformValue(const UniformHandle &handle, const void *data, uint32_t size) {
@@ -36,9 +41,10 @@ namespace spr {
 		while (uniformDataBuffer->getPos() != end) {
 			UniformHandle handle = uniformDataBuffer->read<UniformHandle>();
 			UniformType type = uniformDataBuffer->read<UniformType>();
+			uint8_t count = uniformDataBuffer->read<uint8_t>();
 
 			const uint32_t uniformSize = getUniformSizeByType(type);
-			void *data = uniformDataBuffer->read(uniformSize);
+			void *data = uniformDataBuffer->read(uniformSize * count);
 			setUniformValue(handle, data, uniformSize);
 		}
 	}
@@ -61,8 +67,8 @@ namespace spr {
 	const UniformHandle &UniformRegistry::add(UniformHandle handle, const char *name) {
 		assert(handle.isValid() && "::ERROR: Uniform handle is invalid!");
 
-		m_Uniforms.erase({name});
-		m_Uniforms[{name}] = handle.idx;
+		m_Uniforms.erase({ name });
+		m_Uniforms[{ name }] = handle.idx;
 
 		UniformHandle &outHandle = m_Handles[handle.idx];
 		outHandle = handle;

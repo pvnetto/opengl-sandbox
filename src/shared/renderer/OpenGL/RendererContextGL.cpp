@@ -95,25 +95,25 @@ namespace spr {
 		uint32_t bufferEnd = uniformInfoBuffer->getPos();
 		uniformInfoBuffer->reset();
 		while (uniformInfoBuffer->getPos() < bufferEnd) {
-			UniformType type = uniformInfoBuffer->read<UniformType>();
-			uint32_t location = uniformInfoBuffer->read<uint32_t>();
-			UniformHandle handle = uniformInfoBuffer->read<UniformHandle>();
+			ProgramUniformInfoGL uniformInfo = uniformInfoBuffer->read<ProgramUniformInfoGL>();
+			const auto& [location, handle, index, type] = uniformInfo;
+
 			switch (type) {
 			case UniformType::Float:
-				glUniform1fv(location, 1, uniformManager.getUniformValue<float>(handle));
+				glUniform1fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
 				break;
 			case UniformType::Sampler:
 			case UniformType::Integer:
-				glUniform1iv(location, 1, uniformManager.getUniformValue<int>(handle));
+				glUniform1iv(location, 1, uniformManager.getUniformValue<int>(handle, index));
 				break;
 			case UniformType::Vec2:
-				glUniform2fv(location, 1, uniformManager.getUniformValue<float>(handle));
+				glUniform2fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
 				break;
 			case UniformType::Vec3:
-				glUniform3fv(location, 1, uniformManager.getUniformValue<float>(handle));
+				glUniform3fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
 				break;
 			case UniformType::Mat4x4:
-				glUniformMatrix4fv(location, 1, GL_FALSE, uniformManager.getUniformValue<float>(handle));
+				glUniformMatrix4fv(location, 1, GL_FALSE, uniformManager.getUniformValue<float>(handle, index));
 				break;
 			default:
 				assert(false && "::ERROR: Undefined uniform type");

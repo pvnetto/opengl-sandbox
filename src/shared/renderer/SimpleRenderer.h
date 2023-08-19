@@ -28,7 +28,7 @@ namespace spr {
 
 	void setVertexBuffer(const VertexBufferHandle &handle);
 	void setIndexBuffer(const IndexBufferHandle &handle);
-	void setUniform(const UniformHandle &uniformHandle, const void *data);
+	void setUniform(const UniformHandle &uniformHandle, const void *data, uint8_t count = 1);
 	void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo = SamplerInfo::Default);
 
     VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);
@@ -37,7 +37,7 @@ namespace spr {
     IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);
 	void destroy(IndexBufferHandle &handle);
 
-	UniformHandle createUniform(const char *name, UniformType type);
+	UniformHandle createUniform(const char *name, UniformType type, uint32_t count = 1);
 	void destroy(UniformHandle &uniformHandle);
 
 	ShaderHandle createShader(unsigned int shaderType, const char *shaderSrc);

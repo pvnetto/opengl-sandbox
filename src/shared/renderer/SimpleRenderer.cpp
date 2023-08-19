@@ -37,8 +37,8 @@ namespace spr {
 		s_Context.getFrameDataManager().setIndexBuffer(handle);
 	}
 
-	void setUniform(const UniformHandle& uniformHandle, const void* data) {
-		s_Context.getFrameDataManager().setUniform(uniformHandle, data);
+	void setUniform(const UniformHandle& uniformHandle, const void* data, uint8_t count /*= 1*/) {
+		s_Context.getFrameDataManager().setUniform(uniformHandle, data, count);
 	}
 
 	void setTexture(TextureUnitType unit, const TextureHandle& textureHandle, const struct SamplerInfo& samplerInfo) {
@@ -61,8 +61,8 @@ namespace spr {
 		s_Context.getResourceManager().destroy(handle);
 	}
 
-	UniformHandle createUniform(const char* name, UniformType type) {
-		return s_Context.getResourceManager().createUniform(name, type);
+	UniformHandle createUniform(const char *name, UniformType type, uint32_t count /*= 1*/) {
+		return s_Context.getResourceManager().createUniform(name, type, count);
 	}
 
 	void destroy(UniformHandle& uniformHandle) {

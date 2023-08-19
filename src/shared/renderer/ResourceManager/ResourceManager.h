@@ -20,7 +20,7 @@ namespace spr {
 		IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);		
 		void destroy(IndexBufferHandle &handle);
 
-		UniformHandle createUniform(const char *name, UniformType type);
+		UniformHandle createUniform(const char *name, UniformType type, uint32_t count);
 		void destroy(UniformHandle &handle);
 
 		ShaderHandle createShader(unsigned int shaderType, const char *shaderSrc);

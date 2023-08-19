@@ -34,10 +34,9 @@ namespace spr {
 		rendererResourceManager.destroy(handle);
 		m_IndexBufferHandles.removeHandle(handle);
 	}
-
 	
-	UniformHandle ResourceManager::createUniform(const char *name, UniformType type) {
-		return m_UniformManager.createUniform(name, type);
+	UniformHandle ResourceManager::createUniform(const char *name, UniformType type, uint32_t count) {
+		return m_UniformManager.createUniform(name, type, count);
 	}
 	
 	void ResourceManager::destroy(UniformHandle &uniformHandle) {

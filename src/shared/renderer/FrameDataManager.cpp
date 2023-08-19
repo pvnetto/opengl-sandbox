@@ -55,16 +55,18 @@ namespace spr {
 		m_CurrentDrawCall.IndexBuffer = handle;
 	}
 
-	void FrameDataManager::setUniform(const UniformHandle& uniformHandle, const void* data) {
+	void FrameDataManager::setUniform(const UniformHandle &uniformHandle, const void *data, uint8_t count) {
 		assert(uniformHandle.isValid() && "::ERROR: Invalid uniform handle!");
 		const UniformManager& uniformManager = m_Owner->getResourceManager().getUniformManager();
 		const UniformRef &uniform = uniformManager.getUniform(uniformHandle);
 		const UniformDataBufferPtr &uniformDataBuffer = m_CurrentFrame.UniformDataBuffer;
+		assert(count > 0 && count <= uniform.Count && "::ERROR: Invalid uniform count");
 
 		// Writes uniform data to buffer
 		uniformDataBuffer->write(&uniformHandle, sizeof(UniformHandle));
 		uniformDataBuffer->write(&uniform.Type, sizeof(UniformType));
-		uniformDataBuffer->write(data, spr::getUniformSizeByType(uniform.Type));
+		uniformDataBuffer->write(&count, sizeof(uint8_t));
+		uniformDataBuffer->write(data, spr::getUniformSizeByType(uniform.Type) * count);
 	}
 
 	void FrameDataManager::setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo) {
