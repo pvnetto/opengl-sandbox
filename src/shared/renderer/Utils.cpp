@@ -42,10 +42,11 @@ namespace spr {
         }
     }
 
-    #define mmix(h,k) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
 
     uint32_t murmurHash2A(const void* key, int len, uint32_t seed)
     {
+        #define mmix(h,k) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
+
         const uint32_t m = 0x5bd1e995;
         const int r = 24;
         uint32_t l = len;
@@ -81,6 +82,7 @@ namespace spr {
         h ^= h >> 15;
 
         return h;
+        #undef mmix
     }
 
 

@@ -29,11 +29,11 @@ void LOGL_13_Meshes::OnAttach() {
 	m_LightSourceColorUniform = spr::createUniform("lightColor", spr::UniformType::Vec3);
 	m_ViewPositionUniform = spr::createUniform("viewPos", spr::UniformType::Vec3);
 
-	m_LightColorUniform = spr::createUniform("light.color", spr::UniformType::Vec3);
-	m_LightPositionUniform = spr::createUniform("light.position", spr::UniformType::Vec3);
-	m_LightConstantAttenuationUniform = spr::createUniform("light.constantAttenuation", spr::UniformType::Float);
-	m_LightLinearAttenuationUniform = spr::createUniform("light.linearAttenuation", spr::UniformType::Float);
-	m_LightQuadraticAttenuationUniform = spr::createUniform("light.quadraticAttenuation", spr::UniformType::Float);
+	m_PointLightColorUniform = spr::createUniform("pointLight.color", spr::UniformType::Vec3);
+	m_PointLightPositionUniform = spr::createUniform("pointLight.position", spr::UniformType::Vec3);
+	m_PointLightConstantAttenuationUniform = spr::createUniform("pointLight.constantAttenuation", spr::UniformType::Float);
+	m_PointLightLinearAttenuationUniform = spr::createUniform("pointLight.linearAttenuation", spr::UniformType::Float);
+	m_PointLightQuadraticAttenuationUniform = spr::createUniform("pointLight.quadraticAttenuation", spr::UniformType::Float);
 
 	m_MaterialAmbientStrengthUniform = spr::createUniform("material.ambientStrength", spr::UniformType::Float);
 	m_MaterialDiffuseStrengthUniform = spr::createUniform("material.diffuseStrength", spr::UniformType::Float);
@@ -91,11 +91,11 @@ void LOGL_13_Meshes::OnUpdate() {
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
 		spr::setUniform(m_ViewPositionUniform, glm::value_ptr(m_Camera.GetPosition()));
-		spr::setUniform(m_LightColorUniform, glm::value_ptr(pointLight.Color));
-		spr::setUniform(m_LightPositionUniform, glm::value_ptr(pointLight.Position));
-		spr::setUniform(m_LightConstantAttenuationUniform, &pointLight.ConstantAttenuation);
-		spr::setUniform(m_LightLinearAttenuationUniform, &pointLight.LinearAttenuation);
-		spr::setUniform(m_LightQuadraticAttenuationUniform, &pointLight.QuadraticAttenuation);
+		spr::setUniform(m_PointLightColorUniform, glm::value_ptr(pointLight.Color));
+		spr::setUniform(m_PointLightPositionUniform, glm::value_ptr(pointLight.Position));
+		spr::setUniform(m_PointLightConstantAttenuationUniform, &pointLight.ConstantAttenuation);
+		spr::setUniform(m_PointLightLinearAttenuationUniform, &pointLight.LinearAttenuation);
+		spr::setUniform(m_PointLightQuadraticAttenuationUniform, &pointLight.QuadraticAttenuation);
 		spr::setUniform(m_MaterialAmbientStrengthUniform, &ambientStrength);
 		spr::setUniform(m_MaterialDiffuseStrengthUniform, &diffuseStrength);
 		spr::setUniform(m_MaterialSpecularStrengthUniform, &specularStrength);
@@ -121,11 +121,11 @@ void LOGL_13_Meshes::OnDetach() {
 	spr::destroy(m_ProjectionUniform);
 	spr::destroy(m_LightSourceColorUniform);
 	spr::destroy(m_ViewPositionUniform);
-	spr::destroy(m_LightColorUniform);
-	spr::destroy(m_LightPositionUniform);
-	spr::destroy(m_LightConstantAttenuationUniform);
-	spr::destroy(m_LightLinearAttenuationUniform);
-	spr::destroy(m_LightQuadraticAttenuationUniform);
+	spr::destroy(m_PointLightColorUniform);
+	spr::destroy(m_PointLightPositionUniform);
+	spr::destroy(m_PointLightConstantAttenuationUniform);
+	spr::destroy(m_PointLightLinearAttenuationUniform);
+	spr::destroy(m_PointLightQuadraticAttenuationUniform);
 	spr::destroy(m_MaterialDiffuseMapUniform);
 	spr::destroy(m_MaterialSpecularMapUniform);
 	spr::destroy(m_MaterialAmbientStrengthUniform);

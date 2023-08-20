@@ -31,18 +31,19 @@ namespace spr {
         VertexAttribute(const std::string& name, AttributeType type, uint32_t num, bool normalized = false);
 
         uint32_t getAttributeSize() const;
+		uint32_t getHash() const;
     };
 
     class VertexAttributeLayout {
 
     private:
-        std::vector<VertexAttribute> m_attributes;
+        std::vector<VertexAttribute> m_Attributes;
 
-        uint32_t m_stride = 0;
-        uint32_t m_hash = 0;
+        uint32_t m_Stride = 0;
+        uint32_t m_Hash = 0;
 
     public:
-        inline uint32_t getStride() const { return m_stride; }
+        inline uint32_t getStride() const { return m_Stride; }
 
         VertexAttributeLayout& begin();
         VertexAttributeLayout& add(VertexAttribute attribute);
@@ -50,7 +51,7 @@ namespace spr {
 
         const VertexAttribute& getAttribute(int index) const;
 
-        inline bool operator==(const VertexAttributeLayout& other) const { return m_hash == other.m_hash; }
+        inline bool operator==(const VertexAttributeLayout& other) const { return m_Hash == other.m_Hash; }
         inline bool operator!=(const VertexAttributeLayout& other) const { return !(*this == other); }
 
     };

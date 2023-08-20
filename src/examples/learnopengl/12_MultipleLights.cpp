@@ -28,8 +28,9 @@ void LOGL_12_MultipleLights::OnAttach() {
 	    1.f, 0.09f, 0.032f};
 
 	m_DirectionalLights = {
-	    DirectionalLight{glm::normalize(glm::vec3{0.0f, -0.5f, 0.3f}), {0.1f, 0.1f, 0.1f}},
+	    DirectionalLight{glm::normalize(glm::vec3{0.0f, -0.5f, 0.3f}), {0.1f, 0.1f, 0.5f}},
 	    DirectionalLight{glm::normalize(glm::vec3{0.0f, -0.5f, -0.3f}), {0.1f, 0.5f, 0.1f}},
+	    DirectionalLight{glm::normalize(glm::vec3{0.0f, -0.5f, -0.3f}), {0.1f, 0.1f, 0.1f}},
 	};
 
 	m_CubeVertexBuffer = Utils::LoadCube();

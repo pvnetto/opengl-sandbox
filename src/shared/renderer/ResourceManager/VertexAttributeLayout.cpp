@@ -31,34 +31,36 @@ namespace spr {
 namespace spr {
 
     VertexAttributeLayout& VertexAttributeLayout::begin() {
-        m_attributes.clear();
-        m_stride = 0;
-        m_hash = 0;
+        m_Attributes.clear();
+        m_Stride = 0;
+        m_Hash = 0;
         return *this;
     }
 
     VertexAttributeLayout& VertexAttributeLayout::add(VertexAttribute attribute) {
-        attribute.Offset = m_stride;
-        m_attributes.push_back(attribute);
-        m_stride += attribute.getAttributeSize();
+        attribute.Offset = m_Stride;
+        m_Attributes.push_back(attribute);
+        m_Stride += attribute.getAttributeSize();
         return *this;
     }
 
     VertexAttributeLayout& VertexAttributeLayout::end() {
         std::size_t hash = 0;
-        hashCombine(hash,
-            murmurHash2A(&m_stride, sizeof(m_stride)),
-            murmurHash2A(m_attributes.data(), m_attributes.size() * sizeof(VertexAttribute)));
+        hashCombine(hash, murmurHash2A(&m_Stride, sizeof(m_Stride)));
+
+        for (const auto &attribute : m_Attributes) {
+			hashCombine(hash, attribute.getHash());
+        }
         
-        m_hash = hash;
+        m_Hash = hash;
 
         return *this;
     }
 
     const VertexAttribute& VertexAttributeLayout::getAttribute(int index) const {
 
-        if(index >= 0 && index < m_attributes.size()) {
-            return m_attributes[index];
+        if(index >= 0 && index < m_Attributes.size()) {
+            return m_Attributes[index];
         }
 
         static VertexAttribute empty; 
@@ -86,6 +88,18 @@ namespace spr {
 
     uint32_t VertexAttribute::getAttributeSize() const {
         return getAttributeSizeByType(Type) * Num;
+    }
+
+    uint32_t VertexAttribute::getHash() const {
+		std::size_t hash = 0;
+
+		hashCombine(hash,
+		            murmurHash2A(Name.c_str(), Name.size()),
+		            murmurHash2A(&Type, sizeof(AttributeType)),
+		            murmurHash2A(&Num, sizeof(uint32_t)),
+		            murmurHash2A(&Normalized, sizeof(bool)),
+		            murmurHash2A(&Offset, sizeof(uint32_t)));
+		return hash;
     }
 
 }

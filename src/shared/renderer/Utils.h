@@ -1,11 +1,13 @@
 #pragma once
 
+#include "Handles.h"
+
+#include <cassert>
 #include <cstdint>
 #include <vector>
 #include <memory>
 #include <type_traits>
 
-#include "Handles.h"
 
 namespace spr {
 
@@ -26,6 +28,7 @@ namespace spr {
                 return i;
             }
 
+            assert(false && "::ERROR: No handles available");
             return kInvalidHandle;
         }
 

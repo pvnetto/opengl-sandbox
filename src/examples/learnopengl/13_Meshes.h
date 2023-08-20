@@ -39,11 +39,11 @@ private:
 	spr::UniformHandle m_LightSourceColorUniform;
 
 	spr::UniformHandle m_ViewPositionUniform;
-	spr::UniformHandle m_LightColorUniform;
-	spr::UniformHandle m_LightPositionUniform;
-	spr::UniformHandle m_LightConstantAttenuationUniform;
-	spr::UniformHandle m_LightLinearAttenuationUniform;
-	spr::UniformHandle m_LightQuadraticAttenuationUniform;
+	spr::UniformHandle m_PointLightColorUniform;
+	spr::UniformHandle m_PointLightPositionUniform;
+	spr::UniformHandle m_PointLightConstantAttenuationUniform;
+	spr::UniformHandle m_PointLightLinearAttenuationUniform;
+	spr::UniformHandle m_PointLightQuadraticAttenuationUniform;
 
 	spr::UniformHandle m_MaterialDiffuseMapUniform;
 	spr::UniformHandle m_MaterialSpecularMapUniform;
