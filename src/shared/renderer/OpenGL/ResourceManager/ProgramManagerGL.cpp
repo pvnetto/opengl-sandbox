@@ -114,19 +114,20 @@ namespace spr {
 			memset(name, 0, maxUniformNameLength);
 			glGetActiveUniform(ID, i, maxUniformNameLength, NULL, &count, &type, name);
 
-			assert(count == 1 && "::ERROR: Count != 1, this case is not handled");
-
 			std::string ìnternalName = "";
 			uint8_t uniformIndex = 0;
 			parseUniformName(name, ìnternalName, uniformIndex);
 
-			ProgramUniformInfoGL uniformInfo;
-			uniformInfo.Location = glGetUniformLocation(ID, name);
-			uniformInfo.Handle = uniformManager.getUniformByName(ìnternalName.c_str());
-			uniformInfo.Type = getSPRUniformTypeFromGLType(type);
-			uniformInfo.Index = uniformIndex;
+			for (int i = 0; i < count; i++) {
+				// Inneficient, we could store a single ProgramUniformInfoGL with Index and Count
+				ProgramUniformInfoGL uniformInfo;
+				uniformInfo.Location = glGetUniformLocation(ID, name);
+				uniformInfo.Handle = uniformManager.getUniformByName(ìnternalName.c_str());
+				uniformInfo.Type = getSPRUniformTypeFromGLType(type);
+				uniformInfo.Index = uniformIndex + i;
 
-			UniformInfoBuffer->write(&uniformInfo, sizeof(ProgramUniformInfoGL));
+				UniformInfoBuffer->write(&uniformInfo, sizeof(ProgramUniformInfoGL));			
+			}
 		}
 		delete[] name;
 	}

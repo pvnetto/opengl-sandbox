@@ -10,9 +10,9 @@ public:
     virtual void OnDetach() override;
 
 private:
-    spr::ProgramHandle m_shaderProgramHandle;
-    spr::UniformHandle m_uniformHandle;
-    spr::VertexBufferHandle m_triangleVBHandle;
+    spr::ProgramHandle m_ShaderProgram;
+    spr::UniformHandle m_Uniform;
+    spr::VertexBufferHandle m_TriangleVertexBuffer;
 
     void CreateBuffers();
     void CreateShaders();

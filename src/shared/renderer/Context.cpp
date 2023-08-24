@@ -42,7 +42,7 @@ namespace spr {
 
 }
 
-// TODO: Move Windowing methods to its own module
+// TODO: Move Windowing methods to their own module
 namespace spr {
 
 	void createWindow(const char *windowName, int width, int height) {

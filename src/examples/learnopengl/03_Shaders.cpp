@@ -25,7 +25,7 @@ void LOGL_03_Shaders::CreateBuffers() {
 			.end();
 
 
-	m_triangleVBHandle = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
+	m_TriangleVertexBuffer = spr::createVertexBuffer(vertices, sizeof(vertices), layout);
 }
 
 void LOGL_03_Shaders::CreateShaders() {
@@ -35,8 +35,8 @@ void LOGL_03_Shaders::CreateShaders() {
 	std::string fragSrc = Utils::ReadShaderFile("shaders/frag_basic.frag");
 	spr::ShaderHandle fragHandle = spr::createShader(SPR_FRAGMENT_SHADER, fragSrc.c_str());
 
-	m_uniformHandle = spr::createUniform("horizontalOffset", spr::UniformType::Float);
-	m_shaderProgramHandle = spr::createProgram(vertexHandle, fragHandle);
+	m_Uniform = spr::createUniform("horizontalOffset", spr::UniformType::Float);
+	m_ShaderProgram = spr::createProgram(vertexHandle, fragHandle);
 }
 
 
@@ -47,9 +47,9 @@ void LOGL_03_Shaders::OnAttach() {
 
 void LOGL_03_Shaders::OnUpdate() {
 	const float horizontalOffset = (float) std::sin(glfwGetTime()) * 1.0f;
-	spr::setUniform(m_uniformHandle, &horizontalOffset);
-	spr::setVertexBuffer(m_triangleVBHandle);
-	spr::submit(m_shaderProgramHandle);
+	spr::setUniform(m_Uniform, &horizontalOffset);
+	spr::setVertexBuffer(m_TriangleVertexBuffer);
+	spr::submit(m_ShaderProgram);
 
 	spr::render();
 	
@@ -57,7 +57,7 @@ void LOGL_03_Shaders::OnUpdate() {
 }
 
 void LOGL_03_Shaders::OnDetach() {
-	spr::destroy(m_shaderProgramHandle);
-	spr::destroy(m_uniformHandle);
-	spr::destroy(m_triangleVBHandle);
+	spr::destroy(m_ShaderProgram);
+	spr::destroy(m_Uniform);
+	spr::destroy(m_TriangleVertexBuffer);
 }

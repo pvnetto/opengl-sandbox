@@ -36,18 +36,18 @@ void main() {
 
 
 void LOGL_02_EBO::DeclareBufferObjects() {	
-	glCreateVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
+	glCreateVertexArrays(1, &m_VAO);
+	glBindVertexArray(m_VAO);
 
-	glCreateBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glCreateBuffers(1, &m_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
 
-    glCreateBuffers(1, &m_ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glCreateBuffers(1, &m_EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// Unbinds buffers so they're not accidentally used.
@@ -84,17 +84,17 @@ void LOGL_02_EBO::DeclareShaderProgram() {
 		return;
 	}
 
-	m_shaderProgram = glCreateProgram();
-	glAttachShader(m_shaderProgram, vertexShader);
-	glAttachShader(m_shaderProgram, fragmentShader);
-	glLinkProgram(m_shaderProgram);
+	m_ShaderProgram = glCreateProgram();
+	glAttachShader(m_ShaderProgram, vertexShader);
+	glAttachShader(m_ShaderProgram, fragmentShader);
+	glLinkProgram(m_ShaderProgram);
 
 	int programSuccess;
-	glGetProgramiv(m_shaderProgram, GL_LINK_STATUS, &programSuccess);
+	glGetProgramiv(m_ShaderProgram, GL_LINK_STATUS, &programSuccess);
 
 	if (!programSuccess) {
 		char info[512];
-		glGetProgramInfoLog(m_shaderProgram, 512, NULL, info);
+		glGetProgramInfoLog(m_ShaderProgram, 512, NULL, info);
 		std::cout << "Failed to link shader program: " << info << "\n";
 		return;
 	}
@@ -109,8 +109,8 @@ void LOGL_02_EBO::OnAttach() {
 }
 
 void LOGL_02_EBO::OnUpdate() {
-    glUseProgram(m_shaderProgram);
-    glBindVertexArray(m_vao);
+    glUseProgram(m_ShaderProgram);
+    glBindVertexArray(m_VAO);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

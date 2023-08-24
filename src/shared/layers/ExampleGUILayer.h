@@ -24,7 +24,7 @@ public:
     }
 };
 
-enum ExampleCategory { LearnOpenGL, BookOfShaders, Trigonometry, Matrices, CategoryCount };
+enum ExampleCategory { LearnOpenGL, AdvancedOpenGL, CategoryCount };
 
 class ExampleGUILayer : public Layer {
 public:

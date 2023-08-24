@@ -1,40 +1,13 @@
 # Framebuffers
 
-**Questions**
-
-- After fragment shader is executed, the result is written to a **color buffer**;
-- This buffer represents each pixel that will be shown on the screen, so it usually has the dimensions as the screen;
-	- For an application running on 1920x1080, the buffer should usually have 2,073,600 entries;
-- Each entry on the buffer contains information about its corresponding pixel;
-- You can have more than one color buffer at a time;
-- Color buffers are only one of the types of buffers we can associate to a pixel though, as there are also:
-	- Depth buffers;
-	- Stencil buffers;
-- A **framebuffer** is a structure that contains **a combination of one or more of these buffers**;
-
-
-**Window-system-provided vs. Application-provided**:
-
 
 ## Usage
-
-**Creating/Binding**:
-- **glCreateFramebuffers**: Creates framebuffer objects;
-- **glDeleteFramebuffers**: Deletes framebuffer objects;
-- **glBindFramebuffer**: Binds framebuffer to a target operation;
-	- **GL_READ_FRAMEBUFFER**: Read-only target. Reading will return values from framebuffer bound to this target;
-	- **GL_DRAW_FRAMEBUFFER**: Write-only target. Drawing will update values of framebuffer bound to this target;
-	- **GL_FRAMEBUFFER**: Read/write target. Both reading and drawing will happen on framebuffer bound to this target;
 
 - **glNamedFramebufferParameteri**: Sets parameters for framebuffer when it **doesn't have attachments**;
 	- Otherwise, parameters are determined by the attachments;
 	- **GL_FRAMEBUFFER_DEFAULT_WIDTH**: Framebuffer width;
 	- **GL_FRAMEBUFFER_DEFAULT_HEIGHT**: Framebuffer height;
 	- [And some more](https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glFramebufferParameteri.xhtml).
-
-
-**Invalidating**:
-
 
 **Blitting**:
 - Blitting is the process of copying bits from one buffer to another;
@@ -46,52 +19,20 @@
 	- **dest** must be bound to **GL_DRAW_FRAMEBUFFER**;
 
 
-```cpp
-
-```
-
-
-## Attachments
-
-
-**Completeness**:
-
-
-
 ## Renderbuffers
 
 
 **Usage**:
-- **glCreateRenderbuffers**: Creates a renderbuffer object;
 - **glNamedRenderbufferStorage**: Specifies storage for a renderbuffer;
 	- internalformat must match the type of attachment the buffer will serve as;
 	- **GL_RGBA**: Indicates that the buffer will be used as a **color** attachment;
 	- **GL_DEPTH_COMPONENT**: Indicates that the buffer will be used as a **depth** attachment;
 	- **GL_STENCIL_INDEX**: Indicates that the buffer will be used as a **stencil** attachment;
 	- **GL_DEPTH_STENCIL**: Allows the buffer to be attached as either **depth**, **stencil** or **both** attachments combined;
-- **glNamedFramebufferRenderbuffer**:
-
-**What to use for attachments: Renderbuffers or Textures**:
-- **Renderbuffers**: Basically buffers we can put render info into;
-	- Use them when you know you **won't need to use the attachment as a texture**;
-	- There are **some performance gains** in using renderbuffers, but they're **not big**;
-- **Textures**: Can do the same as renderbuffers and still serve as a texture;
-	- When in doubt, just use textures, there's nothing to lose from using them;
-
-
-## Buffers
-
-### Color Buffers
-- Fragment shaders should return normalized colors ([0, 1] range);
-
-
-### Depth Buffers
-
-
-### Stencil Buffers
 
 
 ## Masks
+
 - Enables/disables writing to specific buffers;
 - **glColorMask**: Enables/disables writing to specific color buffer channels;
 - **glStencilMask**: Sets a bitmask that is applied to stencil buffer on write;

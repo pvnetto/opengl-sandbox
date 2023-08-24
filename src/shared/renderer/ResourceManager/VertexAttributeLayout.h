@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map> 
 
+// TODO: Refactor to a ResourceManager
 namespace spr {
     class VertexAttributeLayout;
     VertexAttributeLayoutHandle findOrCreateVertexAttributeLayout(const VertexAttributeLayout& layout);

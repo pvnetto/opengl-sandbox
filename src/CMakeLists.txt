@@ -2,9 +2,8 @@ set(SANDBOX_SOURCES
 		
 		shared/Camera.cpp
 		shared/FreeCameraController.cpp
-		
-		
-		"shared/ModelLoader.cpp"
+		shared/ModelLoader.cpp
+		shared/RenderUtils.cpp
 		shared/Utils.cpp
 
 		shared/renderer/SimpleRenderer.cpp
@@ -15,6 +14,7 @@ set(SANDBOX_SOURCES
 		shared/renderer/Runtime.cpp
 		shared/renderer/Utils.cpp
 		shared/renderer/ResourceManager/ResourceManager.cpp
+		shared/renderer/ResourceManager/SamplerInfo.cpp
 		shared/renderer/ResourceManager/UniformManager.cpp
 		shared/renderer/ResourceManager/VertexAttributeLayout.cpp
 
@@ -57,7 +57,7 @@ set(SANDBOX_SOURCES
 		examples/learnopengl/13_Meshes.cpp)
 
 
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "shared/RenderUtils.cpp" "shared/renderer/ResourceManager/SamplerInfo.cpp")
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/advancedogl/01_Framebuffers.cpp")
 
 # sets OpenGL policy to prioritize newer versions over legacy when both are found
 cmake_policy(SET CMP0072 NEW)

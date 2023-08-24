@@ -45,8 +45,8 @@ void main() {
 
 void LOGL_02_VAO::DeclareBuffers() {
 	// 1. Declares VAO for first triangle
-	glCreateVertexArrays(1, &m_vaoA);
-	glBindVertexArray(m_vaoA);
+	glCreateVertexArrays(1, &m_VAOa);
+	glBindVertexArray(m_VAOa);
 
 	// 2. Creates vertex buffer for first triangle and fills it with vertex data
 	unsigned int vboA;
@@ -63,8 +63,8 @@ void LOGL_02_VAO::DeclareBuffers() {
 	glBindVertexArray(0);
 
 	// 4. Does the same process for another triangle
-	glCreateVertexArrays(1, &m_vaoB);
-	glBindVertexArray(m_vaoB);
+	glCreateVertexArrays(1, &m_VAOb);
+	glBindVertexArray(m_VAOb);
 
 	unsigned int vboB;
 	glCreateBuffers(1, &vboB);
@@ -130,17 +130,17 @@ void LOGL_02_VAO::DeclareShader(unsigned int &shaderId, const char *vertexShader
 
 void LOGL_02_VAO::OnAttach() {
 	DeclareBuffers();
-	DeclareShader(m_shaderProgram, vertexShaderSource, fragmentShaderSrc);
-	DeclareShader(m_yellowShaderProgram, vertexShaderSource, yellowFragShaderSrc);
+	DeclareShader(m_ShaderProgram, vertexShaderSource, fragmentShaderSrc);
+	DeclareShader(m_YellowShaderProgram, vertexShaderSource, yellowFragShaderSrc);
 }
 
 void LOGL_02_VAO::OnUpdate() {
 	// 5. Binds VAO and draws the triangle
-	glUseProgram(m_shaderProgram);
-	glBindVertexArray(m_vaoA);
+	glUseProgram(m_ShaderProgram);
+	glBindVertexArray(m_VAOa);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 
-	glUseProgram(m_yellowShaderProgram);
-	glBindVertexArray(m_vaoB);
+	glUseProgram(m_YellowShaderProgram);
+	glBindVertexArray(m_VAOb);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 }
