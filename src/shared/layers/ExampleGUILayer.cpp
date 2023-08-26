@@ -22,6 +22,8 @@
 #include "examples/learnopengl/12_MultipleLights.h"
 #include "examples/learnopengl/13_Meshes.h"
 #include "examples/advancedogl/01_Framebuffers.h"
+#include "examples/advancedogl/01_DepthBuffers.h"
+#include "examples/advancedogl/01_StencilBuffers.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {AdvancedOpenGL, "Advanced OpenGL"}};
@@ -52,7 +54,7 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes, "13 - Meshes");
 
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers, "01 - FrameBuffers");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "01 - FrameBuffers: Depth Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers, "01 - FrameBuffers: Depth Testing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "01 - FrameBuffers: Stencil Testing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Blending");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Antialiasing");

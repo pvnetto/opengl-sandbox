@@ -1,13 +1,13 @@
-#include "01_Framebuffers.h"
+#include "01_DepthBuffers.h"
 
 #include "shared/RenderUtils.h"
 
 #include <glad/glad.h>
-#include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
 
-void AOGL_01_Framebuffers::OnAttach() {
-	m_Position = glm::vec3(-0.2f, 0.3f, -2.0f);
+void AOGL_01_DepthBuffers::OnAttach() {
+	m_Position = glm::vec3(-0.5f, 0.f, -2.0f);
 	m_Scale = glm::vec3(1.2f, 1.2f, 1.2f);
 	m_CamerinPosition = glm::vec3(0, 0, 0);
 	m_FieldOfView = 90.f;
@@ -15,33 +15,29 @@ void AOGL_01_Framebuffers::OnAttach() {
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
 	m_CubeVertexBuffer = Utils::LoadCube();
 
-	m_TexUniform = spr::createUniform("tex", spr::UniformType::Sampler);
-	m_AnotherTexUniform = spr::createUniform("anotherTex", spr::UniformType::Sampler);
 	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
 	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
 	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
-
-	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
-	m_BrickTexture = Utils::LoadTexture("assets/bricks.jpg");
-	m_LadybugTexture = Utils::LoadTexture("assets/yps.png");
+	m_NearPlaneUniform = spr::createUniform("nearPlane", spr::UniformType::Float);
+	m_FarPlaneUniform = spr::createUniform("farPlane", spr::UniformType::Float);
+	m_DepthDrawShaderProgram = Utils::LoadShaderProgram("shaders/01_aogl_depth_buffers.vert", "shaders/01_aogl_depth_buffers.frag");
 
 	m_RenderTargetTextureUniform = spr::createUniform("renderTargetTexture", spr::UniformType::Sampler);
-	m_PostProcessShaderProgram = Utils::LoadShaderProgram("shaders/01_aogl_color_buffers.vert", "shaders/01_aogl_color_buffers.frag");
+	m_RenderPassShaderProgram = Utils::LoadShaderProgram("shaders/draw_textured_quad.vert", "shaders/draw_textured_quad.frag");
 
 	// 0. Creates FrameBuffer Object
 	glCreateFramebuffers(1, &m_Framebuffer);
 
-	// 1. Creates Texture Object to use as a Color Buffer
 	const glm::vec2 windowSize = spr::getWindowSize();
 	const int windowWidth = windowSize.x, windowHeight = windowSize.y;
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorBufferTexture);
 	glTextureStorage2D(m_ColorBufferTexture, 1, GL_RGB8, windowWidth, windowHeight);
 
-	// 2. Creates Texture Object to use as a Depth buffer (more on this later)
+	// 1. Creates Texture Object to use as a Depth buffer
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_DepthBufferTexture);
 	glTextureStorage2D(m_DepthBufferTexture, 1, GL_DEPTH_COMPONENT24, windowWidth, windowHeight);
 
-	// 3. Binds Texture Object to Framebuffer Object in one of the color attachments
+	// 2. Binds depth buffer Texture Object to Framebuffer Object in the depth attachment
 	glNamedFramebufferTexture(m_Framebuffer, GL_COLOR_ATTACHMENT0, m_ColorBufferTexture, 0);
 	glNamedFramebufferTexture(m_Framebuffer, GL_DEPTH_ATTACHMENT, m_DepthBufferTexture, 0);
 
@@ -49,81 +45,91 @@ void AOGL_01_Framebuffers::OnAttach() {
 	if (glCheckNamedFramebufferStatus(m_Framebuffer, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		assert(false && "::ERROR: Framebuffer is incomplete");
 	}
+
+	glClearColor(0xff, 0x00, 0xff, 0xff);
 }
 
-void AOGL_01_Framebuffers::OnUpdate() {
-	glm::mat4 model(1.0f);
-	model = glm::translate(model, m_Position);
-	model = glm::rotate(model, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::scale(model, m_Scale);
+void AOGL_01_DepthBuffers::OnUpdate() {
+	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
 
+	// 3. Enables depth testing
+	glEnable(GL_DEPTH_BUFFER_BIT);
+	
+	// 4. (OPTIONAL) Sets depth testing parameters. This already comes with sensible defaults though.
+	glDepthMask(GL_TRUE);			// Defaults to GL_TRUE.
+	glDepthFunc(GL_LESS);			// Defaults to GL_LESS. Replaces depth value when it's smaller than the current (i.e., closer to the viewer).
+
+	// 5. Renders a bunch of cubes at different depths and draws their depth values
 	glm::mat4 view(1.0f);
 	view = glm::translate(view, -m_CamerinPosition);
 
 	glm::mat4 projection(1.0f);
 	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
-	const float near = 0.1f;
-	const float far = 100.f;
+	const float near = 0.1f, far = 1000.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
-
-	// 4. Binds Framebuffer Object to GL context
-	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
-
-	glEnable(GL_DEPTH_BUFFER_BIT);
-
-	// 5. Performs a render pass on the Framebuffer
-	const int texUnit = 0, anotherTexUnit = 1;
-	spr::setUniform(m_TexUniform, &texUnit);
-	spr::setUniform(m_AnotherTexUniform, &anotherTexUnit);
-	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 	spr::setUniform(m_ViewUniform, glm::value_ptr(view));
 	spr::setUniform(m_ProjectionUniform, glm::value_ptr(projection));
+	spr::setUniform(m_NearPlaneUniform, &near);
+	spr::setUniform(m_FarPlaneUniform, &far);
 
-	spr::setTexture(0, m_BrickTexture);
-	spr::setTexture(1, m_LadybugTexture);
+	const int cubeCount = 10;
+	for (int i = 0; i < cubeCount; i++) {
+		const float offsetMultiplier = (float) i - cubeCount / 2.f;
+		const glm::vec3 offset = offsetMultiplier * glm::vec3{ 0.25f, 0.f, 0.25f };
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, m_Position + offset);
+		model = glm::scale(model, m_Scale);
 
-	spr::setVertexBuffer(m_CubeVertexBuffer);
+		spr::setVertexBuffer(m_CubeVertexBuffer);
+		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
+		spr::submit(m_DepthDrawShaderProgram);
+	}
 
-	spr::submit(m_DefaultShaderProgram);
+	//{
+	//	glm::mat4 model(1.0f);
+	//	model = glm::translate(model, m_Position + glm::vec3{ 0.f, 0.f, -20.f });
+	//	model = glm::scale(model, m_Scale * glm::vec3(100.f, 100.f, 1.f));
+	//	spr::setVertexBuffer(m_CubeVertexBuffer);
+	//	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
+	//	spr::submit(m_DepthDrawShaderProgram);
+	//}
 
+
+	// 6. Clears values in the Depth Buffer before writing to it
+	glClear(GL_DEPTH_BUFFER_BIT);
 	spr::clear();
 	spr::render();
 	spr::clean();
 
-	// 6. Binds default Framebuffer (this is the one provided by the windowing system)
+	// 7. Performs another render pass to draw the result to a quad
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// 7. Gets the Framebuffer Object color attachment and draws it in another render pass
 	assert(m_QuadModel.Meshes.size() > 0 && "::ERROR: Quad mesh wasn't properly loaded");
 	const auto &mesh = m_QuadModel.Meshes[0];
 	spr::setVertexBuffer(mesh.VertexBuffer);
 	spr::setIndexBuffer(mesh.IndexBuffer);
 
-	const int renderTargetTextureUnit = 2;
+	const int renderTargetTextureUnit = 0;
 	glBindTextureUnit(renderTargetTextureUnit, m_ColorBufferTexture);
 	spr::setUniform(m_RenderTargetTextureUniform, &renderTargetTextureUnit);
-	spr::submit(m_PostProcessShaderProgram);
+	spr::submit(m_RenderPassShaderProgram);
 
 	spr::clear();
 	spr::render();
 	spr::clean();
 }
 
-void AOGL_01_Framebuffers::OnDetach() {
+void AOGL_01_DepthBuffers::OnDetach() {
 	Utils::UnloadModel(m_QuadModel);
 	spr::destroy(m_CubeVertexBuffer);
-	spr::destroy(m_BrickTexture);
-	spr::destroy(m_LadybugTexture);
-	spr::destroy(m_DefaultShaderProgram);
-	spr::destroy(m_TexUniform);
-	spr::destroy(m_AnotherTexUniform);
+	spr::destroy(m_DepthDrawShaderProgram);
 	spr::destroy(m_ModelUniform);
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);
-	spr::destroy(m_PostProcessShaderProgram);
+	spr::destroy(m_RenderPassShaderProgram);
 	spr::destroy(m_RenderTargetTextureUniform);
+	spr::destroy(m_NearPlaneUniform);
+	spr::destroy(m_FarPlaneUniform);
 
 	glDeleteFramebuffers(1, &m_Framebuffer);
 	glDeleteTextures(1, &m_ColorBufferTexture);

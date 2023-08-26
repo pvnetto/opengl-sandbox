@@ -9,6 +9,7 @@ namespace spr {
 	void RendererContextGL::init(Context* context) {
 		m_ResourceManager.init(context);
 		glCreateVertexArrays(1, &m_DefaultVAO);
+		glClearColor(0.1f, 0.1f, 0.12f, 1);			// Sets default clear color
 	}
 
 	void RendererContextGL::shutdown() {
@@ -16,7 +17,6 @@ namespace spr {
 	}
 
 	void RendererContextGL::clear() {
-		glClearColor(0.1f, 0.1f, 0.12f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
