@@ -9,7 +9,7 @@
 void AOGL_01_Framebuffers::OnAttach() {
 	m_Position = glm::vec3(-0.2f, 0.3f, -2.0f);
 	m_Scale = glm::vec3(1.2f, 1.2f, 1.2f);
-	m_CamerinPosition = glm::vec3(0, 0, 0);
+	m_CameraPosition = glm::vec3(0, 0, 0);
 	m_FieldOfView = 90.f;
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
@@ -60,7 +60,7 @@ void AOGL_01_Framebuffers::OnUpdate() {
 	model = glm::scale(model, m_Scale);
 
 	glm::mat4 view(1.0f);
-	view = glm::translate(view, -m_CamerinPosition);
+	view = glm::translate(view, -m_CameraPosition);
 
 	glm::mat4 projection(1.0f);
 	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
@@ -71,7 +71,7 @@ void AOGL_01_Framebuffers::OnUpdate() {
 	// 4. Binds Framebuffer Object to GL context
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
 
-	glEnable(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 
 	// 5. Performs a render pass on the Framebuffer
 	const int texUnit = 0, anotherTexUnit = 1;

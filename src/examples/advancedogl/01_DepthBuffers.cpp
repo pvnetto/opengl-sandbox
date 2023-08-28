@@ -9,7 +9,7 @@
 void AOGL_01_DepthBuffers::OnAttach() {
 	m_Position = glm::vec3(-0.5f, 0.f, -2.0f);
 	m_Scale = glm::vec3(1.2f, 1.2f, 1.2f);
-	m_CamerinPosition = glm::vec3(0, 0, 0);
+	m_CameraPosition = glm::vec3(0, 0, 0);
 	m_FieldOfView = 90.f;
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
@@ -53,15 +53,15 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
 
 	// 3. Enables depth testing
-	glEnable(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	
 	// 4. (OPTIONAL) Sets depth testing parameters. This already comes with sensible defaults though.
-	glDepthMask(GL_TRUE);			// Defaults to GL_TRUE.
+	glDepthMask(GL_TRUE);			// Defaults to GL_TRUE. This value is ANDed with depth values before they're written to the Depth Buffer.
 	glDepthFunc(GL_LESS);			// Defaults to GL_LESS. Replaces depth value when it's smaller than the current (i.e., closer to the viewer).
 
 	// 5. Renders a bunch of cubes at different depths and draws their depth values
 	glm::mat4 view(1.0f);
-	view = glm::translate(view, -m_CamerinPosition);
+	view = glm::translate(view, -m_CameraPosition);
 
 	glm::mat4 projection(1.0f);
 	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
@@ -84,15 +84,6 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::submit(m_DepthDrawShaderProgram);
 	}
-
-	//{
-	//	glm::mat4 model(1.0f);
-	//	model = glm::translate(model, m_Position + glm::vec3{ 0.f, 0.f, -20.f });
-	//	model = glm::scale(model, m_Scale * glm::vec3(100.f, 100.f, 1.f));
-	//	spr::setVertexBuffer(m_CubeVertexBuffer);
-	//	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
-	//	spr::submit(m_DepthDrawShaderProgram);
-	//}
 
 
 	// 6. Clears values in the Depth Buffer before writing to it

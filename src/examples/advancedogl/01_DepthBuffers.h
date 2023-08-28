@@ -32,7 +32,7 @@ private:
 
 	glm::vec3 m_Position;
 	glm::vec3 m_Scale;
-	glm::vec3 m_CamerinPosition;
+	glm::vec3 m_CameraPosition;
 
 	float m_FieldOfView;
 };

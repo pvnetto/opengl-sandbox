@@ -38,7 +38,7 @@ void LOGL_06_MVP::OnAttach() {
 
 	m_Position = glm::vec3(0.5f, 0.2f, -2.0f);
 	m_Scale = glm::vec3(1.2f, 1.2f, 1.2f);
-	m_CamerinPosition = glm::vec3(0, 0, 0);
+	m_CameraPosition = glm::vec3(0, 0, 0);
 
     m_FieldOfView = 90.f;
 }
@@ -58,7 +58,7 @@ void LOGL_06_MVP::OnUpdate() {
 
 	// 2. Creates View matrix
 	glm::mat4 view(1.0f);
-	view = glm::translate(view, -m_CamerinPosition);
+	view = glm::translate(view, -m_CameraPosition);
 
 	// 3. Creates Projection matrix
 	glm::mat4 projection(1.0f);
@@ -97,7 +97,7 @@ void LOGL_06_MVP::OnImGuiRender() {
 
 	ImGui::Separator();
 	if (ImGui::CollapsingHeader("Camera")) {
-		ImGui::InputFloat3("Position", glm::value_ptr(m_CamerinPosition));
+		ImGui::InputFloat3("Position", glm::value_ptr(m_CameraPosition));
         ImGui::InputFloat("Field of View", &m_FieldOfView);
 	}
     ImGui::End();

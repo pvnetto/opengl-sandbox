@@ -55,7 +55,7 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers, "01 - FrameBuffers");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers, "01 - FrameBuffers: Depth Testing");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "01 - FrameBuffers: Stencil Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers, "01 - FrameBuffers: Stencil Testing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Blending");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Antialiasing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Instancing");
