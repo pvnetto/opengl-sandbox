@@ -98,6 +98,7 @@ namespace spr {
 			ProgramUniformInfoGL uniformInfo = uniformInfoBuffer->read<ProgramUniformInfoGL>();
 			const auto& [location, handle, index, type] = uniformInfo;
 
+			// TODO: This probably doesn't work as intended on arrays!!!
 			switch (type) {
 			case UniformType::Float:
 				glUniform1fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
@@ -111,6 +112,9 @@ namespace spr {
 				break;
 			case UniformType::Vec3:
 				glUniform3fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
+				break;
+			case UniformType::Vec4:
+				glUniform4fv(location, 1, uniformManager.getUniformValue<float>(handle, index));
 				break;
 			case UniformType::Mat4x4:
 				glUniformMatrix4fv(location, 1, GL_FALSE, uniformManager.getUniformValue<float>(handle, index));

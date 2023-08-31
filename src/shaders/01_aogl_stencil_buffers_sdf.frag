@@ -20,7 +20,7 @@ void main()
     uv.x *= (inResolution.x / inResolution.y);
     
     vec2 circlePosition = uv - vec2(0.4, 0.0);
-    float circleSize = (cos(inTime) + 1.0) * 0.5;
+    float circleSize = (cos(inTime * 1.5) + 1.0) * 0.5;
     float circle = circleSDF(circlePosition, circleSize);
     float bg = max(1.0 - circle, 0.0);
     
@@ -30,6 +30,6 @@ void main()
     }
     
     vec3 circleColor = circle * vec3(0.8, 0.3, 0.6);
-    vec3 backgroundColor = bg * vec3(0.25, 0.25, 0.2);
+    vec3 backgroundColor = bg * vec3(0.12, 0.135, 0.135);
     fragColor = vec4(circleColor + backgroundColor, 1.0);
 }

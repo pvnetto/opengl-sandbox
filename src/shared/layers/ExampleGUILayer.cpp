@@ -24,6 +24,7 @@
 #include "examples/advancedogl/01_Framebuffers.h"
 #include "examples/advancedogl/01_DepthBuffers.h"
 #include "examples/advancedogl/01_StencilBuffers.h"
+#include "examples/advancedogl/02_Blending.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {AdvancedOpenGL, "Advanced OpenGL"}};
@@ -34,29 +35,29 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	m_examples.emplace(LearnOpenGL, std::vector<std::shared_ptr<Example>>());
 	m_examples.emplace(AdvancedOpenGL, std::vector<std::shared_ptr<Example>>());
 
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO, "02 - VBO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO, "02 - VAO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO, "02 - EBO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_03_Shaders, "03 - Shaders with uniforms");
-	ADD_SIMPLE(LearnOpenGL, LOGL_04_Textures, "04 - Textures");
-	ADD_SIMPLE(LearnOpenGL, LOGL_05_Transform, "05 - Transform");
-	ADD_SIMPLE(LearnOpenGL, LOGL_06_MVP, "06 - MVP");
-	ADD_SIMPLE(LearnOpenGL, LOGL_07_Camera, "07 - Camera");
-	ADD_SIMPLE(LearnOpenGL, LOGL_08_Lighting, "08 - Basic Lighting");
-	ADD_SIMPLE(LearnOpenGL, LOGL_09_Phong, "09 - Phong Shading");
-	ADD_SIMPLE(LearnOpenGL, LOGL_10_Material, "10 - Materials");
-	ADD_SIMPLE(LearnOpenGL, LOGL_11_SpecularMap, "11 - Specular Map");
-	ADD_SIMPLE(LearnOpenGL, LOGL_11_EmissionMap, "11 - Emission Map");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_DirectionalLight, "12 - Directional light");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_PointLight, "12 - Point light");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_SpotLight, "12 - Spotlight");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_MultipleLights, "12 - Multiple lights");
-	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes, "13 - Meshes");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO,					"02 - VBO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO,					"02 - VAO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO,					"02 - EBO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_03_Shaders,				"03 - Shaders with uniforms");
+	ADD_SIMPLE(LearnOpenGL, LOGL_04_Textures,				"04 - Textures");
+	ADD_SIMPLE(LearnOpenGL, LOGL_05_Transform,				"05 - Transform");
+	ADD_SIMPLE(LearnOpenGL, LOGL_06_MVP,					"06 - MVP");
+	ADD_SIMPLE(LearnOpenGL, LOGL_07_Camera,					"07 - Camera");
+	ADD_SIMPLE(LearnOpenGL, LOGL_08_Lighting,				"08 - Basic Lighting");
+	ADD_SIMPLE(LearnOpenGL, LOGL_09_Phong,					"09 - Phong Shading");
+	ADD_SIMPLE(LearnOpenGL, LOGL_10_Material,				"10 - Materials");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_SpecularMap,			"11 - Specular Map");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_EmissionMap,			"11 - Emission Map");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_DirectionalLight,		"12 - Directional light");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_PointLight,				"12 - Point light");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_SpotLight,				"12 - Spotlight");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_MultipleLights,			"12 - Multiple lights");
+	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes,					"13 - Meshes");
 
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers, "01 - FrameBuffers");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers, "01 - FrameBuffers: Depth Testing");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers, "01 - FrameBuffers: Stencil Testing");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Blending");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers,		"01 - FrameBuffers");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers,		"01 - FrameBuffers: Depth Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers,		"01 - FrameBuffers: Stencil Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_02_Blending,			"02 - Blending");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Antialiasing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Instancing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Tessellation Shading");

@@ -118,8 +118,8 @@ namespace spr {
 			uint8_t uniformIndex = 0;
 			parseUniformName(name, ìnternalName, uniformIndex);
 
+			// TODO: This probably doesn't work as intended on arrays!!! When count > 1, we need to store count on ProgramUniformInfoGL and set the correct count in RendererContextGL
 			for (int i = 0; i < count; i++) {
-				// Inneficient, we could store a single ProgramUniformInfoGL with Index and Count
 				ProgramUniformInfoGL uniformInfo;
 				uniformInfo.Location = glGetUniformLocation(ID, name);
 				uniformInfo.Handle = uniformManager.getUniformByName(ìnternalName.c_str());
@@ -166,6 +166,8 @@ namespace spr {
 				return UniformType::Vec2;
 			case GL_FLOAT_VEC3:
 				return UniformType::Vec3;
+			case GL_FLOAT_VEC4:
+				return UniformType::Vec4;
 			case GL_SAMPLER_2D:
 				return UniformType::Sampler;
 			case GL_FLOAT_MAT4:

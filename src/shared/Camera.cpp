@@ -4,15 +4,16 @@ Camera::Camera(glm::vec3 position, glm::vec3 rotationEuler, glm::vec3 up) {
 	SetPosition(position);
 	SetRotation(rotationEuler);
 
-	m_worldUp = up;
+	m_WorldUp = up;
 
 	SetPerspective(75.0f, 800 / 600, 0.1f, 100.0f);
+	UpdateDirection();
 }
 
 glm::mat4 Camera::GetView() const {
 	// Calculates LookAt matrix manually instead of using glm. Check "Basics - Camera" docs for more info.
-	glm::vec3 cameraDirectionInv = -m_forward;
-	glm::vec3 cameraLeft = glm::normalize(glm::cross(m_worldUp, cameraDirectionInv));
+	glm::vec3 cameraDirectionInv = -m_Forward;
+	glm::vec3 cameraLeft = glm::normalize(glm::cross(m_WorldUp, cameraDirectionInv));
 	glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirectionInv, cameraLeft));
 	glm::mat4 basis(
 	    glm::vec4(cameraLeft, 0),
@@ -25,11 +26,11 @@ glm::mat4 Camera::GetView() const {
 	translation = glm::translate(translation, -m_Position);
 
 	return basis * translation;
-	// return glm::lookAt(m_Position, m_Position + m_forward, m_worldUp);
+	// return glm::lookAt(m_Position, m_Position + m_Forward, m_WorldUp);
 }
 
 glm::vec3 Camera::GetRight() const {
-	return glm::normalize(glm::cross(m_forward, m_worldUp));
+	return glm::normalize(glm::cross(m_Forward, m_WorldUp));
 }
 
 glm::vec3 Camera::GetUp() const {
@@ -52,11 +53,11 @@ void Camera::UpdateDirection() {
 	// Uses y > x > z gimbal order
 	float yaw = glm::radians(m_rotationEuler.y);
 	float pitch = glm::radians(m_rotationEuler.x);
-	m_forward = glm::vec3(
+	m_Forward = glm::vec3(
 	    std::cos(yaw) * std::cos(pitch),
 	    std::sin(pitch),
 	    std::sin(yaw) * std::cos(pitch));
-	m_forward = glm::normalize(m_forward);
+	m_Forward = glm::normalize(m_Forward);
 }
 
 

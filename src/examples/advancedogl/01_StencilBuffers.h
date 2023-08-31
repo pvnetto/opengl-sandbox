@@ -40,8 +40,6 @@ private:
 
 	spr::ProgramHandle m_RenderPassShaderProgram;
 	spr::UniformHandle m_RenderTargetTextureUniform;
-	spr::UniformHandle m_NearPlaneUniform;
-	spr::UniformHandle m_FarPlaneUniform;
 
 private:
 	unsigned int m_Framebuffer;

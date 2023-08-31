@@ -19,7 +19,7 @@ public:
     glm::mat4 GetView() const;
     glm::mat4 GetProjection() const { return m_projection; }
 
-    glm::vec3 GetForward() const { return m_forward; }
+    glm::vec3 GetForward() const { return m_Forward; }
     glm::vec3 GetRight() const;
     glm::vec3 GetUp() const;
 
@@ -37,10 +37,10 @@ public:
     
 private:
     glm::vec3 m_Position;
-    glm::vec3 m_forward;
+    glm::vec3 m_Forward;
     glm::vec3 m_rotationEuler;
 
-    glm::vec3 m_worldUp;
+    glm::vec3 m_WorldUp;
 
     glm::mat4 m_projection;
 

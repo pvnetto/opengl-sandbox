@@ -189,8 +189,6 @@ void AOGL_01_StencilBuffers::OnDetach() {
 	spr::destroy(m_ObjectColorUniform);
 	spr::destroy(m_RenderPassShaderProgram);
 	spr::destroy(m_RenderTargetTextureUniform);
-	spr::destroy(m_NearPlaneUniform);
-	spr::destroy(m_FarPlaneUniform);
 	spr::destroy(m_StencilPassShaderProgram);
 	spr::destroy(m_ResolutionUniform);
 	spr::destroy(m_TimeUniform);
