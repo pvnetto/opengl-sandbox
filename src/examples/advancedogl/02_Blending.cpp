@@ -62,8 +62,7 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ColorUniform, glm::value_ptr(color));
 		spr::submit(m_DefaultShaderProgram);
-		spr::render();
-		spr::clean();
+		spr::flush();
 	};
 
 	if (m_OpaqueFirst) {
@@ -104,16 +103,13 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::setUniform(m_ColorUniform, glm::value_ptr(colors[i]));
 		spr::submit(m_DefaultShaderProgram);
 	}
-	spr::render();
-	spr::clean();
+	spr::flush();
 
-	// (OPTIONAL) This is usually wrong, but we're doing it here for demonstration purposes
+	// (OPTIONAL) Rendering Opaque objects first without ordering the draw calls by depth is usually wrong, but we're doing
+	// it here for demonstration purposes.
 	if (!m_OpaqueFirst) {
 		renderOpaquePass();
-		spr::render();
-		spr::clean();
 	}
-
 }
 
 void AOGL_02_Blending::OnDetach() {

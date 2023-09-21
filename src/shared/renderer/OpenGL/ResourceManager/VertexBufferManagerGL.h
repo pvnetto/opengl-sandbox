@@ -11,7 +11,6 @@ namespace spr {
 
 		void create(const void *data, uint32_t size, const VertexAttributeLayoutHandle &layoutHandle);
 		void destroy();
-		void bind() const;
 	};
 
 	class VertexBufferManagerGL {

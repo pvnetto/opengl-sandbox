@@ -63,9 +63,6 @@ namespace spr {
 			if (cachedDrawCall.VertexBuffer != drawCall.VertexBuffer) {
 				cachedDrawCall.VertexBuffer = drawCall.VertexBuffer;
 				changedAttributesLayout = true;
-
-				const VertexBufferInstanceGL& vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
-				vertexBuffer.bind();
 			}
 
 			if (changedAttributesLayout) {
@@ -98,7 +95,7 @@ namespace spr {
 			ProgramUniformInfoGL uniformInfo = uniformInfoBuffer->read<ProgramUniformInfoGL>();
 			const auto& [location, handle, index, type] = uniformInfo;
 
-			// TODO: This probably doesn't work as intended on arrays!!!
+			// TODO: FIX THIS! It probably doesn't work as intended on arrays!!!
 			switch (type) {
 			case UniformType::Float:
 				glUniform1fv(location, 1, uniformManager.getUniformValue<float>(handle, index));

@@ -25,6 +25,8 @@
 #include "examples/advancedogl/01_DepthBuffers.h"
 #include "examples/advancedogl/01_StencilBuffers.h"
 #include "examples/advancedogl/02_Blending.h"
+#include "examples/advancedogl/03_Antialiasing.h"
+#include "examples/advancedogl/04_Instancing.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {AdvancedOpenGL, "Advanced OpenGL"}};
@@ -58,8 +60,8 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers,		"01 - FrameBuffers: Depth Testing");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers,		"01 - FrameBuffers: Stencil Testing");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_02_Blending,			"02 - Blending");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Antialiasing");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Instancing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_03_Antialiasing,		"03 - Antialiasing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_04_Instancing,			"04 - Instancing");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Tessellation Shading");
 	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Geometry Shading");
 }

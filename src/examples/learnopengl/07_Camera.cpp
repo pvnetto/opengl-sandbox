@@ -19,15 +19,7 @@ void LOGL_07_Camera::OnAttach() {
 	m_CameraRotation = m_Camera.GetRotationEuler();
 	m_ProjectionType = 0;
 
-	spr::VertexAttributeLayout layout;
-	layout.begin()
-	    .add({"inPosition", spr::AttributeType::Float, 3})
-	    .add({"inUV", spr::AttributeType::Float, 2})
-	    .add({"inNormal", spr::AttributeType::Float, 3}) // Unused in this example
-	    .end();
-
-	Utils::PrimitiveData cube = Utils::GetCubeData();
-	m_CubeVertexBuffer = spr::createVertexBuffer(cube.Vertices, cube.NumVertices, layout);
+	m_CubeVertexBuffer = Utils::LoadCube();
 
 	m_TexUniform = spr::createUniform("tex", spr::UniformType::Sampler);
 	m_AnotherTexUniform = spr::createUniform("anotherTex", spr::UniformType::Sampler);

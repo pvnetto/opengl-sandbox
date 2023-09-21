@@ -117,6 +117,8 @@ void LOGL_12_SpotLight::OnDetach() {
 	spr::destroy(m_CubeVertexBuffer);
 	spr::destroy(m_SpotLightShaderProgram);
 	spr::destroy(m_LightSourceShaderProgram);
+	spr::destroy(m_ContainerTexture);
+	spr::destroy(m_ContainerSpecularTexture);
 	spr::destroy(m_ModelUniform);
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);
@@ -130,12 +132,12 @@ void LOGL_12_SpotLight::OnDetach() {
 	spr::destroy(m_LightConstantAttenuationUniform);
 	spr::destroy(m_LightLinearAttenuationUniform);
 	spr::destroy(m_LightQuadraticAttenuationUniform);
+	spr::destroy(m_MaterialDiffuseMapUniform);
+	spr::destroy(m_MaterialSpecularMapUniform);
 	spr::destroy(m_MaterialAmbientStrengthUniform);
 	spr::destroy(m_MaterialDiffuseStrengthUniform);
 	spr::destroy(m_MaterialSpecularStrengthUniform);
 	spr::destroy(m_MaterialShininessUniform);
-	spr::destroy(m_MaterialDiffuseMapUniform);
-	spr::destroy(m_MaterialSpecularMapUniform);
 	spr::destroy(m_TimeUniform);
 }
 

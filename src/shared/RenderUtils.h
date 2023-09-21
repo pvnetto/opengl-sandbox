@@ -7,8 +7,17 @@ namespace Utils {
 	struct PrimitiveData {
 		float *Vertices = nullptr;
 		unsigned int *Indices = nullptr;
+
+		// Number of vertices. Each vertex has position, normal and UV.
 		std::size_t NumVertices = 0;
+
+		// Number of indices. Each index is an uint.
 		std::size_t NumIndices = 0;
+
+		// Number of elements in the Vertices array
+		std::size_t VerticesSize = 0;
+		
+		spr::VertexAttributeLayout Layout;
 	};
 
 	struct MeshInstance {

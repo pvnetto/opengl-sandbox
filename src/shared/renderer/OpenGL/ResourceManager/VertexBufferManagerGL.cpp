@@ -18,11 +18,6 @@ namespace spr {
 		LayoutHandle = kInvalidHandle;
 	}
 
-	void VertexBufferInstanceGL::bind() const {
-		assert(ID != 0 && "::ERROR: Trying to bind a null VertexBuffer");
-		glBindBuffer(GL_ARRAY_BUFFER, ID);
-	}
-
 }
 
 namespace spr {

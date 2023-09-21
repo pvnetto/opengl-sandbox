@@ -91,7 +91,7 @@ void LOGL_02_VBO::DeclareShader() {
 
 	// Deletes both shaders
 	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);    
+	glDeleteShader(fragmentShader);
 }
 
 void LOGL_02_VBO::OnAttach() {

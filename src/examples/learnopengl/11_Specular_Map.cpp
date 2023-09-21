@@ -101,6 +101,8 @@ void LOGL_11_SpecularMap::OnUpdate() {
 void LOGL_11_SpecularMap::OnDetach() {
 	spr::destroy(m_CubeVertexBuffer);
 	spr::destroy(m_LightSourceShaderProgram);
+	spr::destroy(m_ContainerTexture);
+	spr::destroy(m_ContainerSpecularTexture);
 	spr::destroy(m_ModelUniform);
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);

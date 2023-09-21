@@ -50,7 +50,9 @@ namespace spr {
         VertexAttributeLayout& add(VertexAttribute attribute);
         VertexAttributeLayout& end();
 
+        inline std::size_t getAttributeCount() const { return m_Attributes.size(); }
         const VertexAttribute& getAttribute(int index) const;
+
 
         inline bool operator==(const VertexAttributeLayout& other) const { return m_Hash == other.m_Hash; }
         inline bool operator!=(const VertexAttributeLayout& other) const { return !(*this == other); }

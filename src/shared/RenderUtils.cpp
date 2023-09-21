@@ -25,10 +25,20 @@ namespace Utils {
 		// clang-format on
 		static PrimitiveData quad;
 		quad.Vertices = vertices;
-		quad.NumVertices = sizeof(vertices);
+		quad.VerticesSize = sizeof(vertices);
 		quad.Indices = indices;
 		quad.NumIndices = sizeof(indices);
 		return quad;
+	}
+
+	static spr::VertexAttributeLayout GetMeshLayout() {
+		spr::VertexAttributeLayout layout;
+		layout.begin()
+		    .add({"inPosition", spr::AttributeType::Float, 3})
+		    .add({"inUV", spr::AttributeType::Float, 2})
+		    .add({"inNormal", spr::AttributeType::Float, 3})
+		    .end();
+		return layout;
 	}
 
 	PrimitiveData GetCubeData() {
@@ -80,23 +90,15 @@ namespace Utils {
 
 		static PrimitiveData cube;
 		cube.Vertices = vertices;
-		cube.NumVertices = sizeof(vertices);
+		cube.Layout = GetMeshLayout();
+		cube.VerticesSize = sizeof(vertices) / sizeof(float);
+		cube.NumVertices = cube.VerticesSize / (cube.Layout.getStride() / sizeof(float));
 		return cube;
-	}
-
-	static spr::VertexAttributeLayout GetMeshLayout() {
-		spr::VertexAttributeLayout layout;
-		layout.begin()
-		    .add({"inPosition", spr::AttributeType::Float, 3})
-		    .add({"inUV", spr::AttributeType::Float, 2})
-		    .add({"inNormal", spr::AttributeType::Float, 3})
-		    .end();
-		return layout;
 	}
 
 	spr::VertexBufferHandle LoadCube() {
 		Utils::PrimitiveData cube = Utils::GetCubeData();
-		return spr::createVertexBuffer(cube.Vertices, cube.NumVertices, GetMeshLayout());
+		return spr::createVertexBuffer(cube.Vertices, cube.VerticesSize * sizeof(float), cube.Layout);
 	}
 
 	ModelInstance LoadModel(const char* path) {

@@ -15,15 +15,7 @@ static spr::SamplerInfo GetDefaultSamplerInfo() {
 }
 
 void LOGL_06_MVP::OnAttach() {
-	spr::VertexAttributeLayout layout;
-	layout.begin()
-	    .add({"inPosition", spr::AttributeType::Float, 3})
-	    .add({"inUV", spr::AttributeType::Float, 2})
-	    .add({"inNormal", spr::AttributeType::Float, 3})		// Unused in this example
-	    .end();
-
-	Utils::PrimitiveData cube = Utils::GetCubeData();
-	m_CubeVertexBuffer = spr::createVertexBuffer(cube.Vertices, cube.NumVertices, layout);
+	m_CubeVertexBuffer = Utils::LoadCube();
 
 	// 0. Declares the Uniforms in the renderer, so that we can pass data to it later on
 	m_TexUniform = spr::createUniform("tex", spr::UniformType::Sampler);

@@ -29,6 +29,11 @@ namespace spr {
 		s_Context.getRendererContext().render(frameData);
 	}
 
+	void flush() {
+		render();
+		clean();
+	}
+
 	void setVertexBuffer(const VertexBufferHandle& handle) {
 		s_Context.getFrameDataManager().setVertexBuffer(handle);
 	}

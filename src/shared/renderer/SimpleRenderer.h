@@ -25,6 +25,7 @@ namespace spr {
 	
 	void clear();
 	void render();
+	void flush();
 
 	void setVertexBuffer(const VertexBufferHandle &handle);
 	void setIndexBuffer(const IndexBufferHandle &handle);

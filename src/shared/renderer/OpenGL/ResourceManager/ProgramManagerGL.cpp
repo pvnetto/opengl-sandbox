@@ -42,8 +42,8 @@ namespace spr {
 			char linkInfo[512];
 			glGetProgramInfoLog(ID, 512, NULL, linkInfo);
 
-			assert(false && "::ERROR: Failed to link shader");
 			std::cout << "::ERROR: Failed to link shader " << linkInfo << "\n";
+			assert(false);
 		}
 
 		if (!UniformInfoBuffer) {

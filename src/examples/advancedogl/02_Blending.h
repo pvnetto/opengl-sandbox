@@ -44,6 +44,10 @@ private:
 	// - Opaque pass > Transparency pass (✔️): The Opaque Pass is executed first and writes to the Depth Buffer + Color Buffer, so when the Transparency
 	// Pass takes place, even though it's Depth Tested, we don't have to worry because the Opaque colors are already at the Color Buffer and will be blended,
 	// and if the Transparent objects are discarded that means they're behind the Opaque objects, which is fine.
+	//
+	// More about this:
+	// - https://realtimecollisiondetection.net/blog/?p=86
+	// - https://www.khronos.org/opengl/wiki/Transparency_Sorting#Depth_Sorting
 	bool m_OpaqueFirst = true;
 	int m_OpaquePosition = OpaquePosition_Behind;
 };
