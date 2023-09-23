@@ -27,21 +27,26 @@ static std::vector<float> GetColors(int amount) {
 	return colors;
 }
 
-static std::vector<float> GetWorldPositions(int amount) {
+static std::vector<float> GetModels(int amount) {
 	const int rowSize = sqrt(amount);
 	const float gridSize = 2.f;
-	std::vector<float> worldPositions;
+	std::vector<float> models;
 	for (int cubeIndex = 0; cubeIndex < amount; cubeIndex++) {
 		const int rowIdx = (cubeIndex / rowSize) - (rowSize / 2);
 		const int colIdx = (cubeIndex % rowSize) - (rowSize / 2);
+		const float rotationAngle = glm::sin((float)cubeIndex) * 360.f;
 
 		const glm::vec3 worldPosition { rowIdx * gridSize, colIdx * gridSize, -10.f };
-		for (int positionIndex = 0; positionIndex < 3; positionIndex++) {
-			worldPositions.push_back(worldPosition[positionIndex]);
+		glm::mat4 model(1.0f);
+		model = glm::translate(model, worldPosition);
+		model = glm::rotate(model, rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+		for (int modelIndex = 0; modelIndex < 16; modelIndex++) {
+			const int modelRow = modelIndex / 4, modelCol = modelIndex - (modelRow * 4);
+			models.push_back(model[modelRow][modelCol]);
 		}
 	}
 
-	return worldPositions;
+	return models;
 }
 
 void AOGL_04_Instancing::OnAttach() {
@@ -67,7 +72,7 @@ void AOGL_04_Instancing::OnAttach() {
 
 	// 3. Creates Vertex Buffer to store per-instance world positions
 	// NOTE: We could have used the same Vertex Buffer that we use for colors, but we created a separate one to make it easier to use different divisors
-	const std::vector<float> worldPositions = GetWorldPositions(m_CubeCount);
+	const std::vector<float> worldPositions = GetModels(m_CubeCount);
 	glCreateBuffers(1, &m_PerInstancePositionVertexBuffer);
 	glNamedBufferStorage(m_PerInstancePositionVertexBuffer, worldPositions.size() * sizeof(float), worldPositions.data(), 0);
 
@@ -103,20 +108,21 @@ void AOGL_04_Instancing::OnAttach() {
 	}
 
 
-	// 7. Defines attribute layout for Vertex Buffer with per-instance world positions
-	// NOTE: Ideally we would pass the entire model matrix here, but there's a limitation for attributes that they cannot contain 16 values at once, so we'd
-	// have to create 4 attributes to pass a mat4 matrix. This seemed too cumbersome for me, so I'm passing just the world position and calculating the model
-	// matrix inside the shader.
+	// 7. Defines attribute layout for Vertex Buffer with per-instance model matrices
+	// NOTE: Ideally we would pass the entire model matrix in a single attribute, but there's a limitation for attributes that they cannot contain 16 values at once,
+	// so we have to create 4 separate attributes to pass a mat4 matrix. You can still declare the attribute in GLSL as a mat4.
 	{
-		const int attributeIndex = baseAttributeIndex + 1;
-		const int positionBufferBindingPoint = 2;
-		const int positionStride = 3 * sizeof(float);
-		glVertexArrayVertexBuffer(m_VertexArray, positionBufferBindingPoint, m_PerInstancePositionVertexBuffer, NULL, positionStride);
-	
-		glVertexArrayAttribFormat(m_VertexArray, attributeIndex, 3, GL_FLOAT, GL_FALSE, 0);
-		glEnableVertexArrayAttrib(m_VertexArray, attributeIndex);
-		glVertexArrayAttribBinding(m_VertexArray, attributeIndex, positionBufferBindingPoint);
-		glVertexArrayBindingDivisor(m_VertexArray, positionBufferBindingPoint, 1);			// Tells Input Assembly to issue a new position value every instance
+		const int modelMatrixBufferBindingPoint = 2;
+		const int modelStride = 16 * sizeof(float);
+		glVertexArrayVertexBuffer(m_VertexArray, modelMatrixBufferBindingPoint, m_PerInstancePositionVertexBuffer, NULL, modelStride);
+
+		for (int i = 0; i < 4; i++) {
+			const int attributeIndex = baseAttributeIndex + i + 1;
+			glVertexArrayAttribFormat(m_VertexArray, attributeIndex, 4, GL_FLOAT, GL_FALSE, i * (modelStride / 4));
+			glEnableVertexArrayAttrib(m_VertexArray, attributeIndex);
+			glVertexArrayAttribBinding(m_VertexArray, attributeIndex, modelMatrixBufferBindingPoint);
+			glVertexArrayBindingDivisor(m_VertexArray, modelMatrixBufferBindingPoint, 1);			// Tells Input Assembly to issue a new model matrix row every instance
+		}
 	}
 
 
