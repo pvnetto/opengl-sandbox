@@ -73,8 +73,8 @@ void AOGL_04_Instancing::OnAttach() {
 	// 3. Creates Vertex Buffer to store per-instance world positions
 	// NOTE: We could have used the same Vertex Buffer that we use for colors, but we created a separate one to make it easier to use different divisors
 	const std::vector<float> worldPositions = GetModels(m_CubeCount);
-	glCreateBuffers(1, &m_PerInstancePositionVertexBuffer);
-	glNamedBufferStorage(m_PerInstancePositionVertexBuffer, worldPositions.size() * sizeof(float), worldPositions.data(), 0);
+	glCreateBuffers(1, &m_PerInstanceModelVertexBuffer);
+	glNamedBufferStorage(m_PerInstanceModelVertexBuffer, worldPositions.size() * sizeof(float), worldPositions.data(), 0);
 
 	// 4. Creates Vertex Array to store both per-vertex and per-instance layout attributes
 	glCreateVertexArrays(1, &m_VertexArray);
@@ -114,7 +114,7 @@ void AOGL_04_Instancing::OnAttach() {
 	{
 		const int modelMatrixBufferBindingPoint = 2;
 		const int modelStride = 16 * sizeof(float);
-		glVertexArrayVertexBuffer(m_VertexArray, modelMatrixBufferBindingPoint, m_PerInstancePositionVertexBuffer, NULL, modelStride);
+		glVertexArrayVertexBuffer(m_VertexArray, modelMatrixBufferBindingPoint, m_PerInstanceModelVertexBuffer, NULL, modelStride);
 
 		for (int i = 0; i < 4; i++) {
 			const int attributeIndex = baseAttributeIndex + i + 1;
@@ -205,5 +205,5 @@ void AOGL_04_Instancing::OnDetach() {
 	glDeleteVertexArrays(1, &m_VertexArray);
 	glDeleteBuffers(1, &m_MeshVertexBuffer);
 	glDeleteBuffers(1, &m_PerInstanceColorVertexBuffer);
-	glDeleteBuffers(1, &m_PerInstancePositionVertexBuffer);
+	glDeleteBuffers(1, &m_PerInstanceModelVertexBuffer);
 }

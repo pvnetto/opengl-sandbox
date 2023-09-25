@@ -1,0 +1,46 @@
+#version 450 core
+
+// 0. Determines how many vertices each Patch contains
+layout (vertices = 3) out;
+
+in VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} inControlPoints[];
+
+// 1. Outputs an array with one element for each control point inside the patch
+out ControlShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} outControlPoints[];
+
+uniform vec2 u_MousePos;
+
+// (OPTIONAL) Modulates the Tessellation Level according to the distance between the mouse and the center of the screen
+float GetTessellationLevel() {
+    vec2 screenCenter = vec2(0.5);
+    float invDistanceFromCenter = 0.5 - distance(u_MousePos, screenCenter);
+    return max(1.0, 1.0 + floor(invDistanceFromCenter * 8.0));
+}
+
+void main() {
+    // 2. This is invoked once per-control point, so we're assigning the outputs for each of them, which in this case is just
+    // forwarding attributes from the Vertex Shader.
+    // 
+    // gl_InvocationID: Refers to the index of a control point on the patch that's being processed
+    // 
+    outControlPoints[gl_InvocationID].worldPosition   = inControlPoints[gl_InvocationID].worldPosition;
+    outControlPoints[gl_InvocationID].uv              = inControlPoints[gl_InvocationID].uv;
+    outControlPoints[gl_InvocationID].normal          = inControlPoints[gl_InvocationID].normal;
+
+    // 2. Sets Outer Tessellation Levels (3 outer levels per triangle patch)
+    float tessellationLevel = GetTessellationLevel();
+    gl_TessLevelOuter[0] = tessellationLevel;
+    gl_TessLevelOuter[1] = tessellationLevel;
+    gl_TessLevelOuter[2] = tessellationLevel;
+
+    // 3. Sets Inner Tessellation Levels (1 inner level per triangle patch)
+    gl_TessLevelInner[0] = tessellationLevel;
+}

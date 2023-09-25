@@ -5,7 +5,7 @@
 #include "shared/layers/Layer.h"
 #include "shared/renderer/SimpleRenderer.h"
 
-class AOGL_04_Instancing : public Layer {
+class AOGL_05_GeometryShading : public Layer {
 public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -20,11 +20,7 @@ private:
 
 	unsigned int m_VertexArray;
 	unsigned int m_MeshVertexBuffer;
-	unsigned int m_PerInstanceColorVertexBuffer;
-	unsigned int m_PerInstanceModelVertexBuffer;
 
 private:
 	Camera m_Camera;
-
-	int m_CubeCount = 256;
 };

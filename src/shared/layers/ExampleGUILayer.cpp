@@ -27,6 +27,8 @@
 #include "examples/advancedogl/02_Blending.h"
 #include "examples/advancedogl/03_Antialiasing.h"
 #include "examples/advancedogl/04_Instancing.h"
+#include "examples/advancedogl/05_GeometryShading.h"
+#include "examples/advancedogl/06_Tessellation.h"
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {AdvancedOpenGL, "Advanced OpenGL"}};
@@ -62,8 +64,8 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_02_Blending,			"02 - Blending");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_03_Antialiasing,		"03 - Antialiasing");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_04_Instancing,			"04 - Instancing");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Tessellation Shading");
-	//ADD_SIMPLE(AdvancedOpenGL, LOGL_13_Meshes, "Geometry Shading");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_05_GeometryShading,		"05 - Geometry Shading");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_06_Tessellation,		"06 - Tessellation Shading");
 }
 
 void ExampleGUILayer::OnImGuiRender() {

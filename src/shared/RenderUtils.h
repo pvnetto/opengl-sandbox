@@ -14,7 +14,7 @@ namespace Utils {
 		// Number of indices. Each index is an uint.
 		std::size_t NumIndices = 0;
 
-		// Number of elements in the Vertices array
+		// Number of elements in the Vertices array (position + uv + normals = 8 elements per vertex)
 		std::size_t VerticesSize = 0;
 		
 		spr::VertexAttributeLayout Layout;

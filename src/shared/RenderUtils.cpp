@@ -8,29 +8,6 @@
 
 namespace Utils {
 
-	PrimitiveData GetQuadData() {
-		// clang-format off
-		static float vertices[] = {
-			// Position					// UVs
-			-0.5f, -0.5f, 0.0f,         0.0f, 0.0f,
-			0.5f, -0.5f, 0.0f,          1.0f, 0.0f,
-			0.5f, 0.5f, 0.0f,           1.0f, 1.0f,
-			-0.5f, 0.5f, 0.0f,          0.0f, 1.0f,
-		};
-
-		static unsigned int indices[] = {
-			0, 1, 2,
-			2, 3, 0,
-		};
-		// clang-format on
-		static PrimitiveData quad;
-		quad.Vertices = vertices;
-		quad.VerticesSize = sizeof(vertices);
-		quad.Indices = indices;
-		quad.NumIndices = sizeof(indices);
-		return quad;
-	}
-
 	static spr::VertexAttributeLayout GetMeshLayout() {
 		spr::VertexAttributeLayout layout;
 		layout.begin()
@@ -39,6 +16,34 @@ namespace Utils {
 		    .add({"inNormal", spr::AttributeType::Float, 3})
 		    .end();
 		return layout;
+	}
+
+	PrimitiveData GetQuadData() {
+		// clang-format off
+		static float vertices[] = {
+			// Position					// UVs				// Normals (probably incorrect!)
+			-0.5f, -0.5f, 0.0f,         0.0f, 0.0f,			0.f, 0.f, 1.f,
+			0.5f, -0.5f, 0.0f,          1.0f, 0.0f,			0.f, 0.f, 1.f,
+			0.5f, 0.5f, 0.0f,           1.0f, 1.0f,			0.f, 0.f, 1.f,
+			-0.5f, 0.5f, 0.0f,          0.0f, 1.0f,			0.f, 0.f, 1.f,
+		};
+
+		static unsigned int indices[] = {
+			0, 1, 2,
+			2, 3, 0,
+		};
+		// clang-format on
+
+		static PrimitiveData quad;
+		quad.Layout = GetMeshLayout();
+
+		quad.Vertices = vertices;
+		quad.VerticesSize = sizeof(vertices) / sizeof(float);
+		quad.NumVertices = quad.VerticesSize / (quad.Layout.getStride() / sizeof(float));
+		
+		quad.Indices = indices;
+		quad.NumIndices = sizeof(indices) / sizeof(unsigned int);
+		return quad;
 	}
 
 	PrimitiveData GetCubeData() {
@@ -89,10 +94,12 @@ namespace Utils {
 		// clang-format on
 
 		static PrimitiveData cube;
-		cube.Vertices = vertices;
 		cube.Layout = GetMeshLayout();
+
+		cube.Vertices = vertices;
 		cube.VerticesSize = sizeof(vertices) / sizeof(float);
 		cube.NumVertices = cube.VerticesSize / (cube.Layout.getStride() / sizeof(float));
+		
 		return cube;
 	}
 

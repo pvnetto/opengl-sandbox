@@ -168,4 +168,9 @@ namespace spr {
 		return s_State.Height;
 	}
 
+	glm::vec2 getMousePos() {
+		return s_State.LastMousePos;
+	}
+
+
 }

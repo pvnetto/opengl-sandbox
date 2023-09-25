@@ -59,10 +59,13 @@ set(SANDBOX_SOURCES
 		examples/advancedogl/01_StencilBuffers.cpp
 		examples/advancedogl/01_DepthBuffers.cpp
 		examples/advancedogl/02_Blending.cpp
-		examples/advancedogl/03_Antialiasing.cpp)
+		examples/advancedogl/03_Antialiasing.cpp
+		examples/advancedogl/04_Instancing.cpp
+		examples/advancedogl/05_GeometryShading.cpp
+		examples/advancedogl/06_Tessellation.cpp)
 
 
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/advancedogl/04_Instancing.cpp")
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 # sets OpenGL policy to prioritize newer versions over legacy when both are found
 cmake_policy(SET CMP0072 NEW)

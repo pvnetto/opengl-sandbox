@@ -5,7 +5,7 @@
 #include "shared/layers/Layer.h"
 #include "shared/renderer/SimpleRenderer.h"
 
-class AOGL_04_Instancing : public Layer {
+class AOGL_06_Tessellation : public Layer {
 public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
@@ -13,18 +13,18 @@ public:
 
 private:
 	void CreateShaderProgram();
+	void CompileShaderAndAttach(const char *shaderPath, int shaderType);
 
 private:
-	Utils::PrimitiveData m_CubeData;
-	unsigned int m_ShaderProgram;
+	Utils::PrimitiveData m_QuadData;
+	unsigned int m_TessellatedShaderProgram;
 
+	unsigned int m_QuadVertexBuffer;
+	unsigned int m_QuadIndexBuffer;
 	unsigned int m_VertexArray;
-	unsigned int m_MeshVertexBuffer;
-	unsigned int m_PerInstanceColorVertexBuffer;
-	unsigned int m_PerInstanceModelVertexBuffer;
 
 private:
 	Camera m_Camera;
+	bool m_bIsTessellationEnabled = true;
 
-	int m_CubeCount = 256;
 };

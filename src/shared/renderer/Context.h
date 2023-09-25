@@ -37,8 +37,11 @@ namespace spr {
     bool isWindowOpen();
 
     GLFWwindow* getWindow();
+
     glm::vec2 getWindowSize();
     int getWindowWidth();
     int getWindowHeight();
+
+    glm::vec2 getMousePos();
 
 }

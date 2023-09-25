@@ -1,0 +1,50 @@
+#version 450 core
+
+// 0. Sets attributes for the fixed-function Tessellator:
+//		- a. The type of primitive that will be generated, in this case triangles;
+//		- b. How to space the new vertices along the primitive's edges;
+//		- c. Winding order for the new vertices (clockwise or counterclockwise), in this case it's counterclockwise;
+// Primitives output from the Tessellator are then passed to this shader.
+layout (triangles, equal_spacing, ccw) in;
+
+// 1. Declares inputs for the Evaluation Shader
+// This shader is executed per-vertex of the tessellated primitive, but it has access to the values output by the Control Shader,
+// so every vertex processed by this Shader should get the same patch as input, which is the patch that requested the generation of said primitive.
+in ControlShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} patchControlPoints[];
+
+
+// 2. Declares outputs from this shader exactly the same as the ones we're using on the Vertex Shader. This not only makes sense from a logical
+// standpoint, as the Evaluation Shader is basically a Vertex Shader for tessellated primitives, but also has the added benefit that we can use the
+// same Geometry Shader even if tessellation is disabled, as it will receive the same Interface Block as input.
+out VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;    
+} evaluationOutput;
+
+uniform mat4 view;
+uniform mat4 projection;
+
+vec2 interpolate2D(vec2 v0, vec2 v1, vec2 v2)                                                   
+{                                                                                               
+    return vec2(gl_TessCoord.x) * v0 + vec2(gl_TessCoord.y) * v1 + vec2(gl_TessCoord.z) * v2;   
+}                                                                                               
+                                                                                                
+vec3 interpolate3D(vec3 v0, vec3 v1, vec3 v2)                                                   
+{                                                                                               
+    return vec3(gl_TessCoord.x) * v0 + vec3(gl_TessCoord.y) * v1 + vec3(gl_TessCoord.z) * v2;   
+}
+
+void main() {
+    // 3. Interpolates vertex with its patch's control points, thus transforming the vertex to NDC
+    evaluationOutput.worldPosition = interpolate3D(patchControlPoints[0].worldPosition, patchControlPoints[1].worldPosition, patchControlPoints[2].worldPosition);
+    evaluationOutput.uv = interpolate2D(patchControlPoints[0].uv, patchControlPoints[1].uv, patchControlPoints[2].uv);
+    evaluationOutput.normal = interpolate3D(patchControlPoints[0].normal, patchControlPoints[1].normal, patchControlPoints[2].normal);
+    evaluationOutput.normal = normalize(evaluationOutput.normal);
+
+    gl_Position = projection * view * vec4(evaluationOutput.worldPosition.xyz, 1.0);
+}
