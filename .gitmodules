@@ -1,5 +1,5 @@
 [submodule "vendor/glfw"]
-	path = vendor/glfw
+	path = modules/spw/vendor/glfw
 	url = https://github.com/glfw/glfw.git
 [submodule "vendor/glm"]
 	path = vendor/glm
