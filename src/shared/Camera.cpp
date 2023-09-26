@@ -11,7 +11,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 rotationEuler, glm::vec3 up) {
 }
 
 glm::mat4 Camera::GetView() const {
-	// Calculates LookAt matrix manually instead of using glm. Check "Basics - Camera" docs for more info.
+	// Calculates LookAt matrix manually instead of using glm::lookAt, just for reference
 	glm::vec3 cameraDirectionInv = -m_Forward;
 	glm::vec3 cameraLeft = glm::normalize(glm::cross(m_WorldUp, cameraDirectionInv));
 	glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirectionInv, cameraLeft));
