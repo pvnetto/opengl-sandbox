@@ -1,7 +1,10 @@
 #include "11_Emission_Map.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
+#include <spw/SimpleWindow.h>
 
 #include <imgui.h>
 #include <iostream>
@@ -50,9 +53,9 @@ void LOGL_11_EmissionMap::OnAttach() {
 void LOGL_11_EmissionMap::OnUpdate() {
     m_Controller.HandleKeyboardInput();
 
-	glm::vec3 lightSourcePos = glm::vec3(std::cos(spr::runtime::getTime()),
-	                                     std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
-	                                     std::sin(spr::runtime::getTime()) * 2.f);
+	glm::vec3 lightSourcePos = glm::vec3(std::cos(Runtime::get()->getTime()),
+	                                     std::cos(Runtime::get()->getTime()) * std::sin(Runtime::get()->getTime()),
+	                                     std::sin(Runtime::get()->getTime()) * 2.f);
 
 	glm::mat4 sourceModel(1.0f);
 	sourceModel = glm::translate(sourceModel, lightSourcePos);
@@ -70,8 +73,8 @@ void LOGL_11_EmissionMap::OnUpdate() {
 
 
 	glm::mat4 litModel(1.0f);
-	litModel = glm::rotate(litModel, spr::runtime::getTime() * 0.3f, glm::vec3(0.0f, 0.0f, 1.0f));
-	litModel = glm::rotate(litModel, spr::runtime::getTime() * 0.12f, glm::vec3(0.0f, 1.0f, 0.0f));
+	litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.3f, glm::vec3(0.0f, 0.0f, 1.0f));
+	litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.12f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 
 	{
@@ -83,7 +86,7 @@ void LOGL_11_EmissionMap::OnUpdate() {
 		spr::setTexture(matrixUnit, m_MatrixTexture);
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 12.f;
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -139,6 +142,6 @@ void LOGL_11_EmissionMap::OnImGuiRender() {
     ImGui::End();
 }
 
-void LOGL_11_EmissionMap::OnEvent(Event &evt) {
+void LOGL_11_EmissionMap::OnEvent(const Event&evt) {
     m_Controller.HandleEvent(evt);
 }

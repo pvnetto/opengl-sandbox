@@ -2,7 +2,9 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/Utils.h"
-#include "shared/renderer/OpenGL/Helpers.h"
+#include "spr/OpenGL/Helpers.h"
+
+#include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -18,8 +20,8 @@ void AOGL_06_Tessellation::OnAttach() {
 	    glm::vec3(0.f, -90.f, 0.f),
 	    glm::vec3(0.f, 1.f, 0.f));
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const float aspectRatio = windowSize.x / windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const float aspectRatio = windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
 	m_QuadData = Utils::GetQuadData();
@@ -114,9 +116,12 @@ void AOGL_06_Tessellation::OnUpdate() {
 	glUniform4fv(colorLocation, 1, glm::value_ptr(color));
 
 	// (OPTIONAL) Pass mouse position to shader as an uniform
-	const glm::vec2 mousePos = spr::getMousePos();
-	const glm::vec2 screenSize = spr::getWindowSize();
-	const glm::vec2 screenPos = mousePos / screenSize;
+	const spw::Vec2i mousePos = spw::getMousePos();
+	const spw::Vec2i screenSize = spw::getWindowSize();
+	const glm::vec2 screenPos {
+		mousePos.X / screenSize.X,
+		mousePos.Y / screenSize.Y,
+	};
 	unsigned int mousePosLocation = glGetUniformLocation(m_TessellatedShaderProgram, "u_MousePos");
 	glUniform2fv(mousePosLocation, 1, glm::value_ptr(screenPos));
 

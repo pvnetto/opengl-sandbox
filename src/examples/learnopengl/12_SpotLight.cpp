@@ -1,6 +1,7 @@
 #include "12_SpotLight.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Runtime.h"
 
 #include <imgui.h>
 #include <iostream>
@@ -73,7 +74,7 @@ void LOGL_12_SpotLight::OnUpdate() {
 		spr::setTexture(specularUnit, m_ContainerSpecularTexture);
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		const float cutoffAngleRadians = glm::radians(m_Light.CutoffAngle);
 		const float shadowSmoothAngleRadians = glm::radians(m_Light.ShadowSmoothAngle);
 		spr::setUniform(m_ViewPositionUniform, glm::value_ptr(m_Camera.GetPosition()));
@@ -161,6 +162,6 @@ void LOGL_12_SpotLight::OnImGuiRender() {
 	ImGui::End();
 }
 
-void LOGL_12_SpotLight::OnEvent(Event &evt) {
+void LOGL_12_SpotLight::OnEvent(const Event&evt) {
     m_Controller.HandleEvent(evt);
 }

@@ -3,7 +3,7 @@
 #include "shared/Camera.h"
 #include "shared/RenderUtils.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 class AOGL_06_Tessellation : public Layer {
 public:

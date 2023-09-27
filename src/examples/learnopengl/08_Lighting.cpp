@@ -1,7 +1,9 @@
 #include "08_Lighting.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
 
 #include <imgui.h>
 #include <iostream>
@@ -32,10 +34,11 @@ void LOGL_08_Lighting::OnAttach() {
 
 void LOGL_08_Lighting::OnUpdate() {
 	// 1. Draws light source
+	const float currentTime = Runtime::get()->getTime();
 	glm::vec3 orbitPosition = glm::vec3(
-	    std::cos(spr::runtime::getTime()),
-	    std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
-	    std::sin(spr::runtime::getTime()) * 2.f);
+	    std::cos(currentTime),
+	    std::cos(currentTime) * std::sin(currentTime),
+	    std::sin(currentTime) * 2.f);
 
 	glm::mat4 sourceModel(1.0f);
 	sourceModel = glm::translate(sourceModel, orbitPosition);
@@ -50,9 +53,9 @@ void LOGL_08_Lighting::OnUpdate() {
 
 	// 2. Draws lit object
 	glm::mat4 litModel(1.0f);
-	litModel = glm::rotate(litModel, (float)glfwGetTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	litModel = glm::rotate(litModel, (float)glfwGetTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	litModel = glm::rotate(litModel, (float)glfwGetTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+	litModel = glm::rotate(litModel, currentTime * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	litModel = glm::rotate(litModel, currentTime * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	litModel = glm::rotate(litModel, currentTime * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 	spr::setVertexBuffer(m_CubeVertexBuffer);
 	spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));

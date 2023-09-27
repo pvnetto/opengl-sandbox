@@ -1,7 +1,9 @@
 #include "10_Material.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
 
 #include <imgui.h>
 #include <iostream>
@@ -41,9 +43,9 @@ void LOGL_10_Material::OnAttach() {
 
 void LOGL_10_Material::OnUpdate() {
 	m_Controller.HandleKeyboardInput();
-	glm::vec3 lightSourcePos = glm::vec3(std::cos(spr::runtime::getTime()),
-	                                     std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
-	                                     std::sin(spr::runtime::getTime()) * 2.f);
+	glm::vec3 lightSourcePos = glm::vec3(std::cos(Runtime::get()->getTime()),
+	                                     std::cos(Runtime::get()->getTime()) * std::sin(Runtime::get()->getTime()),
+	                                     std::sin(Runtime::get()->getTime()) * 2.f);
 
 	glm::mat4 sourceModel(1.0f);
 	sourceModel = glm::translate(sourceModel, lightSourcePos);
@@ -58,8 +60,8 @@ void LOGL_10_Material::OnUpdate() {
 
 
 	glm::mat4 litModel(1.0f);
-	litModel = glm::rotate(litModel, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	litModel = glm::rotate(litModel, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	litModel = glm::rotate(litModel, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	spr::setVertexBuffer(m_CubeVertexBuffer);
 	spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
@@ -125,6 +127,6 @@ void LOGL_10_Material::OnImGuiRender() {
 	ImGui::End();
 }
 
-void LOGL_10_Material::OnEvent(Event &evt) {
+void LOGL_10_Material::OnEvent(const Event&evt) {
 	m_Controller.HandleEvent(evt);
 }

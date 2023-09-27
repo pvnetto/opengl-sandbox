@@ -1,6 +1,9 @@
 #include "01_StencilBuffers.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -37,8 +40,8 @@ void AOGL_01_StencilBuffers::OnAttach() {
 
 	glCreateFramebuffers(1, &m_Framebuffer);
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const int windowWidth = windowSize.x, windowHeight = windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const int windowWidth = windowSize.X, windowHeight = windowSize.Y;
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorBufferTexture);
 	glTextureStorage2D(m_ColorBufferTexture, 1, GL_RGB8, windowWidth, windowHeight);
 
@@ -94,10 +97,10 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		// 1 1 0 0 0 0 1 1
 		// 1 1 1 1 1 1 1 1
 		// 1 1 1 1 1 1 1 1
-		const glm::vec2 windowSize = spr::getWindowSize();
-		spr::setUniform(m_ResolutionUniform, glm::value_ptr(windowSize));
+		const spw::Vec2i windowSize = spw::getWindowSize();
+		spr::setUniform(m_ResolutionUniform, &windowSize);
 
-		const float currentTime = (float)glfwGetTime();
+		const float currentTime = Runtime::get()->getTime();
 		spr::setUniform(m_TimeUniform, &currentTime);
 
 		const auto &quadMesh = m_QuadModel.Meshes[0];
@@ -119,9 +122,9 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		// (OPTIONAL) Reenables writing to the Color Buffer.
 		//glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-		glm::vec3 lightSourcePos = glm::vec3(std::cos(spr::runtime::getTime()),
-		                                     std::cos(spr::runtime::getTime()) * std::sin(spr::runtime::getTime()),
-		                                     std::sin(spr::runtime::getTime()) * 2.f);
+		glm::vec3 lightSourcePos = glm::vec3(std::cos(Runtime::get()->getTime()),
+		                                     std::cos(Runtime::get()->getTime()) * std::sin(Runtime::get()->getTime()),
+		                                     std::sin(Runtime::get()->getTime()) * 2.f);
 
 		glm::mat4 sourceModel(1.0f);
 		sourceModel = glm::translate(sourceModel, lightSourcePos);
@@ -135,9 +138,9 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		spr::submit(m_LightSourceShaderProgram);
 
 		glm::mat4 litModel(1.0f);
-		litModel = glm::rotate(litModel, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-		litModel = glm::rotate(litModel, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-		litModel = glm::rotate(litModel, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
 		spr::setVertexBuffer(m_CubeVertexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));

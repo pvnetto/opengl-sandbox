@@ -3,7 +3,7 @@
 #include "shared/Light.h"
 #include "shared/FreeCameraController.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 class LOGL_12_MultipleLights : public Layer {
 public:
@@ -11,7 +11,7 @@ public:
 	virtual void OnDetach() override;
 	virtual void OnUpdate() override;
 	virtual void OnImGuiRender() override;
-	virtual void OnEvent(Event &evt) override;
+	virtual void OnEvent(const Event&evt) override;
 
 private:
 	Camera m_Camera;

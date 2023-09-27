@@ -2,7 +2,7 @@
 
 #include "shared/layers/Layer.h"
 #include "shared/FreeCameraController.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 class LOGL_09_Phong : public Layer {
 public:
@@ -10,7 +10,7 @@ public:
 	virtual void OnDetach() override;
     virtual void OnUpdate() override;
     virtual void OnImGuiRender() override;
-    virtual void OnEvent(Event& evt) override;
+    virtual void OnEvent(const Event& evt) override;
 
 private:
     Camera m_Camera;

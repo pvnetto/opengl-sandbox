@@ -3,7 +3,7 @@
 #include "shared/FreeCameraController.h"
 #include "shared/RenderUtils.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 
 class LOGL_13_Meshes : public Layer {
@@ -14,7 +14,7 @@ public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;
     virtual void OnUpdate() override;
-	virtual void OnEvent(Event& evt) override;
+	virtual void OnEvent(const Event& evt) override;
 
 	Camera& GetCamera() { return m_Camera; }
 

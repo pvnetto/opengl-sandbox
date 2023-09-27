@@ -1,6 +1,6 @@
 #include "04_Textures.h"
 #include "shared/Utils.h"
-#include "shared/renderer/OpenGL/Helpers.h"
+#include "spr/OpenGL/Helpers.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>

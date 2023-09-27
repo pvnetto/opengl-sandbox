@@ -1,7 +1,10 @@
 #include "06_MVP.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
+#include <spr/SimpleRenderer.h>
 
 #include <imgui.h>
 #include <iostream>
@@ -43,9 +46,9 @@ void LOGL_06_MVP::OnUpdate() {
 	// 1. Creates Model matrix
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_Position);
-	model = glm::rotate(model, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, m_Scale);
 
 	// 2. Creates View matrix
@@ -54,7 +57,7 @@ void LOGL_06_MVP::OnUpdate() {
 
 	// 3. Creates Projection matrix
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float) (spr::getWindowWidth() / spr::getWindowHeight());
+	const float aspectRatio = (float) (spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f;
 	const float far = 100.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);

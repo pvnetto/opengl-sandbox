@@ -2,7 +2,10 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+
+#include <spr/SimpleRenderer.h>
+
+#include <glm/glm.hpp>
 
 class AOGL_01_Framebuffers : public Layer {
 public:

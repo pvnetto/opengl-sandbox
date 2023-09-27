@@ -2,7 +2,7 @@
 
 #include "shared/Camera.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 class LOGL_08_Lighting : public Layer {
 public:

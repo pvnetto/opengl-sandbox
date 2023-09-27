@@ -1,5 +1,6 @@
 #include "03_Shaders.h"
 
+#include "shared/Runtime.h"
 #include "shared/Utils.h"
 
 #include <glad/glad.h>
@@ -46,7 +47,7 @@ void LOGL_03_Shaders::OnAttach() {
 }
 
 void LOGL_03_Shaders::OnUpdate() {
-	const float horizontalOffset = (float) std::sin(glfwGetTime()) * 1.0f;
+	const float horizontalOffset = (float) std::sin(Runtime::get()->getTime()) * 1.0f;
 	spr::setUniform(m_Uniform, &horizontalOffset);
 	spr::setVertexBuffer(m_TriangleVertexBuffer);
 	spr::submit(m_ShaderProgram);

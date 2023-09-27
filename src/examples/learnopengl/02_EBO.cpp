@@ -1,6 +1,5 @@
 #include "02_EBO.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <iostream>
 

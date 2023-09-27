@@ -1,6 +1,8 @@
 #pragma once
-#include "Event.h"
+
 #include "Camera.h"
+
+#include <spw/Event.h>
 
 class FreeCameraController {
 public:
@@ -8,7 +10,7 @@ public:
     FreeCameraController(Camera& camera, float speed);
 
     void OnUpdate();
-    void HandleEvent(Event& evt);
+    void HandleEvent(const Event& evt);
     void HandleKeyboardInput();
 
 private:

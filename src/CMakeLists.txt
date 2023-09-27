@@ -4,30 +4,8 @@ set(SANDBOX_SOURCES
 		shared/FreeCameraController.cpp
 		shared/ModelLoader.cpp
 		shared/RenderUtils.cpp
+		shared/Runtime.cpp
 		shared/Utils.cpp
-
-		shared/renderer/SimpleRenderer.cpp
-		shared/renderer/Context.cpp
-		shared/renderer/FrameDataManager.cpp
-				
-		shared/renderer/Inputs.cpp
-		shared/renderer/Runtime.cpp
-		shared/renderer/Utils.cpp
-		shared/renderer/ResourceManager/ResourceManager.cpp
-		shared/renderer/ResourceManager/SamplerInfo.cpp
-		shared/renderer/ResourceManager/UniformManager.cpp
-		shared/renderer/ResourceManager/VertexAttributeLayout.cpp
-
-		shared/renderer/OpenGL/RendererContextGL.cpp
-		shared/renderer/OpenGL/Helpers.cpp
-		shared/renderer/OpenGL/ResourceManager/ResourceManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/VertexBufferManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/IndexBufferManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/UniformManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/ShaderManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/ProgramManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/TextureManagerGL.cpp
-		shared/renderer/OpenGL/ResourceManager/TextureUtilsGL.cpp
 
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
@@ -67,23 +45,19 @@ set(SANDBOX_SOURCES
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
-# sets OpenGL policy to prioritize newer versions over legacy when both are found
-cmake_policy(SET CMP0072 NEW)
-find_package(OpenGL REQUIRED)			# check https://stackoverflow.com/a/67307380
-
-target_link_libraries(Sandbox glfw)
-target_link_libraries(Sandbox glad)
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)
-target_link_libraries(Sandbox OpenGL::GL)
 target_link_libraries(Sandbox assimp)
 target_link_libraries(Sandbox stb)
+target_link_libraries(Sandbox spw)
+target_link_libraries(Sandbox spr)
 
 target_compile_definitions(Sandbox PRIVATE GLFW_INCLUDE_NONE)
 
 target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glfw/include
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/modules/spr
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/modules/spw
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glad/include
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui

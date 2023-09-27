@@ -1,6 +1,9 @@
 #include "01_Framebuffers.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtx/transform.hpp>
@@ -32,8 +35,8 @@ void AOGL_01_Framebuffers::OnAttach() {
 	glCreateFramebuffers(1, &m_Framebuffer);
 
 	// 1. Creates Texture Object to use as a Color Buffer
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const int windowWidth = windowSize.x, windowHeight = windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const int windowWidth = windowSize.X, windowHeight = windowSize.Y;
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorBufferTexture);
 	glTextureStorage2D(m_ColorBufferTexture, 1, GL_RGB8, windowWidth, windowHeight);
 
@@ -54,16 +57,16 @@ void AOGL_01_Framebuffers::OnAttach() {
 void AOGL_01_Framebuffers::OnUpdate() {
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_Position);
-	model = glm::rotate(model, spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, m_Scale);
 
 	glm::mat4 view(1.0f);
 	view = glm::translate(view, -m_CameraPosition);
 
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
+	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f;
 	const float far = 100.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);

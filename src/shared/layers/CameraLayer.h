@@ -12,7 +12,7 @@ public:
 	CameraLayer(glm::vec3 position, glm::vec3 rotationEuler, glm::vec3 up);
 	~CameraLayer();
 
-	virtual void OnEvent(Event& evt) override;
+	virtual void OnEvent(const Event& evt) override;
 
 	const Camera& GetCamera() { return camera; }
 

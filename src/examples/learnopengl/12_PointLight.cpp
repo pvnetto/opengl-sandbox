@@ -1,6 +1,7 @@
 #include "12_PointLight.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Runtime.h"
 
 #include <imgui.h>
 #include <iostream>
@@ -50,7 +51,7 @@ void LOGL_12_PointLight::OnUpdate() {
 	m_Controller.HandleKeyboardInput();
 
 	glm::mat4 sourceModel(1.0f);
-	glm::vec3 lightSourcePos{0.f, 0.f, glm::cos(spr::runtime::getTime() * 1.5f) * -3.f};
+	glm::vec3 lightSourcePos{0.f, 0.f, glm::cos(Runtime::get()->getTime() * 1.5f) * -3.f};
 	if (m_Static) {
         lightSourcePos = m_Light.Position;
 	}
@@ -77,7 +78,7 @@ void LOGL_12_PointLight::OnUpdate() {
 		spr::setTexture(specularUnit, m_ContainerSpecularTexture);
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -179,6 +180,6 @@ void LOGL_12_PointLight::OnImGuiRender() {
 	ImGui::End();
 }
 
-void LOGL_12_PointLight::OnEvent(Event &evt) {
+void LOGL_12_PointLight::OnEvent(const Event&evt) {
 	m_Controller.HandleEvent(evt);
 }

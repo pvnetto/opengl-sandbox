@@ -2,6 +2,8 @@
 
 #include "shared/RenderUtils.h"
 
+#include <spw/SimpleWindow.h>
+
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -18,8 +20,8 @@ void AOGL_03_Antialiasing::OnAttach() {
 	    glm::vec3(0.f, 1.f, 0.f));
 	m_LastSampleCountOption = m_SampleCountOption;
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const float aspectRatio = windowSize.x / windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const float aspectRatio = windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
@@ -41,14 +43,14 @@ void AOGL_03_Antialiasing::OnAttach() {
 
 void AOGL_03_Antialiasing::CreateMSAAFramebuffer() {
 	const int sampleCount = std::pow(2, m_SampleCountOption + 1);
-	const glm::vec2 resolution = spr::getWindowSize();
+	const spw::Vec2i resolution = spw::getWindowSize();
 
 	// 1. Creates Multisampled Textures. Note that we're using the GL_TEXTURE_2D_MULTISAMPLE target instead of the usual GL_TEXTURE_2D.
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_MSAAColorTexture);
-	glTextureStorage2DMultisample(m_MSAAColorTexture, sampleCount, GL_RGB8, resolution.x, resolution.y, GL_TRUE);
+	glTextureStorage2DMultisample(m_MSAAColorTexture, sampleCount, GL_RGB8, resolution.X, resolution.Y, GL_TRUE);
 
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_MSAADepthStencilTexture);
-	glTextureStorage2DMultisample(m_MSAADepthStencilTexture, sampleCount, GL_DEPTH24_STENCIL8, resolution.x, resolution.y, GL_TRUE);
+	glTextureStorage2DMultisample(m_MSAADepthStencilTexture, sampleCount, GL_DEPTH24_STENCIL8, resolution.X, resolution.Y, GL_TRUE);
 	
 	// 2. Binds Multisampled Textures to the Framebuffer
 	glCreateFramebuffers(1, &m_MSAAFramebuffer);
@@ -90,7 +92,7 @@ void AOGL_03_Antialiasing::OnUpdate() {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_MSAAFramebuffer);
 
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
+	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f, far = 1000.f;
 	spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 	spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -110,10 +112,10 @@ void AOGL_03_Antialiasing::OnUpdate() {
 
 	// 5. Performs multisample resolve (i.e., blits from a Multisampled Framebuffer to a Non-Multisampled one, in this case the Default Framebuffer)
 	const int defaultFramebuffer = 0;
-	glm::vec2 resolution = spr::getWindowSize();
+	const spw::Vec2i resolution = spw::getWindowSize();
 	glBlitNamedFramebuffer(m_MSAAFramebuffer, defaultFramebuffer,
-	                       0, 0, resolution.x, resolution.y,
-	                       0, 0, resolution.x, resolution.y,
+	                       0, 0, resolution.X, resolution.Y,
+	                       0, 0, resolution.X, resolution.Y,
 	                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	
 	// 6. Binds resolved Default Framebuffer, as this is the one we want to draw

@@ -2,6 +2,8 @@
 
 #include "shared/RenderUtils.h"
 
+#include <spw/SimpleWindow.h>
+
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
@@ -28,8 +30,8 @@ void AOGL_01_DepthBuffers::OnAttach() {
 	// 0. Creates FrameBuffer Object
 	glCreateFramebuffers(1, &m_Framebuffer);
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const int windowWidth = windowSize.x, windowHeight = windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const int windowWidth = windowSize.X, windowHeight = windowSize.Y;
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorBufferTexture);
 	glTextureStorage2D(m_ColorBufferTexture, 1, GL_RGB8, windowWidth, windowHeight);
 
@@ -64,7 +66,7 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 	view = glm::translate(view, -m_CameraPosition);
 
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
+	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f, far = 1000.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
 	spr::setUniform(m_ViewUniform, glm::value_ptr(view));

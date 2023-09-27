@@ -1,7 +1,7 @@
 #pragma once
 
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 class LOGL_05_Transform : public Layer {
 public:

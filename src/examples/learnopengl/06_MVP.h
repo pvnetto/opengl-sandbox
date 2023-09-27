@@ -1,7 +1,9 @@
 #pragma once
 
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+
+#include <spr/SimpleRenderer.h>
+#include <glm/glm.hpp>
 
 class LOGL_06_MVP : public Layer {
 public:

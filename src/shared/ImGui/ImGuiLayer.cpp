@@ -1,12 +1,15 @@
 #include "ImGuiLayer.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <imgui.h>
 
-#include "shared/renderer/SimpleRenderer.h"
+#include <spw/SimpleWindow.h>
+#include <spr/SimpleRenderer.h>
+
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
+
+#include <GLFW/glfw3.h>
 
 ImGuiLayer::ImGuiLayer() : Layer("ImGui Layer") {}
 
@@ -34,7 +37,7 @@ void ImGuiLayer::OnAttach() {
 
 
     // Initializes OpenGL and GLFW
-	ImGui_ImplGlfw_InitForOpenGL(spr::getWindow(), true);
+	ImGui_ImplGlfw_InitForOpenGL((GLFWwindow *) spw::getWindowImpl(), true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 }
 
@@ -45,10 +48,10 @@ void ImGuiLayer::Begin() {
 }
 
 void ImGuiLayer::End() {
-	const auto windowSize = spr::getWindowSize();
+	const auto& windowSize = spw::getWindowSize();
 	
 	ImGuiIO &io = ImGui::GetIO();
-	io.DisplaySize = ImVec2(windowSize.x, windowSize.y);
+	io.DisplaySize = ImVec2(windowSize.X, windowSize.Y);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

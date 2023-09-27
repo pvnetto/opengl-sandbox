@@ -1,6 +1,9 @@
 #include "13_Meshes.h"
 
 #include "shared/Light.h"
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -86,7 +89,7 @@ void LOGL_13_Meshes::OnUpdate() {
 		}
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -135,6 +138,6 @@ void LOGL_13_Meshes::OnDetach() {
 	spr::destroy(m_TimeUniform);
 }
 
-void LOGL_13_Meshes::OnEvent(Event &evt) {
+void LOGL_13_Meshes::OnEvent(const Event&evt) {
 	m_Controller.HandleEvent(evt);
 }

@@ -9,6 +9,6 @@ CameraLayer::CameraLayer(glm::vec3 position, glm::vec3 rotationEuler, glm::vec3 
 
 CameraLayer::~CameraLayer() {}
 
-void CameraLayer::OnEvent(Event& evt) {
+void CameraLayer::OnEvent(const Event& evt) {
 	controller.HandleEvent(evt);
 }

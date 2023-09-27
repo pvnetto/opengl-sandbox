@@ -1,6 +1,9 @@
 #include "02_Blending.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -20,8 +23,8 @@ void AOGL_02_Blending::OnAttach() {
 	OrthographicProps orthographicProperties;
 	orthographicProperties.Size = 6;
 	auto [near, far, size] = orthographicProperties;
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const float aspectRatio = windowSize.x / windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const float aspectRatio = windowSize.X / windowSize.Y;
 	m_Camera.SetOrthographic(size * aspectRatio, size, near, far);
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
@@ -39,7 +42,7 @@ void AOGL_02_Blending::OnAttach() {
 void AOGL_02_Blending::OnUpdate() {
 	// 0. Renders a bunch of cubes at different depths and draws their depth values
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float)(spr::getWindowWidth() / spr::getWindowHeight());
+	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f, far = 1000.f;
 	spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 	spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -50,8 +53,8 @@ void AOGL_02_Blending::OnUpdate() {
 		glDisable(GL_BLEND);
 		const float zPosition = m_OpaquePosition == OpaquePosition_Front ? 0.5f : -0.5f;
 		const glm::vec3 offset{
-		    glm::cos((float)glfwGetTime()),
-		    glm::sin((float)glfwGetTime()), zPosition};
+		    glm::cos(Runtime::get()->getTime()),
+		    glm::sin(Runtime::get()->getTime()), zPosition};
 
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, m_Position + offset * offsetMagnitude);

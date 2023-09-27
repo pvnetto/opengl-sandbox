@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 namespace Utils {
 

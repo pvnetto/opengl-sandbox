@@ -2,7 +2,6 @@
 
 #include <imgui.h>
 
-#include "shared/renderer/SimpleRenderer.h"
 #include "examples/learnopengl/02_EBO.h"
 #include "examples/learnopengl/02_VAO.h"
 #include "examples/learnopengl/02_VBO.h"
@@ -29,6 +28,11 @@
 #include "examples/advancedogl/04_Instancing.h"
 #include "examples/advancedogl/05_GeometryShading.h"
 #include "examples/advancedogl/06_Tessellation.h"
+
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
+#include <spw/SimpleWindow.h>
 
 const std::unordered_map<ExampleCategory, std::string> categoryStr{
     {LearnOpenGL, "LearnOpenGL"}, {AdvancedOpenGL, "Advanced OpenGL"}};
@@ -72,8 +76,8 @@ void ExampleGUILayer::OnImGuiRender() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     float width = 300;
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-    ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + windowSize.x - width, viewport->GetWorkPos().y));
+	const spw::Vec2i windowSize = spw::getWindowSize();
+    ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + windowSize.X - width, viewport->GetWorkPos().y));
     ImGui::SetNextWindowSize(ImVec2(width, viewport->GetWorkSize().y));
 
 	// ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
@@ -83,7 +87,7 @@ void ExampleGUILayer::OnImGuiRender() {
 			for (auto example : m_examples.at((ExampleCategory)i)) {
 				if (ImGui::Selectable(example->m_name.c_str(), m_selected == example)) {
 					m_selected = example;
-					spr::runtime::replaceLayers(m_selected->GetLayers());
+					Runtime::get()->replaceLayers(m_selected->GetLayers());
 				}
 			}
 		}

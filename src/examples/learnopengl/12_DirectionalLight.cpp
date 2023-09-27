@@ -1,7 +1,9 @@
 #include "12_DirectionalLight.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
 
 #include <imgui.h>
 #include <iostream>
@@ -55,7 +57,7 @@ void LOGL_12_DirectionalLight::OnUpdate() {
 		spr::setTexture(specularUnit, m_ContainerSpecularTexture);
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
@@ -110,6 +112,6 @@ void LOGL_12_DirectionalLight::OnImGuiRender() {
     ImGui::End();
 }
 
-void LOGL_12_DirectionalLight::OnEvent(Event &evt) {
+void LOGL_12_DirectionalLight::OnEvent(const Event&evt) {
 	m_Controller.HandleEvent(evt);
 }

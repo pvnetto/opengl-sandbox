@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

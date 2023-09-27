@@ -1,9 +1,10 @@
 #include "SandboxLayer.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
 
-#include <GLFW/glfw3.h>
+#include <spw/SimpleWindow.h>
+#include <spr/SimpleRenderer.h>
+
 #include <glm/gtc/type_ptr.hpp>
 
 void SandboxLayer::OnAttach() {
@@ -20,11 +21,11 @@ void SandboxLayer::OnUpdate() {
 		spr::setVertexBuffer(mesh.VertexBuffer);
 		spr::setIndexBuffer(mesh.IndexBuffer);
 
-		const float currentTime = (float) glfwGetTime();
+		const float currentTime = spw::getTime();
 		spr::setUniform(m_TimeUniform, &currentTime);
 
-		const glm::vec2 resolution = spr::getWindowSize();
-		spr::setUniform(m_ResolutionUniform, glm::value_ptr(resolution));
+		const auto& resolution = spw::getWindowSize();
+		spr::setUniform(m_ResolutionUniform, &resolution);
 		spr::submit(m_ShaderProgram);
 	}
 	spr::render();

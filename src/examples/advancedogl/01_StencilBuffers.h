@@ -2,7 +2,7 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/layers/Layer.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include <spr/SimpleRenderer.h>
 #include "shared/Camera.h"
 #include "shared/FreeCameraController.h"
 

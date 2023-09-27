@@ -1,7 +1,10 @@
 #include "07_Camera.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
+#include <spr/SimpleRenderer.h>
 
 #include <glad/glad.h>
 #include <imgui.h>
@@ -35,7 +38,7 @@ void LOGL_07_Camera::OnAttach() {
 void LOGL_07_Camera::OnUpdate() {
 	if(m_ProjectionType == 0) {
 		auto [fov, near, far] = m_Perspective;
-		m_Camera.SetPerspective(fov, spr::getWindowWidth() / spr::getWindowHeight(), near, far);
+		m_Camera.SetPerspective(fov, spw::getWindowWidth() / spw::getWindowHeight(), near, far);
 	}
 	else if(m_ProjectionType == 1) {
 		auto [near, far, size] = m_Orthographic;
@@ -46,9 +49,9 @@ void LOGL_07_Camera::OnUpdate() {
 
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, glm::vec3(0.f, 1.f, 0.f));
-	model = glm::rotate(model, (float) spr::runtime::getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, (float) spr::runtime::getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, (float) spr::runtime::getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, (float) Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, (float) Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, (float) Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(1.2f, 1.2f, 1.2f));
 
 	const int texUnit = 0, anotherTexUnit = 1;

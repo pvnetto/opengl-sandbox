@@ -1,7 +1,10 @@
 #include "12_MultipleLights.h"
 
 #include "shared/RenderUtils.h"
-#include "shared/renderer/SimpleRenderer.h"
+
+#include "shared/Runtime.h"
+
+#include <spr/SimpleRenderer.h>
 
 #include <iostream>
 
@@ -154,7 +157,7 @@ void LOGL_12_MultipleLights::OnUpdate() {
 		spr::setUniform(m_SpotLightLinearAttenuationUniform, &m_Spotlight.LinearAttenuation);
 		spr::setUniform(m_SpotLightQuadraticAttenuationUniform, &m_Spotlight.QuadraticAttenuation);
 
-		const float time = spr::runtime::getTime();
+		const float time = Runtime::get()->getTime();
 		spr::setUniform(m_TimeUniform, &time);
 	}
 
@@ -215,6 +218,6 @@ void LOGL_12_MultipleLights::OnDetach() {
 void LOGL_12_MultipleLights::OnImGuiRender() {
 }
 
-void LOGL_12_MultipleLights::OnEvent(Event &evt) {
+void LOGL_12_MultipleLights::OnEvent(const Event&evt) {
     m_Controller.HandleEvent(evt);
 }

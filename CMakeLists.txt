@@ -16,3 +16,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${PROJECT_SOURCE_DIR}/src -I${PROJECT_
 
 add_subdirectory(src)
 add_subdirectory(vendor)
+add_subdirectory(modules)

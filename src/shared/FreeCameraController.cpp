@@ -1,56 +1,65 @@
 #include "FreeCameraController.h"
-#include "shared/renderer/SimpleRenderer.h"
+
+#include "shared/Runtime.h"
+
+#include <spw/SimpleWindow.h>
+#include <spw/Inputs.h>
+#include <spr/SimpleRenderer.h>
+
 #define ROTATION_SPEED 6.f
 
 FreeCameraController::FreeCameraController(Camera &camera, float speed) : m_Camera(&camera), m_moveSpeed(speed) {}
 
 void FreeCameraController::HandleKeyboardInput() {
-	glm::vec3 moveDirection(0, 0, 0);
+	glm::vec3 moveDirection { 0, 0, 0 };
 
-	auto window = spr::getWindow();
-	if (spr::input::pressedKey(SPR_KEY_W) == SPR_PRESS) {
+	if (spw::isKeyPressed(spw::KEY_W) == spw::PRESS) {
 		moveDirection = m_Camera->GetForward();
 	}
-	else if (spr::input::pressedKey(SPR_KEY_S) == SPR_PRESS) {
+	else if (spw::isKeyPressed(spw::KEY_S) == spw::PRESS) {
 		moveDirection = -m_Camera->GetForward();
 	}
-	else if (spr::input::pressedKey(SPR_KEY_A) == SPR_PRESS) {
+	else if (spw::isKeyPressed(spw::KEY_A) == spw::PRESS) {
 		moveDirection = -m_Camera->GetRight();
 	}
-	else if (spr::input::pressedKey(SPR_KEY_D) == SPR_PRESS) {
+	else if (spw::isKeyPressed(spw::KEY_D) == spw::PRESS) {
 		moveDirection = m_Camera->GetRight();
 	}
-	else if (spr::input::pressedKey(SPR_KEY_Q) == SPR_PRESS) {
+	else if (spw::isKeyPressed(spw::KEY_Q) == spw::PRESS) {
 		moveDirection = m_Camera->GetUp();
 	}
-	else if (spr::input::pressedKey(SPR_KEY_E) == SPR_PRESS) {
+	else if (spw::isKeyPressed(spw::KEY_E) == spw::PRESS) {
 		moveDirection = -m_Camera->GetUp();
 	}
 
-	m_Camera->AddPosition(moveDirection * m_moveSpeed * spr::runtime::getDeltaTime());
+	m_Camera->AddPosition(moveDirection * m_moveSpeed * Runtime::get()->getDeltaTime());
 }
 
-void FreeCameraController::HandleEvent(Event &evt) {
-	if (MouseMovedEvent *mouseEvt = dynamic_cast<MouseMovedEvent *>(&evt)) {
+void FreeCameraController::HandleEvent(const Event &evt) {
+	if (const MouseMovedEvent *mouseEvt = dynamic_cast<const MouseMovedEvent *>(&evt)) {
 
 		if (m_moving) {
 			// x, y are inverted for rotation
-			glm::vec3 rotationDelta = glm::vec3(mouseEvt->MouseDelta().y, mouseEvt->MouseDelta().x, 0.f);
-			m_Camera->AddRotation(rotationDelta * ROTATION_SPEED * spr::runtime::getDeltaTime());
+			glm::vec3 rotationDelta = glm::vec3(mouseEvt->MouseDelta().Y, mouseEvt->MouseDelta().X, 0.f);
+			m_Camera->AddRotation(rotationDelta * ROTATION_SPEED * Runtime::get()->getDeltaTime());
 		}
 
-		evt.m_handled = true;
+		evt.m_Handled = true;
 	}
-	else if (MouseButtonPressedEvent *pressedEvt = dynamic_cast<MouseButtonPressedEvent *>(&evt)) {
-		if (pressedEvt->GetMouseButton() == GLFW_MOUSE_BUTTON_2) {
+	else if (const MouseButtonPressedEvent *pressedEvt = dynamic_cast<const MouseButtonPressedEvent *>(&evt)) {
+		using namespace spw;
+		
+		if (pressedEvt->GetMouseButton() == MOUSE_BUTTON_RIGHT) {
 			m_moving = true;
-			evt.m_handled = true;
+			evt.m_Handled = true;
 		}
 	}
-	else if (MouseButtonReleasedEvent *releasedEvt = dynamic_cast<MouseButtonReleasedEvent *>(&evt)) {
-		if (releasedEvt->GetMouseButton() == GLFW_MOUSE_BUTTON_2) {
+	else if (const MouseButtonReleasedEvent *releasedEvt = dynamic_cast<const MouseButtonReleasedEvent *>(&evt)) {
+		using namespace spw;
+
+		if (releasedEvt->GetMouseButton() == MOUSE_BUTTON_RIGHT) {
 			m_moving = false;
-			evt.m_handled = true;
+			evt.m_Handled = true;
 		}
 	}
 }

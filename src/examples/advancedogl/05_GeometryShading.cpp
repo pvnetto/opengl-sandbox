@@ -2,7 +2,9 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/Utils.h"
-#include "shared/renderer/OpenGL/Helpers.h"
+#include "spr/OpenGL/Helpers.h"
+
+#include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,8 +19,8 @@ void AOGL_05_GeometryShading::OnAttach() {
 	    glm::vec3(0.f, -90.f, 0.f),
 	    glm::vec3(0.f, 1.f, 0.f));
 
-	const glm::vec2 windowSize = spr::getWindowSize();
-	const float aspectRatio = windowSize.x / windowSize.y;
+	const spw::Vec2i windowSize = spw::getWindowSize();
+	const float aspectRatio = windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
 	m_CubeData = Utils::GetCubeData();
