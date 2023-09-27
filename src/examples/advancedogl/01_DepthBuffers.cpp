@@ -30,7 +30,7 @@ void AOGL_01_DepthBuffers::OnAttach() {
 	// 0. Creates FrameBuffer Object
 	glCreateFramebuffers(1, &m_Framebuffer);
 
-	const spw::Vec2i windowSize = spw::getWindowSize();
+	const spw::Vec2 windowSize = spw::getWindowSize();
 	const int windowWidth = windowSize.X, windowHeight = windowSize.Y;
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorBufferTexture);
 	glTextureStorage2D(m_ColorBufferTexture, 1, GL_RGB8, windowWidth, windowHeight);

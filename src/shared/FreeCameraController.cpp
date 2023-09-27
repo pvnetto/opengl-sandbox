@@ -38,10 +38,12 @@ void FreeCameraController::HandleKeyboardInput() {
 void FreeCameraController::HandleEvent(const Event &evt) {
 	if (const MouseMovedEvent *mouseEvt = dynamic_cast<const MouseMovedEvent *>(&evt)) {
 
-		if (m_moving) {
+		if (m_Moving) {
 			// x, y are inverted for rotation
-			glm::vec3 rotationDelta = glm::vec3(mouseEvt->MouseDelta().Y, mouseEvt->MouseDelta().X, 0.f);
-			m_Camera->AddRotation(rotationDelta * ROTATION_SPEED * Runtime::get()->getDeltaTime());
+			const float currentDeltaTime = Runtime::get()->getDeltaTime();
+			const glm::vec3 rotationDelta = glm::vec3(mouseEvt->MouseDelta().Y, mouseEvt->MouseDelta().X, 0.f);
+			const glm::vec3 rotationVector = rotationDelta * ROTATION_SPEED * currentDeltaTime;
+			m_Camera->AddRotation(rotationVector);
 		}
 
 		evt.m_Handled = true;
@@ -50,7 +52,7 @@ void FreeCameraController::HandleEvent(const Event &evt) {
 		using namespace spw;
 		
 		if (pressedEvt->GetMouseButton() == MOUSE_BUTTON_RIGHT) {
-			m_moving = true;
+			m_Moving = true;
 			evt.m_Handled = true;
 		}
 	}
@@ -58,7 +60,7 @@ void FreeCameraController::HandleEvent(const Event &evt) {
 		using namespace spw;
 
 		if (releasedEvt->GetMouseButton() == MOUSE_BUTTON_RIGHT) {
-			m_moving = false;
+			m_Moving = false;
 			evt.m_Handled = true;
 		}
 	}

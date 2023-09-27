@@ -17,5 +17,5 @@ private:
     Camera* m_Camera;
     float m_moveSpeed;
 
-    bool m_moving = false;
+    bool m_Moving = false;
 };

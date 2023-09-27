@@ -72,7 +72,7 @@ void Runtime::initializeLayers() {
 }
 
 void Runtime::update() {
-	static float lastFrame = 0.f;
+	static float lastFrameTime = 0.f;
 
 	// Executes layers
 	for (Layer *layer : m_Layers) {
@@ -92,13 +92,12 @@ void Runtime::update() {
 	}
 
 	// Calculates delta time
-	const float currentFrame = getTime();
-	m_DeltaTime = currentFrame - lastFrame;
-	lastFrame = currentFrame;
+	const float currentFrameTime = getTime();
+	m_DeltaTime = currentFrameTime - lastFrameTime;
+	lastFrameTime = currentFrameTime;
 
 	// Handles window close event
 	if (spw::isKeyPressed(spw::KEY_ESCAPE) == GLFW_PRESS) {
-		m_bIsActive = false;
 		spw::requestCloseWindow();
 	}
 
@@ -113,8 +112,9 @@ void Runtime::update() {
 void Runtime::broadcastEvent(const Event &evt) {
 	for (auto it = m_Layers.end(); it != m_Layers.begin();) {
 		(*--it)->OnEvent(evt);
-		if (evt.m_Handled)
+		if (evt.m_Handled) {
 			return;
+		}
 	}
 }
 

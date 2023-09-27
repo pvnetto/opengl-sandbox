@@ -15,16 +15,16 @@ int main() {
 		spr::ContextInfo info;
 		info.Width = spw::getWindowWidth();
 		info.Height = spw::getWindowHeight();
+		info.GlLoader = spw::getGlLoaderFn();
 		spr::init(info);
 	}
 
 	// Game Loop
 	{
-		Runtime *runtime = Runtime::get();
-		while (runtime->isActive()) {
+		while (spw::isWindowOpen()) {
 			spr::clear();
 
-			runtime->update();
+			Runtime::get()->update();
 			
 			spw::swapBuffers();
 			spw::pollEvents();

@@ -76,7 +76,7 @@ void ExampleGUILayer::OnImGuiRender() {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     float width = 300;
 
-	const spw::Vec2i windowSize = spw::getWindowSize();
+	const spw::Vec2 windowSize = spw::getWindowSize();
     ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + windowSize.X - width, viewport->GetWorkPos().y));
     ImGui::SetNextWindowSize(ImVec2(width, viewport->GetWorkSize().y));
 

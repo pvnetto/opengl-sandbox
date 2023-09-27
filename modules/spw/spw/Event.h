@@ -4,11 +4,11 @@
 
 namespace spw {
 
-	struct Vec2i {
-		int X, Y;
+	struct Vec2 {
+		float X, Y;
 
-		Vec2i() = default;
-		Vec2i(int inX, int inY) : X(inX), Y(inY) {}
+		Vec2() = default;
+		Vec2(float inX, float inY) : X(inX), Y(inY) {}
 	};
 
 }
@@ -22,18 +22,18 @@ public:
 
 class MouseMovedEvent : public Event {
 public:
-	MouseMovedEvent(double x, double y, spw::Vec2i mouseDelta) : m_MouseX(x), m_MouseY(y), m_MouseDelta(mouseDelta) {}
+	MouseMovedEvent(double x, double y, spw::Vec2 mouseDelta) : m_MouseX(x), m_MouseY(y), m_MouseDelta(mouseDelta) {}
 
 	inline double GetX() { return m_MouseX; }
 	inline double GetY() { return m_MouseY; }
 
-	inline const spw::Vec2i& MouseDelta() const { return m_MouseDelta; }
+	inline const spw::Vec2& MouseDelta() const { return m_MouseDelta; }
 
 	virtual std::string GetName() { return "MouseMoved"; }
 
 private:
 	double m_MouseX, m_MouseY;
-	spw::Vec2i m_MouseDelta;
+	spw::Vec2 m_MouseDelta;
 };
 
 class MouseButtonEvent : public Event {

@@ -23,8 +23,8 @@ void AOGL_02_Blending::OnAttach() {
 	OrthographicProps orthographicProperties;
 	orthographicProperties.Size = 6;
 	auto [near, far, size] = orthographicProperties;
-	const spw::Vec2i windowSize = spw::getWindowSize();
-	const float aspectRatio = windowSize.X / windowSize.Y;
+	const spw::Vec2 windowSize = spw::getWindowSize();
+	const float aspectRatio = (float) windowSize.X / windowSize.Y;
 	m_Camera.SetOrthographic(size * aspectRatio, size, near, far);
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");

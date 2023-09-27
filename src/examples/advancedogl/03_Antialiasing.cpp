@@ -20,8 +20,8 @@ void AOGL_03_Antialiasing::OnAttach() {
 	    glm::vec3(0.f, 1.f, 0.f));
 	m_LastSampleCountOption = m_SampleCountOption;
 
-	const spw::Vec2i windowSize = spw::getWindowSize();
-	const float aspectRatio = windowSize.X / windowSize.Y;
+	const spw::Vec2 windowSize = spw::getWindowSize();
+	const float aspectRatio = (float) windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
@@ -43,7 +43,7 @@ void AOGL_03_Antialiasing::OnAttach() {
 
 void AOGL_03_Antialiasing::CreateMSAAFramebuffer() {
 	const int sampleCount = std::pow(2, m_SampleCountOption + 1);
-	const spw::Vec2i resolution = spw::getWindowSize();
+	const spw::Vec2 resolution = spw::getWindowSize();
 
 	// 1. Creates Multisampled Textures. Note that we're using the GL_TEXTURE_2D_MULTISAMPLE target instead of the usual GL_TEXTURE_2D.
 	glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_MSAAColorTexture);
@@ -112,7 +112,7 @@ void AOGL_03_Antialiasing::OnUpdate() {
 
 	// 5. Performs multisample resolve (i.e., blits from a Multisampled Framebuffer to a Non-Multisampled one, in this case the Default Framebuffer)
 	const int defaultFramebuffer = 0;
-	const spw::Vec2i resolution = spw::getWindowSize();
+	const spw::Vec2 resolution = spw::getWindowSize();
 	glBlitNamedFramebuffer(m_MSAAFramebuffer, defaultFramebuffer,
 	                       0, 0, resolution.X, resolution.Y,
 	                       0, 0, resolution.X, resolution.Y,

@@ -57,8 +57,8 @@ void AOGL_04_Instancing::OnAttach() {
 	    glm::vec3(0.f, -90.f, 0.f),
 	    glm::vec3(0.f, 1.f, 0.f));
 
-	const spw::Vec2i windowSize = spw::getWindowSize();
-	const float aspectRatio = windowSize.X / windowSize.Y;
+	const spw::Vec2 windowSize = spw::getWindowSize();
+	const float aspectRatio = (float) windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
 	m_CubeData = Utils::GetCubeData();

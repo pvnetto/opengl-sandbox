@@ -31,7 +31,6 @@ public:
 
 	float getTime() const;
 	inline float getDeltaTime() const { return m_DeltaTime; }
-	inline bool isActive() const { return m_bIsActive; }
 
 private:
 	void broadcastEvent(const Event &evt);
@@ -43,6 +42,5 @@ private:
 	ExampleGUILayer *m_ExampleLayer = nullptr;
 
 private:
-	bool m_bIsActive = true;
 	float m_DeltaTime = 0.f;
 };

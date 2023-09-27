@@ -8,9 +8,14 @@
 
 namespace spr {
 
+	using GlLoaderResult = void(*)();
+	using GlLoaderFn = GlLoaderResult(*)(const char*);
+
 	struct ContextInfo {
 		int Width = 0;
 		int Height = 0;
+
+		GlLoaderFn GlLoader = nullptr;
 	};
 
     class Context {

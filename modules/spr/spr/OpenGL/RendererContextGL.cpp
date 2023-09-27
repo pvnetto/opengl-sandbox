@@ -1,11 +1,5 @@
 #include "RendererContextGL.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-static_assert(false && "::ERROR: This platform is not supported yet.");
-#endif
-
 #include <spr/Context.h>
 
 #include <glad/glad.h>
@@ -13,7 +7,11 @@ static_assert(false && "::ERROR: This platform is not supported yet.");
 namespace spr {
 
 	void RendererContextGL::init(Context *context, const ContextInfo &info) {
-		if (bool bGladSuccess = gladLoadGLLoader((GLADloadproc) wglGetProcAddress); !bGladSuccess) {
+		// TODO: Instead of getting a loader, assume that the user is creating a window without GLFW and do all loading
+		// inside spr by using the platform-specific API
+		assert(info.GlLoader && "::ERROR: GlLoader was not specified");
+
+		if (bool bGladSuccess = gladLoadGLLoader((GLADloadproc) info.GlLoader); !bGladSuccess) {
 			assert(false && "::ERROR: Failed to load GL");
 		}
 

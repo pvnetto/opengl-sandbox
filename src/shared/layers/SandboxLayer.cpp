@@ -24,7 +24,7 @@ void SandboxLayer::OnUpdate() {
 		const float currentTime = spw::getTime();
 		spr::setUniform(m_TimeUniform, &currentTime);
 
-		const auto& resolution = spw::getWindowSize();
+		const spw::Vec2 resolution = spw::getWindowSize();
 		spr::setUniform(m_ResolutionUniform, &resolution);
 		spr::submit(m_ShaderProgram);
 	}

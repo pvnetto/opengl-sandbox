@@ -3,6 +3,7 @@
 #include "Event.h"
 
 #include <cassert>
+
 #include <GLFW/glfw3.h>
 
 namespace spw {
@@ -11,7 +12,7 @@ namespace spw {
 		const char *Title;
 		int Width, Height;
 
-		spw::Vec2i LastMousePos;
+		spw::Vec2 LastMousePos;
 		bool MouseFirstMove = true;
 	};
 
@@ -37,8 +38,7 @@ namespace spw {
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-		s_Window = glfwCreateWindow(width, height, windowName, NULL, NULL);
-		if (!s_Window) {
+		if (s_Window = glfwCreateWindow(width, height, windowName, NULL, NULL); !s_Window) {
 			assert(false && "::ERROR: Could not initialize window");
 		}
 
@@ -58,15 +58,15 @@ namespace spw {
 		glfwSetCursorPosCallback(s_Window, [](GLFWwindow *window, double mouseX, double mouseY) {
 			WindowState &state = *(WindowState *)glfwGetWindowUserPointer(window);
 
-			spw::Vec2i mousePos = spw::Vec2i(mouseX, mouseY);
+			spw::Vec2 mousePos = spw::Vec2(mouseX, mouseY);
 			if (state.MouseFirstMove) {
 				state.LastMousePos = mousePos;
 				state.MouseFirstMove = false;
 			}
 
-			spw::Vec2i mouseDelta {
-			    mousePos.X - state.LastMousePos.Y,
-				state.LastMousePos.X - mousePos.Y
+			spw::Vec2 mouseDelta {
+			    mousePos.X - state.LastMousePos.X,
+				state.LastMousePos.Y - mousePos.Y
 			};
 			state.LastMousePos = mousePos;
 
@@ -147,16 +147,24 @@ namespace spw {
 		glfwSwapBuffers(s_Window);
 	}
 
+	GlLoaderFn getGlLoaderFn() {
+		return glfwGetProcAddress;
+	}
+
 	float getTime() {
 		return (float) glfwGetTime();
+	}
+
+	bool isWindowOpen() {
+		return !glfwWindowShouldClose(s_Window);
 	}
 
 	void* getWindowImpl() {
 		return s_Window;
 	}
 
-	spw::Vec2i getWindowSize() {
-		return { s_State.Width, s_State.Height };
+	spw::Vec2 getWindowSize() {
+		return { std::roundf(s_State.Width), std::roundf(s_State.Height) };
 	}
 
 	int getWindowWidth() {
@@ -167,7 +175,7 @@ namespace spw {
 		return s_State.Height;
 	}
 
-	spw::Vec2i getMousePos() {
+	spw::Vec2 getMousePos() {
 		return s_State.LastMousePos;
 	}
 
