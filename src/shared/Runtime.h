@@ -15,6 +15,7 @@ public:
 	static Runtime *get();
 
 	void init();
+	void update();
 
 public:
 	void attachLayer(Layer *layer);
@@ -27,8 +28,6 @@ private:
 	void dettachAllLayers();
 
 public:
-	void update();
-
 	float getTime() const;
 	inline float getDeltaTime() const { return m_DeltaTime; }
 
