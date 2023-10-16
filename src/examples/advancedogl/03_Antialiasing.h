@@ -17,15 +17,16 @@ private:
 	void InvalidateMSAAFramebuffer();
 
 private:
-	Utils::ModelInstance m_QuadModel;
+	void DrawScene();
+	void CreateCube();
 
-	spr::VertexBufferHandle m_CubeVertexBuffer;
+private:
+	Utils::PrimitiveData m_CubeData;
 
-	spr::ProgramHandle m_DefaultShaderProgram;
-	spr::UniformHandle m_ModelUniform;
-	spr::UniformHandle m_ViewUniform;
-	spr::UniformHandle m_ProjectionUniform;
-	spr::UniformHandle m_ColorUniform;
+	unsigned int m_CubeVertexArray;
+	unsigned int m_CubeVertexBuffer;
+
+	unsigned int m_DefaultShaderProgram;
 
 	unsigned int m_MSAAFramebuffer;
 	unsigned int m_MSAAColorTexture;

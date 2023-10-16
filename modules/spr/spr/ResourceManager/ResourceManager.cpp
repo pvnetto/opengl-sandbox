@@ -34,6 +34,19 @@ namespace spr {
 		rendererResourceManager.destroy(handle);
 		m_IndexBufferHandles.removeHandle(handle);
 	}
+
+	FramebufferHandle ResourceManager::createFramebuffer(const FramebufferAttachmentMap &attachments) {
+		FramebufferHandle handle = m_FramebufferHandles.allocHandle();
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createFramebuffer(handle, attachments);
+		return handle;
+	}
+
+	void ResourceManager::destroy(FramebufferHandle &handle) {
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.destroy(handle);
+		m_FramebufferHandles.removeHandle(handle);
+	}
 	
 	UniformHandle ResourceManager::createUniform(const char *name, UniformType type, uint32_t count) {
 		return m_UniformManager.createUniform(name, type, count);

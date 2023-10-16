@@ -5,8 +5,10 @@
 namespace spr {
 
 	struct IndexBufferInstanceGL {
-		uint32_t ID;
-		uint32_t IndexCount;
+		uint32_t ID = 0;
+		uint32_t IndexCount = 0;
+
+		static IndexBufferInstanceGL DefaultIndexBuffer;
 
 		void create(const void *data, uint32_t indexCount);
 		void destroy();

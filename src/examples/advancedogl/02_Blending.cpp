@@ -49,7 +49,7 @@ void AOGL_02_Blending::OnUpdate() {
 
 	// 1. Renders Opaque pass
 	const float offsetMagnitude = 5.0f;
-	auto renderOpaquePass = [this, offsetMagnitude]() {
+	auto renderOpaquePass = [this, offsetMagnitude](bool bClearColor) {
 		glDisable(GL_BLEND);
 		const float zPosition = m_OpaquePosition == OpaquePosition_Front ? 0.5f : -0.5f;
 		const glm::vec3 offset{
@@ -65,11 +65,16 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ColorUniform, glm::value_ptr(color));
 		spr::submit(m_DefaultShaderProgram);
+
+		const uint8_t clearFlags = bClearColor ? spr::AsMask(spr::FramebufferAttachmentFlags::All) : 0;
+		spr::setRenderTargetClear(0, clearFlags);
+
 		spr::flush();
 	};
 
 	if (m_OpaqueFirst) {
-		renderOpaquePass();
+		const bool bClearColor = true;
+		renderOpaquePass(bClearColor);
 	}
 
 	// 2. Transparency pass
@@ -89,6 +94,10 @@ void AOGL_02_Blending::OnUpdate() {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	const uint8_t clearFlags = m_OpaqueFirst ? 0 : spr::AsMask(spr::FramebufferAttachmentFlags::All);
+	spr::setRenderTargetClear(0, clearFlags);
+
 	for (int i = 0; i < cubeCount; i++) {
 		float progress = (float) i / (float) cubeCount;
 		float angleRad = glm::radians(progress * 360.f);
@@ -107,11 +116,13 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::submit(m_DefaultShaderProgram);
 	}
 	spr::flush();
+	glDisable(GL_BLEND);
 
 	// (OPTIONAL) Rendering Opaque objects first without ordering the draw calls by depth is usually wrong, but we're doing
 	// it here for demonstration purposes.
 	if (!m_OpaqueFirst) {
-		renderOpaquePass();
+		const bool bClearColor = false;
+		renderOpaquePass(bClearColor);
 	}
 }
 

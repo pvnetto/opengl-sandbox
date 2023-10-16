@@ -31,6 +31,7 @@ namespace Utils {
 	};
 
 	PrimitiveData GetQuadData();
+	PrimitiveData GetScreenQuadData();
 	PrimitiveData GetCubeData();
 
 	spr::VertexBufferHandle LoadCube();

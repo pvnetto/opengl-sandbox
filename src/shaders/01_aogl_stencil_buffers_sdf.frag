@@ -24,7 +24,8 @@ void main()
     float circle = circleSDF(circlePosition, circleSize);
     float bg = max(1.0 - circle, 0.0);
     
-    // Discarded fragments don't write any values to the Framebuffer (includes Color, Depth and Stencil)
+    // Discards fragments that lie inside the SDF circle. This will effectively create a stencil mask with a circular hole inside.
+    // NOTE: Discarded fragments do NOT write any values to Color, Depth and/or Stencil buffers
     if (circle > 0.0) {
         discard;
     }

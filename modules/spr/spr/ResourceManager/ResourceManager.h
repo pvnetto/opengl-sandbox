@@ -1,7 +1,8 @@
 #pragma once
 
-#include "UniformManager.h"
 #include "spr/Handles.h"
+#include "spr/ResourceManager/FramebufferAttachmentType.h"
+#include "UniformManager.h"
 
 namespace spr {
 	class Context;
@@ -19,6 +20,9 @@ namespace spr {
 
 		IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);		
 		void destroy(IndexBufferHandle &handle);
+
+		FramebufferHandle createFramebuffer(const FramebufferAttachmentMap& attachments);
+		void destroy(FramebufferHandle &handle);
 
 		UniformHandle createUniform(const char *name, UniformType type, uint32_t count);
 		void destroy(UniformHandle &handle);
@@ -40,6 +44,7 @@ namespace spr {
 
 		HandleGenerator<VertexBufferHandle> m_VertexBufferHandles;
 		HandleGenerator<IndexBufferHandle> m_IndexBufferHandles;
+		HandleGenerator<FramebufferHandle> m_FramebufferHandles;
 		HandleGenerator<ShaderHandle> m_ShaderHandles;
 		HandleGenerator<ProgramHandle> m_ProgramHandles;
 		HandleGenerator<TextureHandle> m_TextureHandles;

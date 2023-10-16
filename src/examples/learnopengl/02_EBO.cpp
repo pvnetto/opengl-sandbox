@@ -35,24 +35,28 @@ void main() {
 
 
 void LOGL_02_EBO::DeclareBufferObjects() {	
-	glCreateVertexArrays(1, &m_VAO);
-	glBindVertexArray(m_VAO);
-
 	glCreateBuffers(1, &m_VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glNamedBufferData(m_VBO, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glCreateBuffers(1, &m_EBO);
+	glNamedBufferData(m_EBO, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glCreateVertexArrays(1, &m_VAO);
+
+	const int vertexBufferBindingPoint = 0;
+	const int attributeIndex = 0;
+	const int vertexStride = 3 * sizeof(float);
+	const int numVertexElements = 3;
+	glVertexArrayVertexBuffer(m_VAO, vertexBufferBindingPoint, m_VBO, NULL, vertexStride);
+	glVertexArrayAttribFormat(m_VAO, attributeIndex, numVertexElements, GL_FLOAT, GL_FALSE, 0);
+	glVertexArrayAttribBinding(m_VAO, attributeIndex, vertexBufferBindingPoint);
+	glEnableVertexArrayAttrib(m_VAO, attributeIndex);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
 	glEnableVertexAttribArray(0);
+	glVertexArrayElementBuffer(m_VAO, m_EBO);
 
-    glCreateBuffers(1, &m_EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	// Unbinds buffers so they're not accidentally used.
-	// Beware: You should NOT unbind EBO here
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	glDisable(GL_DEPTH_TEST);
 }
 
 void LOGL_02_EBO::DeclareShaderProgram() {
@@ -111,5 +115,6 @@ void LOGL_02_EBO::OnUpdate() {
     glUseProgram(m_ShaderProgram);
     glBindVertexArray(m_VAO);
 
+	glClear(GL_COLOR_BUFFER_BIT);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 }

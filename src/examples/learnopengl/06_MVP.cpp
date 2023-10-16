@@ -39,10 +39,6 @@ void LOGL_06_MVP::OnAttach() {
 }
 
 void LOGL_06_MVP::OnUpdate() {
-	// TODO: Move to spr
-	glEnable(GL_DEPTH_TEST);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	// 1. Creates Model matrix
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_Position);

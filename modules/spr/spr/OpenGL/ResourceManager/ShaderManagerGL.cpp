@@ -8,7 +8,7 @@
 
 namespace spr {
 
-	void ShaderManagerGL::createShader(const ShaderHandle &handle, unsigned int shaderType, const char *shaderSrc) {
+	void ShaderManagerGL::createShader(const ShaderHandle handle, unsigned int shaderType, const char *shaderSrc) {
 		m_Shaders[handle.idx].create(shaderType, shaderSrc);
 	}
 
@@ -16,7 +16,7 @@ namespace spr {
 		m_Shaders[handle.idx].destroy();
 	}
 
-	const ShaderInstanceGL &ShaderManagerGL::getShader(const ShaderHandle &handle) const {
+	const ShaderInstanceGL &ShaderManagerGL::getShader(const ShaderHandle handle) const {
 		assert(handle.isValid() && "::ERROR: Invalid index buffer");
 		return m_Shaders[handle.idx];
 	}

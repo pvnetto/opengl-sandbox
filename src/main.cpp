@@ -22,10 +22,7 @@ int main() {
 	// Game Loop
 	{
 		while (spw::isWindowOpen()) {
-			spr::clear();
-
-			Runtime::get()->update();
-			
+			Runtime::get()->update();			
 			spw::swapBuffers();
 			spw::pollEvents();
 		}

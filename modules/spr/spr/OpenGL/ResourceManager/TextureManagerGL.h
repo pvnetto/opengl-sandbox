@@ -29,10 +29,10 @@ namespace spr {
 
 	class TextureManagerGL {
 	public:
-		void createTexture(const TextureHandle &handle, const struct TextureInfo &textureInfo, const void *data);
+		void createTexture(const TextureHandle handle, const struct TextureInfo &textureInfo, const void *data);
 		void destroy(TextureHandle &handle);
 
-		const TextureInstanceGL &getTexture(const TextureHandle &handle) const;
+		const TextureInstanceGL &getTexture(const TextureHandle handle) const;
 
 		const SamplerInstanceGL &findOrCreateSampler(const SamplerInfo &samplerInfo);
 

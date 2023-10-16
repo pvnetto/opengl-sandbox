@@ -46,6 +46,34 @@ namespace Utils {
 		return quad;
 	}
 
+	PrimitiveData GetScreenQuadData() {
+		// clang-format off
+		static float vertices[] = {
+			// Position					// UVs				// Normals (probably incorrect!)
+			-1.f, -1.f, 0.0f,         0.0f, 0.0f,			0.f, 0.f, 1.f,
+			1.f, -1.f, 0.0f,          1.0f, 0.0f,			0.f, 0.f, 1.f,
+			1.f, 1.f, 0.0f,           1.0f, 1.0f,			0.f, 0.f, 1.f,
+			-1.f, 1.f, 0.0f,          0.0f, 1.0f,			0.f, 0.f, 1.f,
+		};
+
+		static unsigned int indices[] = {
+			0, 1, 2,
+			2, 3, 0,
+		};
+		// clang-format on
+
+		static PrimitiveData quad;
+		quad.Layout = GetMeshLayout();
+
+		quad.Vertices = vertices;
+		quad.VerticesSize = sizeof(vertices) / sizeof(float);
+		quad.NumVertices = quad.VerticesSize / (quad.Layout.getStride() / sizeof(float));
+
+		quad.Indices = indices;
+		quad.NumIndices = sizeof(indices) / sizeof(unsigned int);
+		return quad;
+	}
+
 	PrimitiveData GetCubeData() {
 		// clang-format off
 		static float vertices[] = {
@@ -130,6 +158,8 @@ namespace Utils {
 	}
 
 	spr::TextureHandle LoadTexture(const char *path) {
+		stbi_set_flip_vertically_on_load(true);
+
 		int texWidth, texHeight, numOfChannels;
 		unsigned char *textureData = stbi_load(path, &texWidth, &texHeight, &numOfChannels, 0);
 		if (!textureData) {

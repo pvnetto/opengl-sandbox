@@ -13,15 +13,16 @@ namespace spr {
 	}
 
 	void submit(ProgramHandle &program) {
-		s_Context.getFrameDataManager().submit(program);
+		const uint8_t defaultRenderTargetIndex = 0;
+		s_Context.getFrameDataManager().submit(defaultRenderTargetIndex, program);
+	}
+
+	void submit(uint8_t renderTargetIndex, ProgramHandle& program) {
+		s_Context.getFrameDataManager().submit(renderTargetIndex, program);
 	}
 
 	void clean() {
 		s_Context.getFrameDataManager().reset();
-	}
-
-	void clear() {
-		s_Context.getRendererContext().clear();
 	}
 
 	void render() {
@@ -50,6 +51,22 @@ namespace spr {
 		s_Context.getFrameDataManager().setTexture(unit, textureHandle, samplerInfo);
 	}
 
+	void setFixedFunctionState(const FixedFunctionState &state) {
+		s_Context.getFrameDataManager().setFixedFunctionState(state);
+	}
+
+	void setRenderTargetFramebuffer(const uint8_t renderTargetIndex, const FramebufferHandle handle) {
+		s_Context.getFrameDataManager().setRenderTargetFramebuffer(renderTargetIndex, handle);
+	}
+
+	void setRenderTargetRect(const uint8_t renderTargetIndex, const Rect &rect) {
+		s_Context.getFrameDataManager().setRenderTargetRect(renderTargetIndex, rect);
+	}
+
+	void setRenderTargetClear(const uint8_t renderTargetIndex /*= 0*/, const uint8_t clearFlags /*= 0b111*/) {
+		s_Context.getFrameDataManager().setRenderTargetClear(renderTargetIndex, clearFlags);
+	}
+
 	VertexBufferHandle createVertexBuffer(const void* data, uint32_t size, const VertexAttributeLayout& layout) {
 		return s_Context.getResourceManager().createVertexBuffer(data, size, layout);
 	}
@@ -63,6 +80,14 @@ namespace spr {
 	}
 
 	void destroy(IndexBufferHandle& handle) {
+		s_Context.getResourceManager().destroy(handle);
+	}
+
+	FramebufferHandle createFramebuffer(const FramebufferAttachmentMap &attachments) {
+		return s_Context.getResourceManager().createFramebuffer(attachments);
+	}
+
+	void destroy(FramebufferHandle &handle) {
 		s_Context.getResourceManager().destroy(handle);
 	}
 
@@ -96,6 +121,10 @@ namespace spr {
 
 	void destroy(TextureHandle& handle) {
 		s_Context.getResourceManager().destroy(handle);
+	}
+
+	void blit(const BlitParameters &blitParams) {
+		s_Context.getFrameDataManager().blit(blitParams);
 	}
 
 }

@@ -22,7 +22,7 @@ namespace spr {
 
 namespace spr {
 
-	void VertexBufferManagerGL::createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {
+	void VertexBufferManagerGL::createVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {
 		VertexAttributeLayoutHandle layoutHandle = findOrCreateVertexAttributeLayout(layout);
 		m_VertexBuffers[handle.idx].create(data, size, layoutHandle);
 	}
@@ -31,7 +31,7 @@ namespace spr {
 		m_VertexBuffers[handle.idx].destroy();
 	}
 
-	const VertexBufferInstanceGL &VertexBufferManagerGL::getVertexBuffer(const VertexBufferHandle &handle) const {
+	const VertexBufferInstanceGL &VertexBufferManagerGL::getVertexBuffer(const VertexBufferHandle handle) const {
 		assert(handle.isValid() && "::ERROR: Invalid index buffer");
 		return m_VertexBuffers[handle.idx];
 	}

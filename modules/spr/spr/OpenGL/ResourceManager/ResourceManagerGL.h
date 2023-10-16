@@ -2,6 +2,7 @@
 
 #include "VertexBufferManagerGL.h"
 #include "IndexBufferManagerGL.h"
+#include "FramebufferManagerGL.h"
 #include "UniformManagerGL.h"
 #include "ShaderManagerGL.h"
 #include "ProgramManagerGL.h"
@@ -19,6 +20,9 @@ namespace spr {
 		void createIndexBuffer(const IndexBufferHandle &handle, const void *data, uint32_t size);
 		void destroy(IndexBufferHandle &handle);
 
+		void createFramebuffer(const FramebufferHandle &handle, const FramebufferAttachmentMap &attachments);
+		void destroy(FramebufferHandle &handle);
+
 		void createUniform(const UniformHandle &handle, const UniformRef &uniformRef);
 		void destroy(UniformHandle &uniformHandle);
 
@@ -34,6 +38,7 @@ namespace spr {
 	public:
 		inline const VertexBufferManagerGL &getVertexBufferManager() const { return m_VertexBufferManager; }
 		inline const IndexBufferManagerGL &getIndexBufferManager() const { return m_IndexBufferManager; }
+		inline const FramebufferManagerGL &getFramebufferManager() const { return m_FramebufferManager; }
 		inline const UniformManagerGL &getUniformManager() const { return m_UniformManager; }
 		inline UniformManagerGL &getUniformManager() { return m_UniformManager; }
 		inline const ShaderManagerGL& getShaderManager() const { return m_ShaderManager; }
@@ -44,6 +49,7 @@ namespace spr {
 	private:
 		VertexBufferManagerGL m_VertexBufferManager;
 		IndexBufferManagerGL m_IndexBufferManager;
+		FramebufferManagerGL m_FramebufferManager;
 		UniformManagerGL m_UniformManager;
 		ShaderManagerGL m_ShaderManager;
 		ProgramManagerGL m_ProgramManager;

@@ -12,9 +12,7 @@ namespace spr {
 	using GlLoaderFn = GlLoaderResult(*)(const char*);
 
 	struct ContextInfo {
-		int Width = 0;
-		int Height = 0;
-
+		uint32_t Width = 0, Height = 0;
 		GlLoaderFn GlLoader = nullptr;
 	};
 

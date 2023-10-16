@@ -6,6 +6,7 @@ set(SANDBOX_SOURCES
 		shared/RenderUtils.cpp
 		shared/Runtime.cpp
 		shared/Utils.cpp
+		shared/GlUtils.cpp
 
 		shared/layers/Layer.cpp
 		shared/layers/CameraLayer.cpp
@@ -40,7 +41,9 @@ set(SANDBOX_SOURCES
 		examples/advancedogl/03_Antialiasing.cpp
 		examples/advancedogl/04_Instancing.cpp
 		examples/advancedogl/05_GeometryShading.cpp
-		examples/advancedogl/06_Tessellation.cpp)
+		examples/advancedogl/06_Tessellation.cpp
+		examples/simplerenderer/01_StencilWithRenderer.cpp
+		)
 
 
 add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})

@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <iostream>
 
+// clang-format off
 static constexpr float verticesTriangleA[] = {
     -0.8f, -0.2f, 0.0f, // left
     -0.4f, -0.2f, 0.0f, // right
@@ -11,16 +12,11 @@ static constexpr float verticesTriangleA[] = {
 };
 
 static constexpr float verticesTriangleB[] = {
-    0.0f,
-    -0.2f,
-    0.0f,
-    0.4f,
-    -0.2f,
-    0.0f,
-    0.2f,
-    0.2f,
-    0.0f,
+    0.0f, -0.2f, 0.0f,
+    0.4f, -0.2f, 0.0f,
+    0.2f, 0.2f, 0.0f,
 };
+// clang-format on
 
 static const char *vertexShaderSource = R"(
 #version 330 core
@@ -76,6 +72,8 @@ void LOGL_02_VAO::DeclareBuffers() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glDisable(GL_DEPTH_TEST);
 }
 
 void LOGL_02_VAO::DeclareShader(unsigned int &shaderId, const char *vertexShaderSource, const char *fragShaderSource) {
@@ -135,6 +133,8 @@ void LOGL_02_VAO::OnAttach() {
 }
 
 void LOGL_02_VAO::OnUpdate() {
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	// 5. Binds VAO and draws the triangle
 	glUseProgram(m_ShaderProgram);
 	glBindVertexArray(m_VAOa);

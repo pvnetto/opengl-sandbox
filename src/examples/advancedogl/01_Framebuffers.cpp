@@ -2,12 +2,16 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/Runtime.h"
+#include "shared/Utils.h"
+#include "shared/GlUtils.h"
 
 #include <spw/SimpleWindow.h>
 
 #include <glad/glad.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <iostream>
+#include <stb_image.h>
 
 void AOGL_01_Framebuffers::OnAttach() {
 	m_Position = glm::vec3(-0.2f, 0.3f, -2.0f);
@@ -15,21 +19,14 @@ void AOGL_01_Framebuffers::OnAttach() {
 	m_CameraPosition = glm::vec3(0, 0, 0);
 	m_FieldOfView = 90.f;
 
-	m_QuadModel = Utils::LoadModel("assets/quad.obj");
-	m_CubeVertexBuffer = Utils::LoadCube();
+	CreateQuad();
+	CreateCube();
 
-	m_TexUniform = spr::createUniform("tex", spr::UniformType::Sampler);
-	m_AnotherTexUniform = spr::createUniform("anotherTex", spr::UniformType::Sampler);
-	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
-	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
-	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
+	m_BrickTexture = Utils::CreateTextureGL("assets/bricks.jpg");
+	m_LadybugTexture = Utils::CreateTextureGL("assets/yps.png");
 
-	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
-	m_BrickTexture = Utils::LoadTexture("assets/bricks.jpg");
-	m_LadybugTexture = Utils::LoadTexture("assets/yps.png");
-
-	m_RenderTargetTextureUniform = spr::createUniform("renderTargetTexture", spr::UniformType::Sampler);
-	m_PostProcessShaderProgram = Utils::LoadShaderProgram("shaders/01_aogl_color_buffers.vert", "shaders/01_aogl_color_buffers.frag");
+	m_DefaultShaderProgram = Utils::CreateShaderProgramGL("shaders/05_vertex_mvp.vert", "shaders/03_frag_tex.frag");
+	m_PostProcessShaderProgram = Utils::CreateShaderProgramGL("shaders/01_aogl_color_buffers.vert", "shaders/01_aogl_color_buffers.frag");
 
 	// 0. Creates FrameBuffer Object
 	glCreateFramebuffers(1, &m_Framebuffer);
@@ -55,6 +52,29 @@ void AOGL_01_Framebuffers::OnAttach() {
 }
 
 void AOGL_01_Framebuffers::OnUpdate() {
+	// 4. Binds Framebuffer Object to GL context
+	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
+
+	// 5. Performs a render pass on the Framebuffer
+	DrawScene();
+
+	// 6. Binds default Framebuffer (this is the one provided by the windowing system)
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// 7. Gets the Framebuffer Object color attachment and draws it in another render pass
+	const int renderTargetTextureUnit = 2;
+	glBindTextureUnit(renderTargetTextureUnit, m_ColorBufferTexture);
+
+	glUseProgram(m_PostProcessShaderProgram);
+	int renderTargetTextureLocation = glGetUniformLocation(m_PostProcessShaderProgram, "renderTargetTexture");
+	glUniform1i(renderTargetTextureLocation, renderTargetTextureUnit);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindVertexArray(m_QuadVertexArray);
+	glDrawElements(GL_TRIANGLES, m_QuadData.NumIndices, GL_UNSIGNED_INT, nullptr);
+}
+
+void AOGL_01_Framebuffers::DrawScene() {
 	glm::mat4 model(1.0f);
 	model = glm::translate(model, m_Position);
 	model = glm::rotate(model, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -71,64 +91,85 @@ void AOGL_01_Framebuffers::OnUpdate() {
 	const float far = 100.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
 
-	// 4. Binds Framebuffer Object to GL context
-	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
+	glUseProgram(m_DefaultShaderProgram);
 
-	glEnable(GL_DEPTH_TEST);
-
-	// 5. Performs a render pass on the Framebuffer
 	const int texUnit = 0, anotherTexUnit = 1;
-	spr::setUniform(m_TexUniform, &texUnit);
-	spr::setUniform(m_AnotherTexUniform, &anotherTexUnit);
-	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
-	spr::setUniform(m_ViewUniform, glm::value_ptr(view));
-	spr::setUniform(m_ProjectionUniform, glm::value_ptr(projection));
+	glBindTextureUnit(texUnit, m_BrickTexture);
+	glBindTextureUnit(anotherTexUnit, m_LadybugTexture);
 
-	spr::setTexture(0, m_BrickTexture);
-	spr::setTexture(1, m_LadybugTexture);
+	unsigned int modelLocation = glGetUniformLocation(m_DefaultShaderProgram, "model");
+	unsigned int viewLocation = glGetUniformLocation(m_DefaultShaderProgram, "view");
+	unsigned int projectionLocation = glGetUniformLocation(m_DefaultShaderProgram, "projection");
+	unsigned int texLocation = glGetUniformLocation(m_DefaultShaderProgram, "tex");
+	unsigned int anotherTexLocation = glGetUniformLocation(m_DefaultShaderProgram, "anotherTex");
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform1i(texLocation, texUnit);
+	glUniform1i(anotherTexLocation, anotherTexUnit);
 
-	spr::setVertexBuffer(m_CubeVertexBuffer);
-
-	spr::submit(m_DefaultShaderProgram);
-
-	spr::clear();
-	spr::render();
-	spr::clean();
-
-	// 6. Binds default Framebuffer (this is the one provided by the windowing system)
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// 7. Gets the Framebuffer Object color attachment and draws it in another render pass
-	assert(m_QuadModel.Meshes.size() > 0 && "::ERROR: Quad mesh wasn't properly loaded");
-	const auto &mesh = m_QuadModel.Meshes[0];
-	spr::setVertexBuffer(mesh.VertexBuffer);
-	spr::setIndexBuffer(mesh.IndexBuffer);
-
-	const int renderTargetTextureUnit = 2;
-	glBindTextureUnit(renderTargetTextureUnit, m_ColorBufferTexture);
-	spr::setUniform(m_RenderTargetTextureUniform, &renderTargetTextureUnit);
-	spr::submit(m_PostProcessShaderProgram);
-
-	spr::clear();
-	spr::render();
-	spr::clean();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindVertexArray(m_CubeVertexArray);
+	glDrawArrays(GL_TRIANGLES, 0, m_CubeData.NumVertices);
 }
 
 void AOGL_01_Framebuffers::OnDetach() {
-	Utils::UnloadModel(m_QuadModel);
-	spr::destroy(m_CubeVertexBuffer);
-	spr::destroy(m_BrickTexture);
-	spr::destroy(m_LadybugTexture);
-	spr::destroy(m_DefaultShaderProgram);
-	spr::destroy(m_TexUniform);
-	spr::destroy(m_AnotherTexUniform);
-	spr::destroy(m_ModelUniform);
-	spr::destroy(m_ViewUniform);
-	spr::destroy(m_ProjectionUniform);
-	spr::destroy(m_PostProcessShaderProgram);
-	spr::destroy(m_RenderTargetTextureUniform);
+	glDeleteVertexArrays(1, &m_QuadVertexArray);
+	glDeleteBuffers(1, &m_QuadVertexBuffer);
+	glDeleteBuffers(1, &m_QuadIndexBuffer);
+
+	glDeleteVertexArrays(1, &m_CubeVertexArray);
+	glDeleteBuffers(1, &m_CubeVertexBuffer);
+
+	glDeleteTextures(1, &m_BrickTexture);
+	glDeleteTextures(1, &m_LadybugTexture);
+
+	glDeleteProgram(m_DefaultShaderProgram);
+	glDeleteProgram(m_PostProcessShaderProgram);
 
 	glDeleteFramebuffers(1, &m_Framebuffer);
 	glDeleteTextures(1, &m_ColorBufferTexture);
 	glDeleteTextures(1, &m_DepthBufferTexture);
+}
+
+void AOGL_01_Framebuffers::CreateQuad() {
+	m_QuadData = Utils::GetScreenQuadData();
+
+	glCreateBuffers(1, &m_QuadVertexBuffer);
+	glNamedBufferStorage(m_QuadVertexBuffer, m_QuadData.VerticesSize * sizeof(float), m_QuadData.Vertices, 0);
+
+	glCreateBuffers(1, &m_QuadIndexBuffer);
+	glNamedBufferStorage(m_QuadIndexBuffer, m_QuadData.NumIndices * sizeof(unsigned int), m_QuadData.Indices, 0);
+
+	glCreateVertexArrays(1, &m_QuadVertexArray);
+	const int vertexBufferBindingPoint = 0;
+	glVertexArrayVertexBuffer(m_QuadVertexArray, vertexBufferBindingPoint, m_QuadVertexBuffer, NULL, m_QuadData.Layout.getStride());
+	for (int i = 0, count = m_QuadData.Layout.getAttributeCount(); i < count; i++) {
+		const spr::VertexAttribute &layoutAttribute = m_QuadData.Layout.getAttribute(i);
+
+		glVertexArrayAttribFormat(m_QuadVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+		glVertexArrayAttribBinding(m_QuadVertexArray, i, vertexBufferBindingPoint);
+		glEnableVertexArrayAttrib(m_QuadVertexArray, i);
+	}
+	glVertexArrayElementBuffer(m_QuadVertexArray, m_QuadIndexBuffer);
+}
+
+void AOGL_01_Framebuffers::CreateCube() {
+	m_CubeData = Utils::GetCubeData();
+
+	glCreateBuffers(1, &m_CubeVertexBuffer);
+	glNamedBufferStorage(m_CubeVertexBuffer, m_CubeData.VerticesSize * sizeof(float), m_CubeData.Vertices, 0);
+
+	glCreateVertexArrays(1, &m_CubeVertexArray);
+
+	const int perVertexBufferBindingPoint = 0;
+	glVertexArrayVertexBuffer(m_CubeVertexArray, perVertexBufferBindingPoint, m_CubeVertexBuffer, NULL, m_CubeData.Layout.getStride());
+	for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
+		const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+
+		glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+		glVertexArrayAttribBinding(m_CubeVertexArray, i, perVertexBufferBindingPoint);
+
+		glEnableVertexArrayAttrib(m_CubeVertexArray, i);
+	}
 }

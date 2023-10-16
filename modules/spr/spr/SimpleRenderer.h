@@ -7,6 +7,7 @@
 
 #include "ResourceManager/ShaderType.h"
 #include "ResourceManager/TextureInfo.h"
+#include "ResourceManager/FramebufferAttachmentType.h"
 
 namespace spr {
 	struct ProgramHandle;
@@ -19,9 +20,9 @@ namespace spr {
 	void shutdown();
 
 	void submit(ProgramHandle &program);
+	void submit(uint8_t renderTargetIndex, ProgramHandle &program);
 	void clean();
 	
-	void clear();
 	void render();
 	void flush();
 
@@ -30,11 +31,20 @@ namespace spr {
 	void setUniform(const UniformHandle &uniformHandle, const void *data, uint8_t count = 1);
 	void setTexture(TextureUnitType unit, const TextureHandle &textureHandle, const struct SamplerInfo &samplerInfo = SamplerInfo::Default);
 
+	void setFixedFunctionState(const FixedFunctionState &state);
+
+	void setRenderTargetFramebuffer(const uint8_t renderTargetIndex, const FramebufferHandle handle);
+	void setRenderTargetRect(const uint8_t renderTargetIndex, const Rect &rect);
+	void setRenderTargetClear(const uint8_t renderTargetIndex = 0, const uint8_t clearFlags = spr::AsFlag(FramebufferAttachmentFlags::All));
+
     VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);
 	void destroy(VertexBufferHandle &handle);
 
     IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);
 	void destroy(IndexBufferHandle &handle);
+
+	FramebufferHandle createFramebuffer(const FramebufferAttachmentMap &attachments);
+	void destroy(FramebufferHandle &handle);
 
 	UniformHandle createUniform(const char *name, UniformType type, uint32_t count = 1);
 	void destroy(UniformHandle &uniformHandle);
@@ -47,5 +57,7 @@ namespace spr {
 
 	TextureHandle createTexture(const struct TextureInfo &textureInfo, const void *data);
 	void destroy(TextureHandle &handle);
+
+	void blit(const BlitParameters &blitParams);
 
 }

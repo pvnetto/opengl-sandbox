@@ -36,7 +36,7 @@ private:
 	};
 
 private:
-	// Opaque objects should be renderer before the transparent ones, to avoid depth fragments.
+	// Opaque objects should be rendered before the transparent ones, to avoid depth fragments.
 	// e.g.,
 	//  - Transparency Pass > Opaque Pass (❌): The Transparency Pass is executed first and writes to the Depth Buffer, so when the Opaque Pass
 	// is executed, its fragments are Depth Tested and might be discarded instead of blended with the original colors.

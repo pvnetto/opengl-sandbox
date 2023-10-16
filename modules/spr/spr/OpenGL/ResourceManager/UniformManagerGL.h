@@ -23,10 +23,10 @@ namespace spr {
 	public:
 		void init(Context *owner);
 
-		void createUniform(const UniformHandle& handle, const UniformRef &uniformRef);
+		void createUniform(const UniformHandle handle, const UniformRef &uniformRef);
 		void destroy(UniformHandle &handle);
 
-		void setUniformValue(const UniformHandle &handle, const void *data, uint32_t size);
+		void setUniformValue(const UniformHandle handle, const void *data, uint32_t size);
 		void setUniformValues(UniformDataBufferPtr uniformDataBuffer, uint32_t start, uint32_t end);
 		
 		template <typename T>

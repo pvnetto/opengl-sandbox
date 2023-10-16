@@ -5,6 +5,8 @@
 
 namespace spr {
 
+	IndexBufferInstanceGL IndexBufferInstanceGL::DefaultIndexBuffer = {};
+
 	void IndexBufferInstanceGL::create(const void *data, uint32_t size) {
 		IndexCount = size / sizeof(unsigned int);
 
@@ -29,7 +31,11 @@ namespace spr {
 	}
 
 	const IndexBufferInstanceGL &IndexBufferManagerGL::getIndexBuffer(const IndexBufferHandle &handle) const {
-		assert(handle.isValid() && "::ERROR: Invalid index buffer");
-		return m_IndexBuffers[handle.idx];
+		if (handle.isValid()) {
+			return m_IndexBuffers[handle.idx];
+		}
+		else {
+			return IndexBufferInstanceGL::DefaultIndexBuffer;
+		}
 	}
 }

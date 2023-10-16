@@ -15,10 +15,10 @@ namespace spr {
 
 	class VertexBufferManagerGL {
 	public:
-		void createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout);
+		void createVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t size, const VertexAttributeLayout &layout);
 		void destroy(VertexBufferHandle &handle);
 
-	    const VertexBufferInstanceGL &getVertexBuffer(const VertexBufferHandle &handle) const;
+	    const VertexBufferInstanceGL &getVertexBuffer(const VertexBufferHandle handle) const;
 
 	private:
 		VertexBufferInstanceGL m_VertexBuffers[VertexBufferHandle::capacity];

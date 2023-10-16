@@ -19,29 +19,21 @@ private:
 	glm::vec3 m_LightColor;
 
 private:
-	Utils::ModelInstance m_QuadModel;
+	Utils::PrimitiveData m_QuadData;
 
-	spr::VertexBufferHandle m_CubeVertexBuffer;
+	unsigned int m_QuadVertexArray;
+	unsigned int m_QuadVertexBuffer;
+	unsigned int m_QuadIndexBuffer;
 
-	spr::ProgramHandle m_StencilPassShaderProgram;
-	spr::UniformHandle m_ResolutionUniform;
-	spr::UniformHandle m_TimeUniform;
+	Utils::PrimitiveData m_CubeData;
 
-	spr::ProgramHandle m_LightingShaderProgram;
-	spr::UniformHandle m_ModelUniform;
-	spr::UniformHandle m_ViewUniform;
-	spr::UniformHandle m_ProjectionUniform;
-	spr::UniformHandle m_ViewPositionUniform;
-	spr::UniformHandle m_LightColorUniform;
-	spr::UniformHandle m_LightPositionUniform;
-	spr::UniformHandle m_ObjectColorUniform;
+	unsigned int m_CubeVertexArray;
+	unsigned int m_CubeVertexBuffer;
 
-	spr::ProgramHandle m_LightSourceShaderProgram;
+	unsigned int m_LightingShaderProgram;
+	unsigned int m_LightSourceShaderProgram;
+	unsigned int m_StencilPassShaderProgram;
 
-	spr::ProgramHandle m_RenderPassShaderProgram;
-	spr::UniformHandle m_RenderTargetTextureUniform;
-
-private:
 	unsigned int m_Framebuffer;
 	unsigned int m_ColorBufferTexture;
 	unsigned int m_StencilDepthBufferTexture;

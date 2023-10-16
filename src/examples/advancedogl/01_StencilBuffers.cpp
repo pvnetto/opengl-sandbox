@@ -2,6 +2,8 @@
 
 #include "shared/RenderUtils.h"
 #include "shared/Runtime.h"
+#include "shared/Utils.h"
+#include "shared/GlUtils.h"
 
 #include <spw/SimpleWindow.h>
 
@@ -18,25 +20,51 @@ void AOGL_01_StencilBuffers::OnAttach() {
 	m_LightColor = glm::vec3{0.8f, 0.8f, 1.f};
 
 
-	m_QuadModel = Utils::LoadModel("assets/quad.obj");
-	m_CubeVertexBuffer = Utils::LoadCube();
+	{
+		m_QuadData = Utils::GetScreenQuadData();
 
-	m_ResolutionUniform = spr::createUniform("inResolution", spr::UniformType::Vec2);
-	m_TimeUniform = spr::createUniform("inTime", spr::UniformType::Float);
-	m_StencilPassShaderProgram = Utils::LoadShaderProgram("shaders/01_aogl_stencil_buffers_sdf.vert", "shaders/01_aogl_stencil_buffers_sdf.frag");
+		glCreateBuffers(1, &m_QuadVertexBuffer);
+		glNamedBufferStorage(m_QuadVertexBuffer, m_QuadData.VerticesSize * sizeof(float), m_QuadData.Vertices, 0);
 
-	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
-	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
-	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
-	m_ViewPositionUniform = spr::createUniform("viewPos", spr::UniformType::Vec3);
-	m_LightColorUniform = spr::createUniform("lightColor", spr::UniformType::Vec3);
-	m_LightPositionUniform = spr::createUniform("lightPos", spr::UniformType::Vec3);
-	m_ObjectColorUniform = spr::createUniform("objectColor", spr::UniformType::Vec3);
-	m_LightingShaderProgram = Utils::LoadShaderProgram("shaders/07_phong.vert", "shaders/07_phong.frag");
-	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
+		glCreateBuffers(1, &m_QuadIndexBuffer);
+		glNamedBufferStorage(m_QuadIndexBuffer, m_QuadData.NumIndices * sizeof(unsigned int), m_QuadData.Indices, 0);
 
-	m_RenderTargetTextureUniform = spr::createUniform("renderTargetTexture", spr::UniformType::Sampler);
-	m_RenderPassShaderProgram = Utils::LoadShaderProgram("shaders/draw_textured_quad.vert", "shaders/draw_textured_quad.frag");
+		glCreateVertexArrays(1, &m_QuadVertexArray);
+		const int vertexBufferBindingPoint = 0;
+		glVertexArrayVertexBuffer(m_QuadVertexArray, vertexBufferBindingPoint, m_QuadVertexBuffer, NULL, m_QuadData.Layout.getStride());
+		for (int i = 0, count = m_QuadData.Layout.getAttributeCount(); i < count; i++) {
+			const spr::VertexAttribute &layoutAttribute = m_QuadData.Layout.getAttribute(i);
+
+			glVertexArrayAttribFormat(m_QuadVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+			glVertexArrayAttribBinding(m_QuadVertexArray, i, vertexBufferBindingPoint);
+			glEnableVertexArrayAttrib(m_QuadVertexArray, i);
+		}
+		glVertexArrayElementBuffer(m_QuadVertexArray, m_QuadIndexBuffer);
+	}
+
+	{
+		m_CubeData = Utils::GetCubeData();
+
+		glCreateBuffers(1, &m_CubeVertexBuffer);
+		glNamedBufferStorage(m_CubeVertexBuffer, m_CubeData.VerticesSize * sizeof(float), m_CubeData.Vertices, 0);
+
+		glCreateVertexArrays(1, &m_CubeVertexArray);
+
+		const int perVertexBufferBindingPoint = 0;
+		glVertexArrayVertexBuffer(m_CubeVertexArray, perVertexBufferBindingPoint, m_CubeVertexBuffer, NULL, m_CubeData.Layout.getStride());
+		for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
+			const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+
+			glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+			glVertexArrayAttribBinding(m_CubeVertexArray, i, perVertexBufferBindingPoint);
+
+			glEnableVertexArrayAttrib(m_CubeVertexArray, i);
+		}
+	}
+
+	m_LightingShaderProgram = Utils::CreateShaderProgramGL("shaders/07_phong.vert", "shaders/07_phong.frag");
+	m_LightSourceShaderProgram = Utils::CreateShaderProgramGL("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
+	m_StencilPassShaderProgram = Utils::CreateShaderProgramGL("shaders/01_aogl_stencil_buffers_sdf.vert", "shaders/01_aogl_stencil_buffers_sdf.frag");
 
 	glCreateFramebuffers(1, &m_Framebuffer);
 
@@ -61,6 +89,8 @@ void AOGL_01_StencilBuffers::OnAttach() {
 	// 2. Enables stencil testing
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
+
+	glClearColor(0.88f, 0.88f, 0.88f, 1.0f);
 }
 
 void AOGL_01_StencilBuffers::OnUpdate() {
@@ -85,7 +115,7 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		// 0 0 0 0 0 0 0 0
 		// 0 0 0 0 0 0 0 0
 		// 0 0 0 0 0 0 0 0
-		glClear(GL_STENCIL_BUFFER_BIT);
+		glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// 5. Draws quad with circle hole to the screen to fill the stencil buffer with 1s
 		// At this point, the Stencil Buffer will look something like this:
@@ -97,20 +127,18 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		// 1 1 0 0 0 0 1 1
 		// 1 1 1 1 1 1 1 1
 		// 1 1 1 1 1 1 1 1
+		glUseProgram(m_StencilPassShaderProgram);
+
 		const spw::Vec2 windowSize = spw::getWindowSize();
-		spr::setUniform(m_ResolutionUniform, &windowSize);
+		const int resolutionLocation = glGetUniformLocation(m_StencilPassShaderProgram, "inResolution");
+		glUniform2f(resolutionLocation, (float)windowSize.X, (float) windowSize.Y);
 
 		const float currentTime = Runtime::get()->getTime();
-		spr::setUniform(m_TimeUniform, &currentTime);
+		const int timeLocation = glGetUniformLocation(m_StencilPassShaderProgram, "inTime");
+		glUniform1f(timeLocation, currentTime);
 
-		const auto &quadMesh = m_QuadModel.Meshes[0];
-		spr::setVertexBuffer(quadMesh.VertexBuffer);
-		spr::setIndexBuffer(quadMesh.IndexBuffer);
-		spr::submit(m_StencilPassShaderProgram);
-
-		spr::clear();
-		spr::render();
-		spr::clean();
+		glBindVertexArray(m_QuadVertexArray);
+		glDrawElements(GL_TRIANGLES, m_QuadData.NumIndices, GL_UNSIGNED_INT, nullptr);
 	}
 
 	/* Render Pass */
@@ -130,71 +158,73 @@ void AOGL_01_StencilBuffers::OnUpdate() {
 		sourceModel = glm::translate(sourceModel, lightSourcePos);
 		sourceModel = glm::scale(sourceModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
-		spr::setVertexBuffer(m_CubeVertexBuffer);
-		spr::setUniform(m_ModelUniform, glm::value_ptr(sourceModel));
-		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
-		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
-		spr::setUniform(m_LightColorUniform, glm::value_ptr(m_LightColor));
-		spr::submit(m_LightSourceShaderProgram);
+		glUseProgram(m_LightSourceShaderProgram);
+		{
+			unsigned int modelLocation = glGetUniformLocation(m_LightSourceShaderProgram, "model");
+			unsigned int viewLocation = glGetUniformLocation(m_LightSourceShaderProgram, "view");
+			unsigned int projectionLocation = glGetUniformLocation(m_LightSourceShaderProgram, "projection");
+			unsigned int lightColorLocation = glGetUniformLocation(m_LightSourceShaderProgram, "lightColor");
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(sourceModel));
+			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetView()));
+			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetProjection()));
+			glUniform3fv(lightColorLocation, 1, glm::value_ptr(m_LightColor));
+		}
+
+		glBindVertexArray(m_CubeVertexArray);
+		glDrawArrays(GL_TRIANGLES, 0, m_CubeData.NumVertices);
 
 		glm::mat4 litModel(1.0f);
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
-		spr::setVertexBuffer(m_CubeVertexBuffer);
-		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
-		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
-		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
-		spr::setUniform(m_ViewPositionUniform, glm::value_ptr(m_Camera.GetPosition()));
-		spr::setUniform(m_LightColorUniform, glm::value_ptr(m_LightColor));
-		spr::setUniform(m_LightPositionUniform, glm::value_ptr(lightSourcePos));
-		spr::setUniform(m_ObjectColorUniform, glm::value_ptr(m_ObjectColor));
-		spr::submit(m_LightingShaderProgram);
+		glUseProgram(m_LightingShaderProgram);
+		{
+			unsigned int modelLocation = glGetUniformLocation(m_LightingShaderProgram, "model");
+			unsigned int viewLocation = glGetUniformLocation(m_LightingShaderProgram, "view");
+			unsigned int projectionLocation = glGetUniformLocation(m_LightingShaderProgram, "projection");
+			unsigned int lightColorLocation = glGetUniformLocation(m_LightingShaderProgram, "lightColor");
+			unsigned int lightPosLocation = glGetUniformLocation(m_LightingShaderProgram, "lightPos");
+			unsigned int viewPosLocation = glGetUniformLocation(m_LightingShaderProgram, "viewPos");
+			unsigned int objectColorLocation = glGetUniformLocation(m_LightingShaderProgram, "objectColor");
+			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(litModel));
+			glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetView()));
+			glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetProjection()));
+			glUniform3fv(lightColorLocation, 1, glm::value_ptr(m_LightColor));
+			glUniform3fv(lightPosLocation, 1, glm::value_ptr(lightSourcePos));
+			glUniform3fv(viewPosLocation, 1, glm::value_ptr(m_Camera.GetPosition()));
+			glUniform3fv(objectColorLocation, 1, glm::value_ptr(m_ObjectColor));
+		}
 
-		glClear(GL_DEPTH_BUFFER_BIT);
-		spr::render();
-		spr::clean();
+		glBindVertexArray(m_CubeVertexArray);
+		glDrawArrays(GL_TRIANGLES, 0, m_CubeData.NumVertices);
 	}
 
 	/* Draw Pass */
+	// 7. Blits result to default framebuffer, which will get picked up by double buffering and drawn to the screen
 	{
-		// 7. Performs another render pass to draw the result to a quad
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		const int defaultFramebuffer = 0;
+		const spw::Vec2 resolution = spw::getWindowSize();
+		glBlitNamedFramebuffer(m_Framebuffer, defaultFramebuffer,
+							   0, 0, resolution.X, resolution.Y,
+							   0, 0, resolution.X, resolution.Y,
+							   GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-		assert(m_QuadModel.Meshes.size() > 0 && "::ERROR: Quad mesh wasn't properly loaded");
-		const auto &mesh = m_QuadModel.Meshes[0];
-		spr::setVertexBuffer(mesh.VertexBuffer);
-		spr::setIndexBuffer(mesh.IndexBuffer);
-
-		const int renderTargetTextureUnit = 0;
-		glBindTextureUnit(renderTargetTextureUnit, m_ColorBufferTexture);
-		spr::setUniform(m_RenderTargetTextureUniform, &renderTargetTextureUnit);
-		spr::submit(m_RenderPassShaderProgram);
-
-		spr::clear();
-		spr::render();
-		spr::clean();
+		glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
 	}
 }
 
 void AOGL_01_StencilBuffers::OnDetach() {
-	Utils::UnloadModel(m_QuadModel);
-	spr::destroy(m_CubeVertexBuffer);
-	spr::destroy(m_LightingShaderProgram);
-	spr::destroy(m_LightSourceShaderProgram);
-	spr::destroy(m_ModelUniform);
-	spr::destroy(m_ViewUniform);
-	spr::destroy(m_ProjectionUniform);
-	spr::destroy(m_ViewPositionUniform);
-	spr::destroy(m_LightColorUniform);
-	spr::destroy(m_LightPositionUniform);
-	spr::destroy(m_ObjectColorUniform);
-	spr::destroy(m_RenderPassShaderProgram);
-	spr::destroy(m_RenderTargetTextureUniform);
-	spr::destroy(m_StencilPassShaderProgram);
-	spr::destroy(m_ResolutionUniform);
-	spr::destroy(m_TimeUniform);
+	glDeleteVertexArrays(1, &m_QuadVertexArray);
+	glDeleteBuffers(1, &m_QuadIndexBuffer);
+	glDeleteBuffers(1, &m_QuadVertexBuffer);
+
+	glDeleteVertexArrays(1, &m_CubeVertexArray);
+	glDeleteBuffers(1, &m_CubeVertexBuffer);
+
+	glDeleteProgram(m_LightingShaderProgram);
+	glDeleteProgram(m_LightSourceShaderProgram);
+	glDeleteProgram(m_StencilPassShaderProgram);
 
 	glDeleteFramebuffers(1, &m_Framebuffer);
 	glDeleteTextures(1, &m_ColorBufferTexture);

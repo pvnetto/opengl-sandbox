@@ -7,7 +7,7 @@
 
 namespace spr {
 
-	void TextureManagerGL::createTexture(const TextureHandle &handle, const struct TextureInfo &textureInfo, const void *data) {
+	void TextureManagerGL::createTexture(const TextureHandle handle, const struct TextureInfo &textureInfo, const void *data) {
 		m_Textures[handle.idx].create(textureInfo, data);
 	}
 
@@ -15,7 +15,7 @@ namespace spr {
 		m_Textures[handle.idx].destroy();
 	}
 
-	const TextureInstanceGL &TextureManagerGL::getTexture(const TextureHandle &handle) const {
+	const TextureInstanceGL &TextureManagerGL::getTexture(const TextureHandle handle) const {
 		assert(handle.isValid() && "::ERROR: Invalid texture");
 		return m_Textures[handle.idx];
 	}
@@ -29,19 +29,25 @@ namespace spr {
 		return m_Samplers[samplerHash];
 	}
 
-	void TextureInstanceGL::create(const struct TextureInfo &textureInfo, const void *data) {
+	void TextureInstanceGL::create(const TextureInfo &textureInfo, const void *data) {
 		glCreateTextures(GL_TEXTURE_2D, 1, &ID);
 
 		if (textureInfo.Depth == 1) {
-			glTextureStorage2D(ID, textureInfo.MipCount, getInternalFormatGL(textureInfo.Format), textureInfo.Width, textureInfo.Height);
-			glTextureSubImage2D(ID, 0, 0, 0, textureInfo.Width, textureInfo.Height, getFormatGL(textureInfo.Format), GL_UNSIGNED_BYTE, data);		
+			glTextureStorage2D(ID, textureInfo.MipCount, getInternalFormatGL(textureInfo.Format), textureInfo.Width, textureInfo.Height);	
 		}
 		else {
 			assert(false && "::ERROR: 3D textures are not supported yet");
 		}
 
-		if (textureInfo.MipCount > 1) {
-			glGenerateTextureMipmap(ID);
+		// Render target textures don't need to store data, as they'll be filled during rendering
+		// NOTE: We should consider creating Renderbuffers if the texture doesn't need to be accessed
+		const bool bIsRenderTargetTexture = (textureInfo.Flags & (uint32_t)TextureFlags::IsRenderTargetTexture);
+		if (!bIsRenderTargetTexture && data) {
+			glTextureSubImage2D(ID, 0, 0, 0, textureInfo.Width, textureInfo.Height, getFormatGL(textureInfo.Format), GL_UNSIGNED_BYTE, data);
+
+			if (textureInfo.MipCount > 1) {
+				glGenerateTextureMipmap(ID);
+			}
 		}
 	}
 

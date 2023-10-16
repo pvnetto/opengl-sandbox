@@ -24,7 +24,7 @@ public:
     }
 };
 
-enum ExampleCategory { LearnOpenGL, AdvancedOpenGL, CategoryCount };
+enum ExampleCategory { LearnOpenGL, AdvancedOpenGL, RendererExamples, CategoryCount };
 
 class ExampleGUILayer : public Layer {
 public:

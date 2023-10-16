@@ -1,6 +1,7 @@
 #include "01_DepthBuffers.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Utils.h"
 
 #include <spw/SimpleWindow.h>
 
@@ -14,18 +15,25 @@ void AOGL_01_DepthBuffers::OnAttach() {
 	m_CameraPosition = glm::vec3(0, 0, 0);
 	m_FieldOfView = 90.f;
 
-	m_QuadModel = Utils::LoadModel("assets/quad.obj");
-	m_CubeVertexBuffer = Utils::LoadCube();
+	m_QuadData = Utils::GetQuadData();
 
-	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
-	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
-	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
-	m_NearPlaneUniform = spr::createUniform("nearPlane", spr::UniformType::Float);
-	m_FarPlaneUniform = spr::createUniform("farPlane", spr::UniformType::Float);
-	m_DepthDrawShaderProgram = Utils::LoadShaderProgram("shaders/01_aogl_depth_buffers.vert", "shaders/01_aogl_depth_buffers.frag");
+	glCreateBuffers(1, &m_QuadVertexBuffer);
+	glNamedBufferStorage(m_QuadVertexBuffer, m_QuadData.VerticesSize * sizeof(float), m_QuadData.Vertices, 0);
 
-	m_RenderTargetTextureUniform = spr::createUniform("renderTargetTexture", spr::UniformType::Sampler);
-	m_RenderPassShaderProgram = Utils::LoadShaderProgram("shaders/draw_textured_quad.vert", "shaders/draw_textured_quad.frag");
+	glCreateBuffers(1, &m_QuadIndexBuffer);
+	glNamedBufferStorage(m_QuadIndexBuffer, m_QuadData.NumIndices * sizeof(unsigned int), m_QuadData.Indices, 0);
+
+	glCreateVertexArrays(1, &m_VertexArray);
+	const int vertexBufferBindingPoint = 0;
+	glVertexArrayVertexBuffer(m_VertexArray, vertexBufferBindingPoint, m_QuadVertexBuffer, NULL, m_QuadData.Layout.getStride());
+	for (int i = 0, count = m_QuadData.Layout.getAttributeCount(); i < count; i++) {
+		const spr::VertexAttribute &layoutAttribute = m_QuadData.Layout.getAttribute(i);
+
+		glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+		glVertexArrayAttribBinding(m_VertexArray, i, vertexBufferBindingPoint);
+		glEnableVertexArrayAttrib(m_VertexArray, i);
+	}
+	glVertexArrayElementBuffer(m_VertexArray, m_QuadIndexBuffer);
 
 	// 0. Creates FrameBuffer Object
 	glCreateFramebuffers(1, &m_Framebuffer);
@@ -48,7 +56,58 @@ void AOGL_01_DepthBuffers::OnAttach() {
 		assert(false && "::ERROR: Framebuffer is incomplete");
 	}
 
-	glClearColor(0xff, 0x00, 0xff, 0xff);
+	CreateShaderProgram();
+
+	glClearColor(1.f, 0.f, 1.f, 1.f);
+}
+
+void AOGL_01_DepthBuffers::CreateShaderProgram() {
+	const std::string vertexSrc = Utils::ReadShaderFile("shaders/01_aogl_depth_buffers.vert");
+	const char *vertexSrcC = vertexSrc.c_str();
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSrcC, NULL);
+	glCompileShader(vertexShader);
+
+	int vertSuccess;
+	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertSuccess);
+	if (!vertSuccess) {
+		char info[512];
+		glGetShaderInfoLog(vertexShader, 512, NULL, info);
+		assert(false && "::ERROR: Failed to compile Vertex Shader");
+		return;
+	}
+
+	const std::string fragSrc = Utils::ReadShaderFile("shaders/01_aogl_depth_buffers.frag");
+	const char *fragSrcC = fragSrc.c_str();
+	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragSrcC, NULL);
+	glCompileShader(fragmentShader);
+
+	int fragSuccess;
+	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragSuccess);
+	if (!fragSuccess) {
+		char info[512];
+		glGetShaderInfoLog(fragmentShader, 512, NULL, info);
+		assert(false && "::ERROR: Failed to compile Fragment Shader");
+		return;
+	}
+
+	m_DepthDrawShaderProgram = glCreateProgram();
+	glAttachShader(m_DepthDrawShaderProgram, vertexShader);
+	glAttachShader(m_DepthDrawShaderProgram, fragmentShader);
+	glLinkProgram(m_DepthDrawShaderProgram);
+
+	int programSuccess;
+	glGetProgramiv(m_DepthDrawShaderProgram, GL_LINK_STATUS, &programSuccess);
+	if (!programSuccess) {
+		char info[512];
+		glGetProgramInfoLog(m_DepthDrawShaderProgram, 512, NULL, info);
+		assert(false && "::ERROR: Failed to link shader program");
+		return;
+	}
+
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
 }
 
 void AOGL_01_DepthBuffers::OnUpdate() {
@@ -57,11 +116,14 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 	// 3. Enables depth testing
 	glEnable(GL_DEPTH_TEST);
 	
-	// 4. (OPTIONAL) Sets depth testing parameters. This already comes with sensible defaults though.
+	// 4. (OPTIONAL) Sets depth testing parameters. This already comes with sensible defaults, so no need to change anything.
 	glDepthMask(GL_TRUE);			// Defaults to GL_TRUE. This value is ANDed with depth values before they're written to the Depth Buffer.
 	glDepthFunc(GL_LESS);			// Defaults to GL_LESS. Replaces depth value when it's smaller than the current (i.e., closer to the viewer).
 
-	// 5. Renders a bunch of cubes at different depths and draws their depth values
+	// 5. Clears values in the Depth Buffer before writing to it
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	// 6. Renders a bunch of cubes at different depths and draws their depth values
 	glm::mat4 view(1.0f);
 	view = glm::translate(view, -m_CameraPosition);
 
@@ -69,11 +131,20 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
 	const float near = 0.1f, far = 1000.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
-	spr::setUniform(m_ViewUniform, glm::value_ptr(view));
-	spr::setUniform(m_ProjectionUniform, glm::value_ptr(projection));
-	spr::setUniform(m_NearPlaneUniform, &near);
-	spr::setUniform(m_FarPlaneUniform, &far);
 
+	glUseProgram(m_DepthDrawShaderProgram);
+
+	unsigned int modelLocation = glGetUniformLocation(m_DepthDrawShaderProgram, "model");
+	unsigned int viewLocation = glGetUniformLocation(m_DepthDrawShaderProgram, "view");
+	unsigned int projectionLocation = glGetUniformLocation(m_DepthDrawShaderProgram, "projection");
+	unsigned int nearPlaneLocation = glGetUniformLocation(m_DepthDrawShaderProgram, "nearPlane");
+	unsigned int farPlaneLocation = glGetUniformLocation(m_DepthDrawShaderProgram, "farPlane");
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform1f(nearPlaneLocation, near);
+	glUniform1f(farPlaneLocation, far);
+
+	const uint8_t depthRenderTarget = 0;
 	const int cubeCount = 10;
 	for (int i = 0; i < cubeCount; i++) {
 		const float offsetMultiplier = (float) i - cubeCount / 2.f;
@@ -82,48 +153,26 @@ void AOGL_01_DepthBuffers::OnUpdate() {
 		model = glm::translate(model, m_Position + offset);
 		model = glm::scale(model, m_Scale);
 
-		spr::setVertexBuffer(m_CubeVertexBuffer);
-		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
-		spr::submit(m_DepthDrawShaderProgram);
+		glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+		glBindVertexArray(m_VertexArray);
+		glDrawElements(GL_TRIANGLES, m_QuadData.NumIndices, GL_UNSIGNED_INT, nullptr);
 	}
 
-
-	// 6. Clears values in the Depth Buffer before writing to it
-	glClear(GL_DEPTH_BUFFER_BIT);
-	spr::clear();
-	spr::render();
-	spr::clean();
-
-	// 7. Performs another render pass to draw the result to a quad
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	assert(m_QuadModel.Meshes.size() > 0 && "::ERROR: Quad mesh wasn't properly loaded");
-	const auto &mesh = m_QuadModel.Meshes[0];
-	spr::setVertexBuffer(mesh.VertexBuffer);
-	spr::setIndexBuffer(mesh.IndexBuffer);
-
-	const int renderTargetTextureUnit = 0;
-	glBindTextureUnit(renderTargetTextureUnit, m_ColorBufferTexture);
-	spr::setUniform(m_RenderTargetTextureUniform, &renderTargetTextureUnit);
-	spr::submit(m_RenderPassShaderProgram);
-
-	spr::clear();
-	spr::render();
-	spr::clean();
+	// 7. Blits result to default framebuffer, which will get picked up by double buffering and drawn to the screen
+	const int defaultFramebuffer = 0;
+	const spw::Vec2 resolution = spw::getWindowSize();
+	glBlitNamedFramebuffer(m_Framebuffer, defaultFramebuffer,
+	                       0, 0, resolution.X, resolution.Y,
+	                       0, 0, resolution.X, resolution.Y,
+	                       GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
 }
 
 void AOGL_01_DepthBuffers::OnDetach() {
-	Utils::UnloadModel(m_QuadModel);
-	spr::destroy(m_CubeVertexBuffer);
-	spr::destroy(m_DepthDrawShaderProgram);
-	spr::destroy(m_ModelUniform);
-	spr::destroy(m_ViewUniform);
-	spr::destroy(m_ProjectionUniform);
-	spr::destroy(m_RenderPassShaderProgram);
-	spr::destroy(m_RenderTargetTextureUniform);
-	spr::destroy(m_NearPlaneUniform);
-	spr::destroy(m_FarPlaneUniform);
-
+	glDeleteVertexArrays(1, &m_VertexArray);
+	glDeleteBuffers(1, &m_QuadIndexBuffer);
+	glDeleteBuffers(1, &m_QuadVertexBuffer);
+	glDeleteProgram(m_DepthDrawShaderProgram);
 	glDeleteFramebuffers(1, &m_Framebuffer);
 	glDeleteTextures(1, &m_ColorBufferTexture);
 	glDeleteTextures(1, &m_DepthBufferTexture);

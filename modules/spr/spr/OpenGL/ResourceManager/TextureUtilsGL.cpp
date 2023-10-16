@@ -10,6 +10,8 @@ namespace spr {
 			return GL_RGB8;
 		case spr::TextureFormat::RGBA8:
 			return GL_RGBA8;
+		case spr::TextureFormat::DEPTH_24_STENCIL_8:
+			return GL_DEPTH24_STENCIL8;
 		default:
 			assert(false && "::ERROR: Unknown texture format");
 			return GL_RGB8;

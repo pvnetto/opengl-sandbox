@@ -13,10 +13,10 @@ namespace spr {
 
 	class ShaderManagerGL {
 	public:
-		void createShader(const ShaderHandle &handle, unsigned int shaderType, const char *shaderSrc);
+		void createShader(const ShaderHandle handle, unsigned int shaderType, const char *shaderSrc);
 		void destroy(ShaderHandle& handle);
 
-	    const ShaderInstanceGL& getShader(const ShaderHandle& handle) const;
+	    const ShaderInstanceGL& getShader(const ShaderHandle handle) const;
 
 	private:
 		ShaderInstanceGL m_Shaders[ShaderHandle::capacity];

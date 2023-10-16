@@ -25,6 +25,18 @@ namespace spr {
 		m_IndexBufferManager.destroy(handle);
 	}
 
+	void ResourceManagerGL::createFramebuffer(const FramebufferHandle &handle, const FramebufferAttachmentMap &attachments) {
+		FramebufferAttachmentMapGL attachmentMapGl;
+		for (const auto [attachmentType, textureHandle] : attachments) {
+			attachmentMapGl.emplace(attachmentType, m_TextureManager.getTexture(textureHandle));
+		}
+		m_FramebufferManager.createFramebuffer(handle, attachmentMapGl);
+	}
+
+	void ResourceManagerGL::destroy(FramebufferHandle &handle) {
+		m_FramebufferManager.destroy(handle);
+	}
+
 	void ResourceManagerGL::createUniform(const UniformHandle &handle, const UniformRef &uniformRef) {
 		m_UniformManager.createUniform(handle, uniformRef);
 	}

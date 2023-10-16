@@ -39,10 +39,12 @@ void LOGL_05_Transform::OnAttach() {
 void LOGL_05_Transform::OnUpdate() {
 	// 2. Enables depth testing, allowing the Vertex Shader to write to the Depth Buffer, which is used by the ROP to determine
 	// which pixels are in front of each other (thus enabling 3D rendering), more on this later.
-	glEnable(GL_DEPTH_TEST);
+	// NOTE: We don't need to call this here, the renderer is already doing it
+	// glEnable(GL_DEPTH_TEST);
 
 	// 3. Clears Depth Buffer before rendering, as well as the Color Buffer, as usual
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// NOTE: We don't need to call this here, the renderer is already doing it
+	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// 4. Calculates the cube's transform
 	glm::mat4 transform(1.0f);

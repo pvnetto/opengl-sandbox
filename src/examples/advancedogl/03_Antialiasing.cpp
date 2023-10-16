@@ -1,6 +1,8 @@
 #include "03_Antialiasing.h"
 
 #include "shared/RenderUtils.h"
+#include "shared/Utils.h"
+#include "shared/GlUtils.h"
 
 #include <spw/SimpleWindow.h>
 
@@ -24,16 +26,11 @@ void AOGL_03_Antialiasing::OnAttach() {
 	const float aspectRatio = (float) windowSize.X / windowSize.Y;
 	m_Camera.SetPerspective(90.f, aspectRatio, 0.1f, 100.f);
 
-	m_QuadModel = Utils::LoadModel("assets/quad.obj");
-	m_CubeVertexBuffer = Utils::LoadCube();
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 
-	m_ModelUniform = spr::createUniform("model", spr::UniformType::Mat4x4);
-	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
-	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
-	m_ColorUniform = spr::createUniform("color", spr::UniformType::Vec4);
-	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
-
-	glClearColor(0xa1, 0xa1, 0xa1, 0xff);
+	CreateCube();
+	m_DefaultShaderProgram = Utils::CreateShaderProgramGL("shaders/default_unlit.vert", "shaders/default_unlit.frag");
 
 	// 0. Creates Framebuffer and Multisampled Textures to use as attachments
 	// NOTE: If you're using GLFW, you can configure the Default Framebuffer to use MSAA with glfwWindowHint(GLFW_SAMPLES, numSamples), without
@@ -90,25 +87,7 @@ void AOGL_03_Antialiasing::OnUpdate() {
 
 	// 4. Performs a render pass using the Multisampled Framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, m_MSAAFramebuffer);
-
-	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
-	const float near = 0.1f, far = 1000.f;
-	spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
-	spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
-
-	glm::mat4 model(1.0f);
-	model = glm::translate(model, m_Position);
-	model = glm::rotate(model, 45.f, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::scale(model, m_Scale);
-
-	const glm::vec4 color{0.12f, 0.12f, 0.12f, 1.f};
-	spr::setVertexBuffer(m_CubeVertexBuffer);
-	spr::setUniform(m_ModelUniform, glm::value_ptr(model));
-	spr::setUniform(m_ColorUniform, glm::value_ptr(color));
-	spr::clear();
-	spr::submit(m_DefaultShaderProgram);
-	spr::flush();
+	DrawScene();
 
 	// 5. Performs multisample resolve (i.e., blits from a Multisampled Framebuffer to a Non-Multisampled one, in this case the Default Framebuffer)
 	const int defaultFramebuffer = 0;
@@ -123,14 +102,34 @@ void AOGL_03_Antialiasing::OnUpdate() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void AOGL_03_Antialiasing::DrawScene() {
+	glm::mat4 model(1.0f);
+	model = glm::translate(model, m_Position);
+	model = glm::rotate(model, 45.f, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::scale(model, m_Scale);
+
+	glUseProgram(m_DefaultShaderProgram);
+
+	const unsigned int modelLocation = glGetUniformLocation(m_DefaultShaderProgram, "model");
+	const unsigned int viewLocation = glGetUniformLocation(m_DefaultShaderProgram, "view");
+	const unsigned int projectionLocation = glGetUniformLocation(m_DefaultShaderProgram, "projection");
+	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(viewLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetView()));
+	glUniformMatrix4fv(projectionLocation, 1, GL_FALSE, glm::value_ptr(m_Camera.GetProjection()));
+
+	const glm::vec4 color{0.12f, 0.12f, 0.12f, 1.f};
+	const unsigned int colorLocation = glGetUniformLocation(m_DefaultShaderProgram, "color");
+	glUniform4fv(colorLocation, 1, glm::value_ptr(color));
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glBindVertexArray(m_CubeVertexArray);
+	glDrawArrays(GL_TRIANGLES, 0, m_CubeData.NumVertices);
+}
+
 void AOGL_03_Antialiasing::OnDetach() {
-	Utils::UnloadModel(m_QuadModel);
-	spr::destroy(m_CubeVertexBuffer);
-	spr::destroy(m_DefaultShaderProgram);
-	spr::destroy(m_ModelUniform);
-	spr::destroy(m_ViewUniform);
-	spr::destroy(m_ProjectionUniform);
-	spr::destroy(m_ColorUniform);
+	glDeleteVertexArrays(1, &m_CubeVertexArray);
+	glDeleteBuffers(1, &m_CubeVertexBuffer);
+	glDeleteProgram(m_DefaultShaderProgram);
 	InvalidateMSAAFramebuffer();
 }
 
@@ -147,4 +146,24 @@ void AOGL_03_Antialiasing::OnImGuiRender() {
 	ImGui::Spacing();
 
 	ImGui::End();
+}
+
+void AOGL_03_Antialiasing::CreateCube() {
+	m_CubeData = Utils::GetCubeData();
+
+	glCreateBuffers(1, &m_CubeVertexBuffer);
+	glNamedBufferStorage(m_CubeVertexBuffer, m_CubeData.VerticesSize * sizeof(float), m_CubeData.Vertices, 0);
+
+	glCreateVertexArrays(1, &m_CubeVertexArray);
+
+	const int bufferBindingPoint = 0;
+	glVertexArrayVertexBuffer(m_CubeVertexArray, bufferBindingPoint, m_CubeVertexBuffer, NULL, m_CubeData.Layout.getStride());
+	for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
+		const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+
+		glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+		glVertexArrayAttribBinding(m_CubeVertexArray, i, bufferBindingPoint);
+
+		glEnableVertexArrayAttrib(m_CubeVertexArray, i);
+	}
 }

@@ -14,21 +14,17 @@ public:
 	virtual void OnUpdate() override;
 
 private:
-	Utils::ModelInstance m_QuadModel;
-
-	spr::VertexBufferHandle m_CubeVertexBuffer;
-
-	spr::ProgramHandle m_DepthDrawShaderProgram;
-	spr::UniformHandle m_ModelUniform;
-	spr::UniformHandle m_ViewUniform;
-	spr::UniformHandle m_ProjectionUniform;
-
-	spr::ProgramHandle m_RenderPassShaderProgram;
-	spr::UniformHandle m_RenderTargetTextureUniform;
-	spr::UniformHandle m_NearPlaneUniform;
-	spr::UniformHandle m_FarPlaneUniform;
+	void CreateShaderProgram();
 
 private:
+	Utils::PrimitiveData m_QuadData;
+
+	unsigned int m_VertexArray;
+	unsigned int m_QuadVertexBuffer;
+	unsigned int m_QuadIndexBuffer;
+
+	unsigned int m_DepthDrawShaderProgram;
+
 	unsigned int m_Framebuffer;
 	unsigned int m_ColorBufferTexture;
 	unsigned int m_DepthBufferTexture;

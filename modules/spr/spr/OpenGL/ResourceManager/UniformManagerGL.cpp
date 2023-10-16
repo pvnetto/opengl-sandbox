@@ -13,7 +13,7 @@ namespace spr {
 		m_Owner = owner;
 	}
 
-	void UniformManagerGL::createUniform(const UniformHandle& handle, const UniformRef &uniformRef) {
+	void UniformManagerGL::createUniform(const UniformHandle handle, const UniformRef &uniformRef) {
 		uint32_t size = spr::getUniformSizeByType(uniformRef.Type) * uniformRef.Count;
 
 		// Initializes empty block of data
@@ -31,7 +31,7 @@ namespace spr {
 		m_UniformRegistry.remove(handle);
 	}
 
-	void UniformManagerGL::setUniformValue(const UniformHandle &handle, const void *data, uint32_t size) {
+	void UniformManagerGL::setUniformValue(const UniformHandle handle, const void *data, uint32_t size) {
 		memcpy(m_UniformValues[handle.idx], data, size);
 	}
 
