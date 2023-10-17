@@ -22,6 +22,7 @@ namespace spr {
 		uint32_t Height = 1;
 		uint32_t Depth = 1;
 		uint32_t MipCount = 1;
+		uint32_t NumSamples = 1;
 		TextureFormat Format;
 		uint32_t Flags = 0;
 	};

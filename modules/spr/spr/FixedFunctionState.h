@@ -6,11 +6,23 @@
 namespace spr {
 	// clang-format off
 	struct ColorBufferState {
-		uint8_t bColorWriteMask			: 1;
+
+		enum ColorChannelFlags {
+			NoChannels			= 0,
+			RedChannelFlag		= 0b0001,
+			GreenChannelFlag	= 0b0010,
+			BlueChannelFlag		= 0b0100,
+			AlphaChannelFlag	= 0b1000,
+			AllChannels			= RedChannelFlag | GreenChannelFlag | BlueChannelFlag | AlphaChannelFlag,
+		};
+
+		uint8_t bColorWriteMask			: 4;
+		uint8_t bMSAAEnabled			: 1;
 		//uint8_t						: 7;
 
 		ColorBufferState() {
-			bColorWriteMask = 1;
+			bColorWriteMask		= AllChannels;
+			bMSAAEnabled		= true;
 		}
 	};
 
@@ -116,8 +128,12 @@ namespace spr {
 		}
 
 		// Color Buffer
-		void SetColorWriteEnabled(bool bEnabled) {
-			ColorState.bColorWriteMask = bEnabled;
+		void SetColorWriteEnabled(bool bRedEnabled, bool bGreenEnabled, bool bBlueEnabled, bool bAlphaEnabled) {
+			ColorState.bColorWriteMask = 0;
+			ColorState.bColorWriteMask |= bRedEnabled	* ColorBufferState::RedChannelFlag;
+			ColorState.bColorWriteMask |= bGreenEnabled * ColorBufferState::GreenChannelFlag;
+			ColorState.bColorWriteMask |= bBlueEnabled	* ColorBufferState::BlueChannelFlag;
+			ColorState.bColorWriteMask |= bAlphaEnabled * ColorBufferState::AlphaChannelFlag;
 		}
 
 		// Stencil Testing

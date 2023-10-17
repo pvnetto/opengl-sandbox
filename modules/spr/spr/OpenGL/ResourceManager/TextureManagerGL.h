@@ -12,6 +12,8 @@ namespace spr {
 		uint32_t ID;
 
 		void create(const struct TextureInfo &textureInfo, const void *data);
+		void create2D(const struct TextureInfo &textureInfo, const void *data);
+		void create2DMultisampled(const struct TextureInfo &textureInfo, const void *data);
 		void destroy();
 		void bind(TextureUnitType unit) const;
 	};

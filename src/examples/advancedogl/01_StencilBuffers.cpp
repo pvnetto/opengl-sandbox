@@ -229,4 +229,6 @@ void AOGL_01_StencilBuffers::OnDetach() {
 	glDeleteFramebuffers(1, &m_Framebuffer);
 	glDeleteTextures(1, &m_ColorBufferTexture);
 	glDeleteTextures(1, &m_StencilDepthBufferTexture);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

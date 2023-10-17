@@ -115,16 +115,18 @@ namespace spr {
 				currentProgram.bindAttributes(m_DefaultVAO, vertexBuffer);
 			}
 
-			if (cachedDrawCall.IndexBuffer.isValid()) {
-				const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
-				const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
-				glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
-			}
-			else {
-				const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
-				const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
-				const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
-				glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+			if (cachedDrawCall.VertexBuffer.isValid()) {
+				if (cachedDrawCall.IndexBuffer.isValid()) {
+					const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
+					const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
+					glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
+				}
+				else {
+					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
+					const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
+					const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
+					glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+				}			
 			}
 		}
 
@@ -234,9 +236,20 @@ namespace spr {
 	}
 
 	void RendererContextGL::applyColorState(const spr::ColorBufferState &state) {
-		// TODO: Add one mask per channel
-		const GLboolean colorMask = state.bColorWriteMask ? GL_TRUE : GL_FALSE;
-		glColorMask(colorMask, colorMask, colorMask, colorMask);
+		// clang-format off
+		const GLboolean redMask		= state.bColorWriteMask & spr::ColorBufferState::RedChannelFlag		? GL_TRUE : GL_FALSE;
+		const GLboolean greenMask	= state.bColorWriteMask & spr::ColorBufferState::GreenChannelFlag	? GL_TRUE : GL_FALSE;
+		const GLboolean blueMask	= state.bColorWriteMask & spr::ColorBufferState::BlueChannelFlag	? GL_TRUE : GL_FALSE;
+		const GLboolean alphaMask	= state.bColorWriteMask & spr::ColorBufferState::AlphaChannelFlag	? GL_TRUE : GL_FALSE;
+		// clang-format on
+		glColorMask(redMask, greenMask, blueMask, alphaMask);
+
+		if (state.bMSAAEnabled) {
+			glEnable(GL_MULTISAMPLE);
+		}
+		else {
+			glDisable(GL_MULTISAMPLE);
+		}
 	}
 
 	void RendererContextGL::applyDepthState(const spr::DepthBufferState &state) {

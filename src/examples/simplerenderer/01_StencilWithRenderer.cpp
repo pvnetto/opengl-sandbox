@@ -35,19 +35,22 @@ void SPRE_01_StencilWithRenderer::OnAttach() {
 	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 
 
+	static const int msaaSampleCount = 8;
 	const auto &[windowWidth, windowHeight] = spw::getWindowSize();
 	spr::TextureInfo colorTextureInfo;
-	colorTextureInfo.Width		= windowWidth;
-	colorTextureInfo.Height		= windowHeight;
-	colorTextureInfo.Format		= spr::TextureFormat::RGB8;
-	colorTextureInfo.Flags		|= (uint8_t) spr::TextureFlags::IsRenderTargetTexture;
+	colorTextureInfo.Width			= windowWidth;
+	colorTextureInfo.Height			= windowHeight;
+	colorTextureInfo.Format			= spr::TextureFormat::RGB8;
+	colorTextureInfo.Flags			|= (uint8_t) spr::TextureFlags::IsRenderTargetTexture;
+	colorTextureInfo.NumSamples		= msaaSampleCount; 
 	m_ColorBufferTexture = spr::createTexture(colorTextureInfo, nullptr);
 
 	spr::TextureInfo stencilDepthTextureInfo;
-	stencilDepthTextureInfo.Width	= windowWidth;
-	stencilDepthTextureInfo.Height	= windowHeight;
-	stencilDepthTextureInfo.Format	= spr::TextureFormat::DEPTH_24_STENCIL_8;
-	stencilDepthTextureInfo.Flags	|= (uint8_t)spr::TextureFlags::IsRenderTargetTexture;
+	stencilDepthTextureInfo.Width			= windowWidth;
+	stencilDepthTextureInfo.Height			= windowHeight;
+	stencilDepthTextureInfo.Format			= spr::TextureFormat::DEPTH_24_STENCIL_8;
+	stencilDepthTextureInfo.Flags			|= (uint8_t)spr::TextureFlags::IsRenderTargetTexture;
+	stencilDepthTextureInfo.NumSamples		= msaaSampleCount; 
 	m_StencilDepthBufferTexture = spr::createTexture(stencilDepthTextureInfo, nullptr);
 
 	m_Framebuffer = spr::createFramebuffer({
@@ -55,6 +58,7 @@ void SPRE_01_StencilWithRenderer::OnAttach() {
 		{ spr::FramebufferAttachmentType::DepthStencil, m_StencilDepthBufferTexture },
 	});
 
+	// TODO: Move to RenderTarget clear config
 	glClearColor(0.88f, 0.88f, 0.88f, 1.0f);
 }
 
@@ -74,13 +78,11 @@ void SPRE_01_StencilWithRenderer::OnUpdate() {
 	spr::setRenderTargetClear(renderPassTarget, 0);
 	spr::setRenderTargetRect(renderPassTarget, { 0, 0, (uint32_t) windowWidth, (uint32_t) windowHeight });
 
-
 	// 1. Stencil Pass:
 	// - Performs a render pass on a framebuffer while writing only to the stencil buffer;
 	// - The purpose of this pass is to fill the stencil buffer with values that can be used by another pass on the same framebuffer;
 	{
 		spr::FixedFunctionState state;
-		state.SetDepthTestEnabled(false);
 		state.SetStencilTestEnabled(true);
 		state.SetStencilWriteMask(0xff);
 		state.SetStencilTest(spr::StencilBufferState::TestFnAlways, 0x01, 0xff);

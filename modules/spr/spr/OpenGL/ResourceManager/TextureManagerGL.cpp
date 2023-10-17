@@ -30,13 +30,14 @@ namespace spr {
 	}
 
 	void TextureInstanceGL::create(const TextureInfo &textureInfo, const void *data) {
-		glCreateTextures(GL_TEXTURE_2D, 1, &ID);
-
-		if (textureInfo.Depth == 1) {
-			glTextureStorage2D(ID, textureInfo.MipCount, getInternalFormatGL(textureInfo.Format), textureInfo.Width, textureInfo.Height);	
+		assert(textureInfo.Depth == 1 && "::ERROR: 3D textures are not supported yet");
+		
+		const bool bMultisampled = textureInfo.NumSamples > 1;
+		if (bMultisampled) {
+			create2DMultisampled(textureInfo, data);
 		}
 		else {
-			assert(false && "::ERROR: 3D textures are not supported yet");
+			create2D(textureInfo, data);
 		}
 
 		// Render target textures don't need to store data, as they'll be filled during rendering
@@ -49,6 +50,16 @@ namespace spr {
 				glGenerateTextureMipmap(ID);
 			}
 		}
+	}
+
+	void TextureInstanceGL::create2D(const TextureInfo& textureInfo, const void* data) {
+		glCreateTextures(GL_TEXTURE_2D, 1, &ID);
+		glTextureStorage2D(ID, textureInfo.MipCount, getInternalFormatGL(textureInfo.Format), textureInfo.Width, textureInfo.Height);
+	}
+
+	void TextureInstanceGL::create2DMultisampled(const TextureInfo &textureInfo, const void *data) {
+		glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &ID);
+		glTextureStorage2DMultisample(ID, textureInfo.NumSamples, getInternalFormatGL(textureInfo.Format), textureInfo.Width, textureInfo.Height, GL_TRUE);
 	}
 
 	void TextureInstanceGL::destroy() {
