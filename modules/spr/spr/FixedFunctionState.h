@@ -7,21 +7,48 @@ namespace spr {
 	// clang-format off
 	struct ColorBufferState {
 
-		enum ColorChannelFlags {
-			NoChannels			= 0,
-			RedChannelFlag		= 0b0001,
-			GreenChannelFlag	= 0b0010,
-			BlueChannelFlag		= 0b0100,
-			AlphaChannelFlag	= 0b1000,
-			AllChannels			= RedChannelFlag | GreenChannelFlag | BlueChannelFlag | AlphaChannelFlag,
+		enum BlendingFactor : uint8_t {
+			FactorZero								= 0b00000,
+			FactorOne								= 0b00001,
+			FactorSourceColor						= 0b00010,
+			FactorOneMinusSourceColor				= 0b00011,
+			FactorDestinationColor					= 0b00100,
+			FactorOneMinusDestinationColor			= 0b00101,
+			FactorSourceAlpha						= 0b00110,
+			FactorOneMinusSourceAlpha				= 0b00111,
+			FactorDestinationAlpha					= 0b01000,
+			FactorOneMinusDestinationAlpha			= 0b01001,
+			FactorConstantColor						= 0b01010,
+			FactorOneMinusConstantColor				= 0b01011,
+			FactorConstantAlpha						= 0b01100,
+			FactorOneMinusConstantAlpha				= 0b01101,
+
+			FactorSourceDefault						= FactorSourceAlpha,
+			FactorDestinationDefault				= FactorOneMinusSourceAlpha,
 		};
 
-		uint8_t bColorWriteMask			: 4;
-		uint8_t bMSAAEnabled			: 1;
-		//uint8_t						: 7;
+		// byte 1
+		uint8_t BlendingSourceFactor			: 5;
+		uint8_t RedMask							: 1;
+		uint8_t GreenMask						: 1;
+		uint8_t BlueMask						: 1;
+
+		// byte 2
+		uint8_t AlphaMask						: 1;
+		uint8_t bIsBlendingEnabled				: 1;
+		uint8_t BlendingDestinationFactor		: 5;
+		uint8_t bMSAAEnabled					: 1;
 
 		ColorBufferState() {
-			bColorWriteMask		= AllChannels;
+			RedMask				= true;
+			GreenMask			= true;
+			BlueMask			= true;
+			AlphaMask			= true;
+
+			bIsBlendingEnabled			= false;
+			BlendingSourceFactor		= FactorSourceDefault;
+			BlendingDestinationFactor	= FactorDestinationDefault;
+
 			bMSAAEnabled		= true;
 		}
 	};
@@ -114,9 +141,10 @@ namespace spr {
 
 
 	struct FixedFunctionState {
-		DepthBufferState	DepthState;			// head: -,		tail: -3b
-		StencilBufferState	StencilState;		// head: +8b,	tail: -1b
-		ColorBufferState	ColorState;			// head: +1b,	tail: -7b
+		// There's some bit packing waste here, but we don't care about it
+		StencilBufferState	StencilState;
+		DepthBufferState	DepthState;
+		ColorBufferState	ColorState;
 
 		inline bool operator==(const FixedFunctionState& other) const {
 			// Assumes the state is basically a huge bitmask, with only primitive integer types
@@ -129,11 +157,16 @@ namespace spr {
 
 		// Color Buffer
 		void SetColorWriteEnabled(bool bRedEnabled, bool bGreenEnabled, bool bBlueEnabled, bool bAlphaEnabled) {
-			ColorState.bColorWriteMask = 0;
-			ColorState.bColorWriteMask |= bRedEnabled	* ColorBufferState::RedChannelFlag;
-			ColorState.bColorWriteMask |= bGreenEnabled * ColorBufferState::GreenChannelFlag;
-			ColorState.bColorWriteMask |= bBlueEnabled	* ColorBufferState::BlueChannelFlag;
-			ColorState.bColorWriteMask |= bAlphaEnabled * ColorBufferState::AlphaChannelFlag;
+			// clang-format off
+			ColorState.RedMask		|= bRedEnabled;
+			ColorState.GreenMask	|= bGreenEnabled;
+			ColorState.BlueMask		|= bBlueEnabled;
+			ColorState.AlphaMask	|= bAlphaEnabled;
+			// clang-format on
+		}
+
+		void SetBlendingEnabled(bool bBlendingEnabled) {
+			ColorState.bIsBlendingEnabled = bBlendingEnabled;
 		}
 
 		// Stencil Testing

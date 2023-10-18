@@ -116,10 +116,9 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::submit(m_DefaultShaderProgram);
 	}
 	spr::flush();
-	glDisable(GL_BLEND);
 
-	// (OPTIONAL) Rendering Opaque objects first without ordering the draw calls by depth is usually wrong, but we're doing
-	// it here for demonstration purposes.
+	// (OPTIONAL) Rendering the Opaque Pass before the Transparency Pass is usually wrong, as the Depth Testing might hide
+	// them if the transparent objects are in front of them, but we're doing it here for demonstration purposes.
 	if (!m_OpaqueFirst) {
 		const bool bClearColor = false;
 		renderOpaquePass(bClearColor);
@@ -134,6 +133,8 @@ void AOGL_02_Blending::OnDetach() {
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);
 	spr::destroy(m_ColorUniform);
+
+	glDisable(GL_BLEND);
 }
 
 void AOGL_02_Blending::OnImGuiRender() {

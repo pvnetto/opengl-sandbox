@@ -231,18 +231,74 @@ namespace spr {
 			return GL_ALWAYS;
 		}
 
-		assert(false && "spr::ERROR: Unknown stencil fn flag");
+		assert(false && "spr::ERROR: Unknown depth fn flag");
 		return getDepthFnGL(spr::DepthBufferState::TestFnDefault);
 	}
 
+	static GLenum getBlendFactorGL(const uint8_t factorFlag) {
+		if (factorFlag == spr::ColorBufferState::FactorZero)
+		{
+			return GL_ZERO;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOne)
+		{
+			return GL_ONE;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorSourceColor)
+		{
+			return GL_SRC_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusSourceColor)
+		{
+			return GL_ONE_MINUS_SRC_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorDestinationColor)
+		{
+			return GL_DST_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusDestinationColor)
+		{
+			return GL_ONE_MINUS_DST_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorSourceAlpha)
+		{
+			return GL_SRC_ALPHA;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusSourceAlpha)
+		{
+			return GL_ONE_MINUS_SRC_ALPHA;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorDestinationAlpha)
+		{
+			return GL_DST_ALPHA;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusDestinationAlpha)
+		{
+			return GL_ONE_MINUS_DST_ALPHA;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorConstantColor)
+		{
+			return GL_CONSTANT_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusConstantColor)
+		{
+			return GL_ONE_MINUS_CONSTANT_COLOR;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorConstantAlpha)
+		{
+			return GL_CONSTANT_ALPHA;
+		}
+		if (factorFlag == spr::ColorBufferState::FactorOneMinusConstantAlpha)
+		{
+			return GL_ONE_MINUS_CONSTANT_ALPHA;
+		}
+
+		assert(false && "spr::ERROR: Unknown factor flag");
+		return getBlendFactorGL(spr::ColorBufferState::FactorSourceDefault);
+	}
+
 	void RendererContextGL::applyColorState(const spr::ColorBufferState &state) {
-		// clang-format off
-		const GLboolean redMask		= state.bColorWriteMask & spr::ColorBufferState::RedChannelFlag		? GL_TRUE : GL_FALSE;
-		const GLboolean greenMask	= state.bColorWriteMask & spr::ColorBufferState::GreenChannelFlag	? GL_TRUE : GL_FALSE;
-		const GLboolean blueMask	= state.bColorWriteMask & spr::ColorBufferState::BlueChannelFlag	? GL_TRUE : GL_FALSE;
-		const GLboolean alphaMask	= state.bColorWriteMask & spr::ColorBufferState::AlphaChannelFlag	? GL_TRUE : GL_FALSE;
-		// clang-format on
-		glColorMask(redMask, greenMask, blueMask, alphaMask);
+		glColorMask(state.RedMask, state.GreenMask, state.BlueMask, state.AlphaMask);
 
 		if (state.bMSAAEnabled) {
 			glEnable(GL_MULTISAMPLE);
@@ -250,35 +306,45 @@ namespace spr {
 		else {
 			glDisable(GL_MULTISAMPLE);
 		}
+
+		if (state.bIsBlendingEnabled) {
+			glEnable(GL_BLEND);
+
+			const GLenum blendSourceFactor = getBlendFactorGL(state.BlendingSourceFactor);
+			const GLenum blendDestinationFactor = getBlendFactorGL(state.BlendingDestinationFactor);
+			glBlendFunc(blendSourceFactor, blendDestinationFactor);
+		}
+		else {
+			glDisable(GL_BLEND);
+		}
 	}
 
 	void RendererContextGL::applyDepthState(const spr::DepthBufferState &state) {
 		if (state.bIsDepthTestEnabled) {
 			glEnable(GL_DEPTH_TEST);
+			glDepthMask(state.bDepthWriteMask ? GL_TRUE : GL_FALSE);
+			glDepthFunc(getDepthFnGL(state.DepthTestFn));
 		}
 		else {
 			glDisable(GL_DEPTH_TEST);
 		}
-
-		glDepthMask(state.bDepthWriteMask ? GL_TRUE : GL_FALSE);
-		glDepthFunc(getDepthFnGL(state.DepthTestFn));
 	}
 
 	void RendererContextGL::applyStencilState(const spr::StencilBufferState &state) {
 		if (state.bIsStencilTestEnabled) {
 			glEnable(GL_STENCIL_TEST);
+
+			const GLenum stencilTestFn = getStencilFnGL(state.StencilTestFn);
+			glStencilFunc(stencilTestFn, state.StencilTestReferenceValue, state.StencilTestMask);
+
+			const GLenum stencilFailOp = getStencilOpGL(state.StencilFailOp);
+			const GLenum stencilPassDepthFailOp = getStencilOpGL(state.StencilPassDepthFailOp);
+			const GLenum stencilPassDepthPassOp = getStencilOpGL(state.StencilPassDepthPassOp);
+			glStencilOp(stencilFailOp, stencilPassDepthFailOp, stencilPassDepthPassOp);
 		}
 		else {
 			glDisable(GL_STENCIL_TEST);
 		}
-
-		const GLenum stencilTestFn = getStencilFnGL(state.StencilTestFn);
-		glStencilFunc(stencilTestFn, state.StencilTestReferenceValue, state.StencilTestMask);
-
-		const GLenum stencilFailOp = getStencilOpGL(state.StencilFailOp);
-		const GLenum stencilPassDepthFailOp = getStencilOpGL(state.StencilPassDepthFailOp);
-		const GLenum stencilPassDepthPassOp = getStencilOpGL(state.StencilPassDepthPassOp);
-		glStencilOp(stencilFailOp, stencilPassDepthFailOp, stencilPassDepthPassOp);
 	}
 
 	void RendererContextGL::setUniforms(UniformInfoBufferPtr uniformInfoBuffer) {

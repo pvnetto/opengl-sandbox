@@ -14,8 +14,8 @@ void SPRE_01_StencilWithRenderer::OnAttach() {
 	    glm::vec3(-2.8f, 2.f, 2.8f),
 	    glm::vec3(-26.f, -42.f, 0.f),
 	    glm::vec3(0.f, 1.f, 0.f));
-	m_ObjectColor = glm::vec3{0.2f, 0.35f, 1.f};
-	m_LightColor = glm::vec3{0.8f, 0.8f, 1.f};
+	m_ObjectColor = { 0.2f, 0.35f, 1.f };
+	m_LightColor = { 0.8f, 0.8f, 1.f };
 
 	m_QuadModel = Utils::LoadModel("assets/quad.obj");
 	m_CubeVertexBuffer = Utils::LoadCube();
@@ -30,9 +30,11 @@ void SPRE_01_StencilWithRenderer::OnAttach() {
 	m_ViewPositionUniform = spr::createUniform("viewPos", spr::UniformType::Vec3);
 	m_LightColorUniform = spr::createUniform("lightColor", spr::UniformType::Vec3);
 	m_LightPositionUniform = spr::createUniform("lightPos", spr::UniformType::Vec3);
-	m_ObjectColorUniform = spr::createUniform("objectColor", spr::UniformType::Vec3);
+	m_ObjectColorUniform = spr::createUniform("objectColor", spr::UniformType::Vec4);
+	m_ColorUniform = spr::createUniform("color", spr::UniformType::Vec4);
+	
 	m_LightingShaderProgram = Utils::LoadShaderProgram("shaders/07_phong.vert", "shaders/07_phong.frag");
-	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
+	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
 
 
 	static const int msaaSampleCount = 8;
@@ -106,8 +108,7 @@ void SPRE_01_StencilWithRenderer::OnUpdate() {
 	// - The idea here is to disable Stencil writing and only use Stencil values for testing;
 	// - We're only going to write to fragments whose Stencil values are 0 (i.e., subtract mask);
 	{
-
-		glm::vec3 lightSourcePos = glm::vec3(std::cos(Runtime::get()->getTime()),
+		const glm::vec3 lightSourcePos = glm::vec3(std::cos(Runtime::get()->getTime()),
 		                                     std::cos(Runtime::get()->getTime()) * std::sin(Runtime::get()->getTime()),
 		                                     std::sin(Runtime::get()->getTime()) * 2.f);
 
@@ -115,25 +116,27 @@ void SPRE_01_StencilWithRenderer::OnUpdate() {
 		sourceModel = glm::translate(sourceModel, lightSourcePos);
 		sourceModel = glm::scale(sourceModel, glm::vec3(0.3f, 0.3f, 0.3f));
 
-		spr::FixedFunctionState state;
-		state.SetStencilTestEnabled(true);
-		state.SetStencilWriteMask(0x00);
-		state.SetStencilTest(spr::StencilBufferState::TestFnNotEqual, 0x01, 0xff);
-		state.SetStencilOp(spr::StencilBufferState::OpKeep, spr::StencilBufferState::OpKeep, spr::StencilBufferState::OpKeep);
-		spr::setFixedFunctionState(state);
+		spr::FixedFunctionState renderPassState;
+		renderPassState.SetStencilTestEnabled(true);
+		renderPassState.SetStencilWriteMask(0x00);
+		renderPassState.SetStencilTest(spr::StencilBufferState::TestFnNotEqual, 0x01, 0xff);
+		renderPassState.SetStencilOp(spr::StencilBufferState::OpKeep, spr::StencilBufferState::OpKeep, spr::StencilBufferState::OpKeep);
 
+		const glm::vec4 lightSourceColor{m_LightColor.r, m_LightColor.g, m_LightColor.b, 1.f};
+		spr::setFixedFunctionState(renderPassState);
 		spr::setVertexBuffer(m_CubeVertexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(sourceModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
-		spr::setUniform(m_LightColorUniform, glm::value_ptr(m_LightColor));
-		spr::submit(renderPassTarget, m_LightSourceShaderProgram);
+		spr::setUniform(m_ColorUniform, glm::value_ptr(lightSourceColor));
+		spr::submit(renderPassTarget, m_UnlitShaderProgram);
 
 		glm::mat4 litModel(1.0f);
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 0.8f, glm::vec3(0.0f, 0.0f, 1.0f));
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 2.f, glm::vec3(0.0f, 1.0f, 0.0f));
 		litModel = glm::rotate(litModel, Runtime::get()->getTime() * 1.2f, glm::vec3(1.0f, 0.0f, 0.0f));
 
+		spr::setFixedFunctionState(renderPassState);
 		spr::setVertexBuffer(m_CubeVertexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
@@ -169,7 +172,7 @@ void SPRE_01_StencilWithRenderer::OnDetach() {
 	Utils::UnloadModel(m_QuadModel);
 	spr::destroy(m_CubeVertexBuffer);
 	spr::destroy(m_LightingShaderProgram);
-	spr::destroy(m_LightSourceShaderProgram);
+	spr::destroy(m_UnlitShaderProgram);
 	spr::destroy(m_ModelUniform);
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);
@@ -177,6 +180,7 @@ void SPRE_01_StencilWithRenderer::OnDetach() {
 	spr::destroy(m_LightColorUniform);
 	spr::destroy(m_LightPositionUniform);
 	spr::destroy(m_ObjectColorUniform);
+	spr::destroy(m_ColorUniform);
 	spr::destroy(m_StencilPassShaderProgram);
 	spr::destroy(m_ResolutionUniform);
 	spr::destroy(m_TimeUniform);

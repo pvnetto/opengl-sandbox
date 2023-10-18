@@ -41,6 +41,8 @@ private:
 	spr::UniformHandle m_LightPositionUniform;
 	spr::UniformHandle m_ObjectColorUniform;
 
-	spr::ProgramHandle m_LightSourceShaderProgram;
+	spr::UniformHandle m_ColorUniform;
+
+	spr::ProgramHandle m_UnlitShaderProgram;
 
 };
