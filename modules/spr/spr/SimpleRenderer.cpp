@@ -26,6 +26,8 @@ namespace spr {
 	}
 
 	void render() {
+		s_Context.getFrameDataManager().sortDrawCalls();
+
 		const FrameData &frameData = s_Context.getFrameDataManager().getCurrentFrameData();
 		s_Context.getRendererContext().render(frameData);
 	}

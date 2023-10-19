@@ -6,7 +6,7 @@
 #include "shared/Camera.h"
 #include "shared/FreeCameraController.h"
 
-class SPRE_01_StencilWithRenderer : public Layer {
+class SPRE_01_Stenciling : public Layer {
 public:
 	virtual void OnAttach() override;
 	virtual void OnDetach() override;

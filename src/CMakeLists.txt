@@ -42,7 +42,8 @@ set(SANDBOX_SOURCES
 		examples/advancedogl/04_Instancing.cpp
 		examples/advancedogl/05_GeometryShading.cpp
 		examples/advancedogl/06_Tessellation.cpp
-		examples/simplerenderer/01_StencilWithRenderer.cpp
+		examples/simplerenderer/01_Stenciling.cpp
+		examples/simplerenderer/02_OrderIndependentBlending.cpp
 		)
 
 

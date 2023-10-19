@@ -1,4 +1,4 @@
-#include "01_StencilWithRenderer.h"
+#include "01_Stenciling.h"
 
 #include "shared/RenderUtils.h"
 #include "shared/Runtime.h"
@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
 
-void SPRE_01_StencilWithRenderer::OnAttach() {
+void SPRE_01_Stenciling::OnAttach() {
 	m_Camera = Camera(
 	    glm::vec3(-2.8f, 2.f, 2.8f),
 	    glm::vec3(-26.f, -42.f, 0.f),
@@ -66,7 +66,7 @@ void SPRE_01_StencilWithRenderer::OnAttach() {
 
 using ClearFlags = spr::FramebufferAttachmentFlags;
 
-void SPRE_01_StencilWithRenderer::OnUpdate() {
+void SPRE_01_Stenciling::OnUpdate() {
 	// 0. Sets up render targets
 	const auto &[windowWidth, windowHeight] = spw::getWindowSize();
 
@@ -168,7 +168,7 @@ void SPRE_01_StencilWithRenderer::OnUpdate() {
 	spr::flush();
 }
 
-void SPRE_01_StencilWithRenderer::OnDetach() {
+void SPRE_01_Stenciling::OnDetach() {
 	Utils::UnloadModel(m_QuadModel);
 	spr::destroy(m_CubeVertexBuffer);
 	spr::destroy(m_LightingShaderProgram);

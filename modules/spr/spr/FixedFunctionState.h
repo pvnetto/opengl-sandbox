@@ -27,6 +27,16 @@ namespace spr {
 			FactorDestinationDefault				= FactorOneMinusSourceAlpha,
 		};
 
+		enum BlendingEquation : uint8_t {
+			BlendEquationAdd					= 0b000,
+			BlendEquationSubtract				= 0b001,
+			BlendEquationReverseSubtract		= 0b010,
+			BlendEquationMinFn					= 0b011,
+			BlendEquationMaxFn					= 0b100,
+
+			BlendEquationDefault				= BlendEquationAdd,
+		};
+
 		// byte 1
 		uint8_t BlendingSourceFactor			: 5;
 		uint8_t RedMask							: 1;
@@ -39,6 +49,11 @@ namespace spr {
 		uint8_t BlendingDestinationFactor		: 5;
 		uint8_t bMSAAEnabled					: 1;
 
+		// byte 3
+		uint8_t BlendingEquation				: 3;
+		//uint8_t								: 5;
+
+
 		ColorBufferState() {
 			RedMask				= true;
 			GreenMask			= true;
@@ -48,6 +63,7 @@ namespace spr {
 			bIsBlendingEnabled			= false;
 			BlendingSourceFactor		= FactorSourceDefault;
 			BlendingDestinationFactor	= FactorDestinationDefault;
+			BlendingEquation			= BlendEquationDefault;
 
 			bMSAAEnabled		= true;
 		}
@@ -125,7 +141,7 @@ namespace spr {
 		//uint8_t							: 1;
 
 		StencilBufferState() {
-			bIsStencilTestEnabled				= false;
+			bIsStencilTestEnabled			= false;
 			StencilWriteMaskFront			= 0b11111111;
 			StencilWriteMaskBack			= 0b11111111;
 
@@ -139,6 +155,27 @@ namespace spr {
 		}
 	};
 
+	// Refer to this for draw call sorting: https://realtimecollisiondetection.net/blog/?p=86
+	struct DrawCallSortKey {
+		uint8_t bIsBlendingDisabled	: 1;
+		uint8_t BlendingEquation	: 3;
+		//uint8_t					: 7;
+
+		inline bool operator>(const DrawCallSortKey& otherKey) const {
+			// -0: 1st different byte in other is greater than this
+			//  0: Equal
+			// +0: 1st different byte in this is greater than other
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) > 0;
+		}
+
+		inline bool operator<(const DrawCallSortKey& otherKey) const {
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) < 0;
+		}
+
+		inline bool operator==(const DrawCallSortKey& otherKey) const {
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) == 0;
+		}
+	};
 
 	struct FixedFunctionState {
 		// There's some bit packing waste here, but we don't care about it
@@ -153,6 +190,13 @@ namespace spr {
 
 		inline bool operator !=(const FixedFunctionState& other) const {
 			return !(*this == other);
+		}
+
+		DrawCallSortKey GetSortKey() const {
+			DrawCallSortKey sortKey;
+			sortKey.bIsBlendingDisabled		= !(!!ColorState.bIsBlendingEnabled);
+			sortKey.BlendingEquation		= ColorState.BlendingEquation;
+			return sortKey;
 		}
 
 		// Color Buffer

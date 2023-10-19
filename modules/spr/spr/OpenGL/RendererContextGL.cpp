@@ -66,6 +66,7 @@ namespace spr {
 				cachedDrawCall.RenderTargetIndex = drawCall.RenderTargetIndex;
 			}
 
+			// TODO: Instead of always applying the entire state, use dirty flags on each property to avoid state changes
 			if (drawCall.FixedFunctionState != cachedDrawCall.FixedFunctionState) {
 				applyColorState(drawCall.FixedFunctionState.ColorState);
 				applyDepthState(drawCall.FixedFunctionState.DepthState);
@@ -297,6 +298,27 @@ namespace spr {
 		return getBlendFactorGL(spr::ColorBufferState::FactorSourceDefault);
 	}
 
+	static GLenum getBlendEquationGL(const uint8_t blendEquationFlag) {
+		if (blendEquationFlag == spr::ColorBufferState::BlendEquationAdd) {
+			return GL_FUNC_ADD;	
+		}
+		if (blendEquationFlag == spr::ColorBufferState::BlendEquationSubtract) {
+			return GL_FUNC_SUBTRACT;
+		}
+		if (blendEquationFlag == spr::ColorBufferState::BlendEquationReverseSubtract) {
+			return GL_FUNC_REVERSE_SUBTRACT;
+		}
+		if (blendEquationFlag == spr::ColorBufferState::BlendEquationMinFn) {
+			return GL_MIN;
+		}
+		if (blendEquationFlag == spr::ColorBufferState::BlendEquationMaxFn) {
+			return GL_MAX;
+		}
+
+		assert(false && "spr::ERROR: Unknown blend equation flag");
+		return getBlendEquationGL(spr::ColorBufferState::BlendEquationDefault);
+	}
+
 	void RendererContextGL::applyColorState(const spr::ColorBufferState &state) {
 		glColorMask(state.RedMask, state.GreenMask, state.BlueMask, state.AlphaMask);
 
@@ -313,6 +335,9 @@ namespace spr {
 			const GLenum blendSourceFactor = getBlendFactorGL(state.BlendingSourceFactor);
 			const GLenum blendDestinationFactor = getBlendFactorGL(state.BlendingDestinationFactor);
 			glBlendFunc(blendSourceFactor, blendDestinationFactor);
+
+			const GLenum blendEquation = getBlendEquationGL(state.BlendingEquation);
+			glBlendEquation(blendEquation);
 		}
 		else {
 			glDisable(GL_BLEND);

@@ -4,6 +4,7 @@
 #include <spr/ResourceManager/SamplerInfo.h>
 
 #include <cassert>
+#include <algorithm>
 
 #define CHECK_RENDER_TARGET_INDEX(index) assert(index >= 0 && index < RenderTarget::kMaxRenderTargets)
 
@@ -19,6 +20,13 @@ namespace spr {
 		for (uint8_t i = 0; i < RenderTarget::kMaxRenderTargets; i++) {
 			RenderTargets[i].Framebuffer = kInvalidHandle;
 		}
+	}
+
+	// DrawCalls are sorted by descending order. If DrawCallA > DrawCallB, it should be executed first.
+	void FrameData::sortDrawCalls() {
+		std::sort(DrawCalls.begin(), DrawCalls.end(), [](const auto& drawCallA, const auto& drawCallB) {
+			return drawCallA > drawCallB;
+		});
 	}
 
 	uint32_t FrameData::lastDrawCallUniformEnd() {
@@ -56,6 +64,10 @@ namespace spr {
 	void FrameDataManager::reset() {
 		m_CurrentFrame.clear();
 		m_CurrentDrawCall.clear();
+	}
+
+	void FrameDataManager::sortDrawCalls() {
+		m_CurrentFrame.sortDrawCalls();
 	}
 
 	void FrameDataManager::setVertexBuffer(const VertexBufferHandle handle) {

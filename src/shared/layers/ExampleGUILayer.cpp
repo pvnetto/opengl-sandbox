@@ -28,7 +28,8 @@
 #include "examples/advancedogl/04_Instancing.h"
 #include "examples/advancedogl/05_GeometryShading.h"
 #include "examples/advancedogl/06_Tessellation.h"
-#include "examples/simplerenderer/01_StencilWithRenderer.h"
+#include "examples/simplerenderer/01_Stenciling.h"
+#include "examples/simplerenderer/02_OrderIndependentBlending.h"
 
 #include "shared/Runtime.h"
 
@@ -77,7 +78,8 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_05_GeometryShading,		"05 - Geometry Shading");
 	ADD_SIMPLE(AdvancedOpenGL, AOGL_06_Tessellation,		"06 - Tessellation Shading");
 
-	ADD_SIMPLE(RendererExamples, SPRE_01_StencilWithRenderer,	"01 - Stenciling");
+	ADD_SIMPLE(RendererExamples, SPRE_01_Stenciling,				"01 - Stenciling");
+	ADD_SIMPLE(RendererExamples, SPRE_02_OrderIndependentBlending,	"02 - Order Independent Blending");
 }
 
 void ExampleGUILayer::OnImGuiRender() {

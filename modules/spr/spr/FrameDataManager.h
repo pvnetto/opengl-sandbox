@@ -42,6 +42,19 @@ namespace spr {
 
 		uint8_t RenderTargetIndex = RenderTarget::kMaxRenderTargets;
 
+		inline bool operator>(const DrawCallData& other) const {
+			return FixedFunctionState.GetSortKey() > other.FixedFunctionState.GetSortKey();
+		}
+
+		inline bool operator<(const DrawCallData& other) const {
+			return FixedFunctionState.GetSortKey() < other.FixedFunctionState.GetSortKey();
+		}
+
+		inline bool operator==(const DrawCallData& other) const {
+			return FixedFunctionState.GetSortKey() == other.FixedFunctionState.GetSortKey();
+		}
+
+
 
 		void clear();
 	};
@@ -61,6 +74,7 @@ namespace spr {
 		RenderTarget					RenderTargets[RenderTarget::kMaxRenderTargets + 1];
 
 		void clear();
+		void sortDrawCalls();
 		uint32_t lastDrawCallUniformEnd();
 	};
 
@@ -75,6 +89,8 @@ namespace spr {
 		void submit(uint8_t renderTargetIndex, ProgramHandle &program);
 		/* Cleans current frame data. This should be called after rendering a frame */
 		void reset();
+		/* Sorts draw calls by their sort key */
+		void sortDrawCalls();
 
 		void setVertexBuffer(const VertexBufferHandle handle);
 		void setIndexBuffer(const IndexBufferHandle handle);
