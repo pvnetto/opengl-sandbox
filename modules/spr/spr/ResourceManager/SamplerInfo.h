@@ -27,6 +27,13 @@ namespace spr {
 
 		static SamplerInfo Default;
 
+		inline bool operator==(const SamplerInfo& other) const {
+			return MagnificationFilter == other.MagnificationFilter
+				&& MinificationFilter == other.MinificationFilter
+				&& WrappingHorizontal == other.WrappingHorizontal
+				&& WrappingVertical == other.WrappingVertical;
+		}
+
 		SamplerHashType GetHash() const {
 			SamplerHashType hash = 0;
 			hashCombine(hash,

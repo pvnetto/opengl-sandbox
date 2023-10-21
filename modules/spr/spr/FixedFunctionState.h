@@ -155,28 +155,6 @@ namespace spr {
 		}
 	};
 
-	// Refer to this for draw call sorting: https://realtimecollisiondetection.net/blog/?p=86
-	struct DrawCallSortKey {
-		uint8_t bIsBlendingDisabled	: 1;
-		uint8_t BlendingEquation	: 3;
-		//uint8_t					: 7;
-
-		inline bool operator>(const DrawCallSortKey& otherKey) const {
-			// -0: 1st different byte in other is greater than this
-			//  0: Equal
-			// +0: 1st different byte in this is greater than other
-			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) > 0;
-		}
-
-		inline bool operator<(const DrawCallSortKey& otherKey) const {
-			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) < 0;
-		}
-
-		inline bool operator==(const DrawCallSortKey& otherKey) const {
-			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) == 0;
-		}
-	};
-
 	struct FixedFunctionState {
 		// There's some bit packing waste here, but we don't care about it
 		StencilBufferState	StencilState;
@@ -190,13 +168,6 @@ namespace spr {
 
 		inline bool operator !=(const FixedFunctionState& other) const {
 			return !(*this == other);
-		}
-
-		DrawCallSortKey GetSortKey() const {
-			DrawCallSortKey sortKey;
-			sortKey.bIsBlendingDisabled		= !(!!ColorState.bIsBlendingEnabled);
-			sortKey.BlendingEquation		= ColorState.BlendingEquation;
-			return sortKey;
 		}
 
 		// Color Buffer

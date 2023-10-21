@@ -39,7 +39,7 @@ void AOGL_03_Antialiasing::OnAttach() {
 }
 
 void AOGL_03_Antialiasing::CreateMSAAFramebuffer() {
-	const int sampleCount = std::pow(2, m_SampleCountOption + 1);
+	const int sampleCount = std::round(std::pow(2, m_SampleCountOption + 1));
 	const spw::Vec2 resolution = spw::getWindowSize();
 
 	// 1. Creates Multisampled Textures. Note that we're using the GL_TEXTURE_2D_MULTISAMPLE target instead of the usual GL_TEXTURE_2D.

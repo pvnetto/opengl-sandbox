@@ -107,6 +107,11 @@ void LOGL_12_SpotLight::OnUpdate() {
 		spr::setUniform(m_ModelUniform, glm::value_ptr(litModel));
 		spr::setUniform(m_ViewUniform, glm::value_ptr(m_Camera.GetView()));
 		spr::setUniform(m_ProjectionUniform, glm::value_ptr(m_Camera.GetProjection()));
+
+		const int containerUnit = 0, specularUnit = 1;
+		spr::setTexture(containerUnit, m_ContainerTexture);
+		spr::setTexture(specularUnit, m_ContainerSpecularTexture);
+
 		spr::submit(m_SpotLightShaderProgram);
 	}
 

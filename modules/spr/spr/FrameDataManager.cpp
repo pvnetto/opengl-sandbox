@@ -1,7 +1,8 @@
 #include "FrameDataManager.h"
 
-#include <spr/Context.h>
-#include <spr/ResourceManager/SamplerInfo.h>
+#include "spr/Context.h"
+#include "spr/ResourceManager/SamplerInfo.h"
+#include "spr/Utils.h"
 
 #include <cassert>
 #include <algorithm>
@@ -30,7 +31,9 @@ namespace spr {
 	}
 
 	uint32_t FrameData::lastDrawCallUniformEnd() {
-		if (DrawCalls.empty()) return 0;
+		if (DrawCalls.empty()) {
+			return 0;
+		}
 		return DrawCalls[DrawCalls.size() - 1].UniformsEnd;
 	}
 
@@ -40,7 +43,31 @@ namespace spr {
 		IndexBuffer = kInvalidHandle;
 		UniformsStart = 0;
 		UniformsEnd = 0;
-		TextureBindings.empty();
+		TextureBindings.clear();
+	}
+
+	// Not so great for ordering as it's basically an equality check, but still better than nothing
+	static std::size_t getTextureStateHash(const spr::TextureBindings &textureBindings) {
+		std::size_t hash = 0;
+
+		for (uint8_t textureUnit = 0; textureUnit < textureBindings.size(); textureUnit++) {
+			const TextureBinding &textureBinding = textureBindings[textureUnit]; 
+			spr::hashCombine(hash,
+					textureBinding.Sampler.GetHash(),
+					murmurHash2A(&textureBinding.Texture.idx, sizeof(uint8_t)),
+					murmurHash2A(&textureUnit, sizeof(uint8_t)));
+		}
+
+		return hash;
+	}
+
+	DrawCallSortKey DrawCallData::getSortKey() const {
+		DrawCallSortKey sortKey;
+		sortKey.bIsBlendingDisabled = !(!!FixedFunctionState.ColorState.bIsBlendingEnabled);
+		sortKey.BlendingEquation = FixedFunctionState.ColorState.BlendingEquation;
+		sortKey.ShaderProgram = Program.idx;
+		sortKey.TextureStateHash = getTextureStateHash(TextureBindings);
+		return sortKey;
 	}
 
 	void FrameDataManager::init(Context *owner, const struct ContextInfo &info) {
@@ -98,7 +125,9 @@ namespace spr {
 		TextureBinding binding;
 		binding.Texture = textureHandle;
 		binding.Sampler = samplerInfo;
-		m_CurrentDrawCall.TextureBindings.emplace(unit, binding);
+
+		m_CurrentDrawCall.TextureBindings.resize(unit + 1);
+		m_CurrentDrawCall.TextureBindings[unit] = binding;
 	}
 
 	void FrameDataManager::setRenderTargetFramebuffer(const uint8_t renderTargetIndex, const FramebufferHandle handle) {

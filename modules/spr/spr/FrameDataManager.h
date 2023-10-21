@@ -14,10 +14,14 @@ namespace spr {
 	struct TextureBinding {
 		TextureHandle Texture;
 		SamplerInfo Sampler;
+
+		bool operator==(const TextureBinding& other) const {
+			return Texture == other.Texture && Sampler == other.Sampler;
+		}
 	};
 
-	using TextureUnitType = uint32_t;
-	using TextureBindings = std::unordered_map<TextureUnitType, TextureBinding>;
+	using TextureUnitType = uint8_t;
+	using TextureBindings = std::vector<TextureBinding>;
 
 	struct RenderTarget {
 		FramebufferHandle Framebuffer = kInvalidHandle;
@@ -25,6 +29,35 @@ namespace spr {
 		uint8_t ClearFlags = spr::AsFlag(FramebufferAttachmentFlags::All);
 
 		static inline const uint8_t kMaxRenderTargets = 32;
+	};
+
+	// Refer to this for draw call sorting: https://realtimecollisiondetection.net/blog/?p=86
+	struct DrawCallSortKey {
+		// 1 byte - blending
+		uint8_t bIsBlendingDisabled		: 1;
+		uint8_t BlendingEquation		: 3;
+		//uint8_t						: 4;
+
+		// 2 bytes - program
+		HandleType ShaderProgram;
+
+		// 8 bytes - texture bindings
+		std::size_t TextureStateHash;
+
+		inline bool operator>(const DrawCallSortKey &otherKey) const {
+			// -0: 1st different byte in other is greater than this
+			//  0: Equal
+			// +0: 1st different byte in this is greater than other
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) > 0;
+		}
+
+		inline bool operator<(const DrawCallSortKey &otherKey) const {
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) < 0;
+		}
+
+		inline bool operator==(const DrawCallSortKey &otherKey) const {
+			return memcmp(this, &otherKey, sizeof(DrawCallSortKey)) == 0;
+		}
 	};
 
 	struct DrawCallData {
@@ -43,20 +76,20 @@ namespace spr {
 		uint8_t RenderTargetIndex = RenderTarget::kMaxRenderTargets;
 
 		inline bool operator>(const DrawCallData& other) const {
-			return FixedFunctionState.GetSortKey() > other.FixedFunctionState.GetSortKey();
+			return getSortKey() > other.getSortKey();
 		}
 
 		inline bool operator<(const DrawCallData& other) const {
-			return FixedFunctionState.GetSortKey() < other.FixedFunctionState.GetSortKey();
+			return getSortKey() < other.getSortKey();
 		}
 
 		inline bool operator==(const DrawCallData& other) const {
-			return FixedFunctionState.GetSortKey() == other.FixedFunctionState.GetSortKey();
+			return getSortKey() == other.getSortKey();
 		}
 
-
-
 		void clear();
+		DrawCallSortKey getSortKey() const;
+
 	};
 
 	struct BlitParameters {

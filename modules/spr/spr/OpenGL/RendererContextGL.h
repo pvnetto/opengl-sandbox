@@ -23,7 +23,6 @@ namespace spr {
 		void applyStencilState(const struct spr::StencilBufferState &state);
 		void setUniforms(UniformInfoBufferPtr uniformInfoBuffer);
 
-
 	public:
 		inline ResourceManagerGL &getResourceManager() { return m_ResourceManager; }
 

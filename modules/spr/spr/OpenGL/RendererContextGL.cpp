@@ -66,8 +66,7 @@ namespace spr {
 				cachedDrawCall.RenderTargetIndex = drawCall.RenderTargetIndex;
 			}
 
-			// TODO: Instead of always applying the entire state, use dirty flags on each property to avoid state changes
-			if (drawCall.FixedFunctionState != cachedDrawCall.FixedFunctionState) {
+			{
 				applyColorState(drawCall.FixedFunctionState.ColorState);
 				applyDepthState(drawCall.FixedFunctionState.DepthState);
 				applyStencilState(drawCall.FixedFunctionState.StencilState);
@@ -86,14 +85,31 @@ namespace spr {
 			const ProgramInstanceGL &currentProgram = programManager.getProgram(cachedDrawCall.Program);
 			setUniforms(currentProgram.UniformInfoBuffer);
 
-			// TODO: We could probably cache these as well, and avoid binding samplers every frame
-			TextureManagerGL &textureManager = m_ResourceManager.getTextureManager();
-			for (const auto &[textureUnit, textureBinding] : drawCall.TextureBindings) {
-				const TextureInstanceGL &texture = textureManager.getTexture(textureBinding.Texture);
-				texture.bind(textureUnit);
+			if (cachedDrawCall.TextureBindings != drawCall.TextureBindings) {
+				TextureManagerGL &textureManager = m_ResourceManager.getTextureManager();
+				for (uint8_t textureUnit = 0; textureUnit < drawCall.TextureBindings.size(); textureUnit++) {
+					const TextureBinding& binding = drawCall.TextureBindings[textureUnit];
+					if (!binding.Texture.isValid()) {
+						continue;
+					}
+					
+					const bool bIsTextureUnitUnused = textureUnit >= cachedDrawCall.TextureBindings.size();
+					const bool bHasTextureChanged = bIsTextureUnitUnused
+						|| cachedDrawCall.TextureBindings[textureUnit].Texture != binding.Texture;
+					if (bHasTextureChanged) {
+						const TextureInstanceGL &texture = textureManager.getTexture(binding.Texture);
+						texture.bind(textureUnit);					
+					}
 
-				const SamplerInstanceGL &sampler = textureManager.findOrCreateSampler(textureBinding.Sampler);
-				sampler.bind(textureUnit);
+					const bool bHasSamplerChanged = bIsTextureUnitUnused
+						|| cachedDrawCall.TextureBindings[textureUnit].Sampler.GetHash() != binding.Sampler.GetHash();
+					if (bHasSamplerChanged) {
+						const SamplerInstanceGL &sampler = textureManager.findOrCreateSampler(binding.Sampler);
+						sampler.bind(textureUnit);					
+					}
+				}
+
+				cachedDrawCall.TextureBindings = drawCall.TextureBindings;
 			}
 
 			if (cachedDrawCall.IndexBuffer != drawCall.IndexBuffer) {
