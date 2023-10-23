@@ -9,8 +9,16 @@ namespace spr {
 		m_UniformManager.init(owner);
 	}
 
-	void ResourceManagerGL::createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {
-		m_VertexBufferManager.createVertexBuffer(handle, data, size, layout);
+	void ResourceManagerGL::createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, const VertexAttributeLayout &layout) {
+		m_VertexBufferManager.createVertexBuffer(handle, data, byteSize, layout);
+	}
+
+	void ResourceManagerGL::createInstancedVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout) {
+		m_VertexBufferManager.createVertexBuffer(handle, data, byteSize, layout);
+	}
+
+	void ResourceManagerGL::updateVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t offset) {
+		m_VertexBufferManager.updateVertexBuffer(handle, data, byteSize, offset);
 	}
 
 	void ResourceManagerGL::destroy(VertexBufferHandle &handle) {

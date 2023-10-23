@@ -9,11 +9,23 @@ namespace spr {
 		m_UniformManager.init(owner);
 	}
 
-	VertexBufferHandle ResourceManager::createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout) {
+	VertexBufferHandle ResourceManager::createVertexBuffer(const void *data, uint32_t byteSize, const VertexAttributeLayout &layout) {
 		VertexBufferHandle handle = m_VertexBufferHandles.allocHandle();
 		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
-		rendererResourceManager.createVertexBuffer(handle, data, size, layout);
+		rendererResourceManager.createVertexBuffer(handle, data, byteSize, layout);
 		return handle;
+	}
+
+	VertexBufferHandle ResourceManager::createInstancedVertexBuffer(const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout) {
+		VertexBufferHandle handle = m_VertexBufferHandles.allocHandle();
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.createInstancedVertexBuffer(handle, data, byteSize, instanceCount, layout);
+		return handle;
+	}
+
+	void ResourceManager::updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t offset) {
+		auto &rendererResourceManager = m_Owner->getRendererContext().getResourceManager();
+		rendererResourceManager.updateVertexBuffer(handle, data, byteSize, offset);
 	}
 
 	void ResourceManager::destroy(VertexBufferHandle &handle) {

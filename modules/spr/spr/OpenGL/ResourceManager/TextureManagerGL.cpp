@@ -84,7 +84,7 @@ namespace spr {
 	}
 
 	void SamplerInstanceGL::bind(TextureUnitType unit) const {
-		glBindSampler(1, unit);
+		glBindSampler(unit, ID);
 	}
 
 }

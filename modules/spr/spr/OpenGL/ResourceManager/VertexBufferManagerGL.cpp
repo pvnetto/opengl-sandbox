@@ -5,26 +5,44 @@
 
 namespace spr {
 
-	void VertexBufferInstanceGL::create(const void *data, uint32_t size, const VertexAttributeLayoutHandle &layoutHandle) {
+	void VertexBufferInstanceGL::create(const void *data, uint32_t size, uint32_t instanceCount, const VertexAttributeLayoutHandle &layoutHandle) {
 		Size = size;
 		LayoutHandle = layoutHandle;
+		InstanceCount = instanceCount;
 
+		// Instanced vertex buffers are dynamic by default, others are not
+		const GLbitfield storageFlags = InstanceCount > 0 ? GL_DYNAMIC_STORAGE_BIT : 0;
 		glCreateBuffers(1, &ID);
-		glNamedBufferStorage(ID, size, data, 0);		// Immutable storage (read-only, as no flag was specified)
+		glNamedBufferStorage(ID, size, data, storageFlags);
+	}
+
+	void VertexBufferInstanceGL::update(const void *data, uint32_t byteSize, uint32_t offset) {
+		assert(InstanceCount > 0 && "spr::ERROR: For now, we only support dynamic storage for instanced vertex buffers");
+		glNamedBufferSubData(ID, offset, byteSize, data);
 	}
 
 	void VertexBufferInstanceGL::destroy() {
 		glDeleteBuffers(1, &ID);
-		LayoutHandle = kInvalidHandle;
+		LayoutHandle = k_InvalidHandle;
 	}
 
 }
 
 namespace spr {
 
-	void VertexBufferManagerGL::createVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t size, const VertexAttributeLayout &layout) {
-		VertexAttributeLayoutHandle layoutHandle = findOrCreateVertexAttributeLayout(layout);
-		m_VertexBuffers[handle.idx].create(data, size, layoutHandle);
+	void VertexBufferManagerGL::createVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, const VertexAttributeLayout &layout) {
+		constexpr uint32_t instanceCount = 0;
+		const VertexAttributeLayoutHandle layoutHandle = findOrCreateVertexAttributeLayout(layout);
+		m_VertexBuffers[handle.idx].create(data, byteSize, instanceCount, layoutHandle);
+	}
+
+	void VertexBufferManagerGL::createInstancedVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout) {
+		const VertexAttributeLayoutHandle layoutHandle = findOrCreateVertexAttributeLayout(layout);
+		m_VertexBuffers[handle.idx].create(data, byteSize, instanceCount, layoutHandle);
+	}
+
+	void VertexBufferManagerGL::updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t offset, uint32_t byteSize) {
+		m_VertexBuffers[handle.idx].update(data, byteSize, offset);
 	}
 
 	void VertexBufferManagerGL::destroy(VertexBufferHandle &handle) {

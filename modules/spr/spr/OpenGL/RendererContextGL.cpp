@@ -44,6 +44,7 @@ namespace spr {
 			UniformManagerGL &uniformManager = m_ResourceManager.getUniformManager();
 			uniformManager.setUniformValues(frameData.UniformDataBuffer, drawCall.UniformsStart, drawCall.UniformsEnd);
 
+			// Performs render target switch
 			if (const bool bHasRenderTargetChanged = cachedDrawCall.RenderTargetIndex != drawCall.RenderTargetIndex) {
 				const RenderTarget &currentRenderTarget = frameData.RenderTargets[cachedDrawCall.RenderTargetIndex];
 				const RenderTarget &newRenderTarget = frameData.RenderTargets[drawCall.RenderTargetIndex];
@@ -65,14 +66,18 @@ namespace spr {
 
 				cachedDrawCall.RenderTargetIndex = drawCall.RenderTargetIndex;
 			}
+			glCheckError();
 
+			// Applies fixed-function state (glEnable and what-not)
 			{
 				applyColorState(drawCall.FixedFunctionState.ColorState);
 				applyDepthState(drawCall.FixedFunctionState.DepthState);
 				applyStencilState(drawCall.FixedFunctionState.StencilState);
 				cachedDrawCall.FixedFunctionState = drawCall.FixedFunctionState;
 			}
+			glCheckError();
 
+			// Checks whether the program has changed between draw calls. We use program for sorting, so hopefully this prevents unnecessary shader switches.
 			const ProgramManagerGL &programManager = m_ResourceManager.getProgramManager();
 			bool changedAttributesLayout = false;
 			if (cachedDrawCall.Program != drawCall.Program) {
@@ -82,9 +87,12 @@ namespace spr {
 				programManager.getProgram(cachedDrawCall.Program).use();
 			}
 
+			// Updates uniforms
 			const ProgramInstanceGL &currentProgram = programManager.getProgram(cachedDrawCall.Program);
 			setUniforms(currentProgram.UniformInfoBuffer);
+			glCheckError();
 
+			// Updates texture unit bindings and samplers
 			if (cachedDrawCall.TextureBindings != drawCall.TextureBindings) {
 				TextureManagerGL &textureManager = m_ResourceManager.getTextureManager();
 				for (uint8_t textureUnit = 0; textureUnit < drawCall.TextureBindings.size(); textureUnit++) {
@@ -98,7 +106,7 @@ namespace spr {
 						|| cachedDrawCall.TextureBindings[textureUnit].Texture != binding.Texture;
 					if (bHasTextureChanged) {
 						const TextureInstanceGL &texture = textureManager.getTexture(binding.Texture);
-						texture.bind(textureUnit);					
+						texture.bind(textureUnit);	
 					}
 
 					const bool bHasSamplerChanged = bIsTextureUnitUnused
@@ -111,7 +119,9 @@ namespace spr {
 
 				cachedDrawCall.TextureBindings = drawCall.TextureBindings;
 			}
+			glCheckError();
 
+			// Binds Index Buffer if it has changed between draw calls
 			if (cachedDrawCall.IndexBuffer != drawCall.IndexBuffer) {
 				const IndexBufferManagerGL &indexBufferManager = m_ResourceManager.getIndexBufferManager();
 				const IndexBufferInstanceGL &indexBuffer = indexBufferManager.getIndexBuffer(drawCall.IndexBuffer);
@@ -119,32 +129,51 @@ namespace spr {
 
 				cachedDrawCall.IndexBuffer = drawCall.IndexBuffer;
 			}
+			glCheckError();
 
+			// Checks if vertex buffer has changed between draw calls, and if so, updates the program's attributes
 			const VertexBufferManagerGL &vertexBufferManager = m_ResourceManager.getVertexBufferManager();
-			if (cachedDrawCall.VertexBuffer != drawCall.VertexBuffer) {
+			if (cachedDrawCall.VertexBuffers != drawCall.VertexBuffers) {
 				changedAttributesLayout = true;
-
-				cachedDrawCall.VertexBuffer = drawCall.VertexBuffer;
+				cachedDrawCall.VertexBuffers = drawCall.VertexBuffers;
 			}
 
 			if (changedAttributesLayout) {
-				const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
-				currentProgram.bindAttributes(m_DefaultVAO, vertexBuffer);
-			}
+				currentProgram.resetAttributeBindings();
 
-			if (cachedDrawCall.VertexBuffer.isValid()) {
+				for (const VertexBufferHandle &vertexBufferHandle : drawCall.VertexBuffers) {
+					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(vertexBufferHandle);
+					currentProgram.bindAttributes(m_DefaultVAO, vertexBuffer);
+				}
+			}
+			glCheckError();
+
+			// Stores any non-instanced vertex buffer, just in case we need to determine how many vertices we're drawing.
+			VertexBufferHandle nonInstancedVertexBuffer = k_InvalidHandle;
+			for (const VertexBufferHandle &vertexBufferHandle : drawCall.VertexBuffers) {
+				const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(vertexBufferHandle);
+				if (vertexBuffer.InstanceCount == 0) {
+					nonInstancedVertexBuffer = vertexBufferHandle;
+					break;
+				}
+			}
+			glCheckError();
+
+			// Finally, draws stuff to the screen
+			if (!cachedDrawCall.VertexBuffers.empty()) {
 				if (cachedDrawCall.IndexBuffer.isValid()) {
 					const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
 					const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
 					glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
 				}
 				else {
-					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(cachedDrawCall.VertexBuffer);
+					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(nonInstancedVertexBuffer);
 					const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
 					const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
 					glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 				}			
 			}
+			glCheckError();
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

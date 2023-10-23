@@ -14,7 +14,9 @@ namespace spr {
 	public:
 		void init(Context *owner);
 
-		void createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t size, const VertexAttributeLayout &layout);
+		void createVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, const VertexAttributeLayout &layout);
+		void createInstancedVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout);
+		void updateVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t offset);
 		void destroy(VertexBufferHandle &handle);
 
 		void createIndexBuffer(const IndexBufferHandle &handle, const void *data, uint32_t size);

@@ -82,13 +82,13 @@ void AOGL_04_Instancing::OnAttach() {
 	glCreateVertexArrays(1, &m_VertexArray);
 
 	// 5. Defines attribute layout for Vertex Buffer with per-vertex data
-	const int perVertexBufferBindingPoint = 0;
-	glVertexArrayVertexBuffer(m_VertexArray, perVertexBufferBindingPoint, m_MeshVertexBuffer, NULL, m_CubeData.Layout.getStride());
+	const int perVertexBindingPoint = 0;
+	glVertexArrayVertexBuffer(m_VertexArray, perVertexBindingPoint, m_MeshVertexBuffer, NULL, m_CubeData.Layout.getStride());
 	for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
 		const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
 
 		glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-		glVertexArrayAttribBinding(m_VertexArray, i, perVertexBufferBindingPoint);
+		glVertexArrayAttribBinding(m_VertexArray, i, perVertexBindingPoint);
 		
 		glEnableVertexArrayAttrib(m_VertexArray, i);
 	}

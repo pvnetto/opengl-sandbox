@@ -64,12 +64,15 @@ namespace spr {
 		glUseProgram(ID);
 	}
 
+	void ProgramInstanceGL::resetAttributeBindings() const {
+		CurrentBufferBindingPoint = 0;
+	}
+
 	void ProgramInstanceGL::bindAttributes(uint32_t vaoId, const VertexBufferInstanceGL &vertexBuffer) const {
 		// TODO: Check ARB_vertex_attrib_binding extension
-		// TODO: Alternatively, we could have one VAO per attribute layout, and only switch buffers when required 
+		// TODO: Alternatively, we could have one VAO per attribute layout, and only switch buffers when required
 		VertexAttributeLayout &layout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
-		static constexpr uint32_t bufferBindingPoint = 0;
-		glVertexArrayVertexBuffer(vaoId, bufferBindingPoint, vertexBuffer.ID, NULL, layout.getStride());
+		glVertexArrayVertexBuffer(vaoId, CurrentBufferBindingPoint, vertexBuffer.ID, NULL, layout.getStride());
 		for (int i = 0; i < Attributes.size(); i++) {
 			const ProgramAttributeGL &programAttribute = Attributes[i];
 			const int attributeLocation = programAttribute.Location;
@@ -82,8 +85,13 @@ namespace spr {
 			                          getGLBool(layoutAttribute.Normalized),
 			                          layoutAttribute.Offset);
 			glEnableVertexArrayAttrib(vaoId, attributeLocation);
-			glVertexArrayAttribBinding(vaoId, attributeLocation, bufferBindingPoint);
+			glVertexArrayAttribBinding(vaoId, attributeLocation, CurrentBufferBindingPoint);
 		}
+
+		if (vertexBuffer.InstanceCount > 0) {
+			glVertexArrayBindingDivisor(vaoId, CurrentBufferBindingPoint, vertexBuffer.InstanceCount);
+		}
+		CurrentBufferBindingPoint++;
 	}
 
 	static void parseUniformName(const char* inName, std::string& outName, uint8_t& outIndex) {

@@ -11,23 +11,38 @@
 
 namespace spr {
 
-	static const uint8_t DefaultRenderTargetIndex = 0;
+	static const uint8_t k_DefaultRenderTargetIndex = 0;
 
 	void FrameData::clear() {
 		UniformDataBuffer->reset();
 		DrawCalls.clear();
 		BlitRequests.clear();
+		SortMode = DrawCallSortMode::Default;
 
 		for (uint8_t i = 0; i < RenderTarget::kMaxRenderTargets; i++) {
-			RenderTargets[i].Framebuffer = kInvalidHandle;
+			RenderTargets[i].Framebuffer = k_InvalidHandle;
 		}
 	}
 
 	// DrawCalls are sorted by descending order. If DrawCallA > DrawCallB, it should be executed first.
-	void FrameData::sortDrawCalls() {
-		std::sort(DrawCalls.begin(), DrawCalls.end(), [](const auto& drawCallA, const auto& drawCallB) {
+	static void sortDrawCallsByState(std::vector<DrawCallData>& drawCalls) {
+		std::sort(drawCalls.begin(), drawCalls.end(), [](const auto &drawCallA, const auto &drawCallB) {
 			return drawCallA > drawCallB;
 		});
+	}
+
+	void FrameData::sortDrawCalls() {
+		switch (SortMode) {
+		case spr::DrawCallSortMode::Default:
+			sortDrawCallsByState(DrawCalls);
+			break;
+		case spr::DrawCallSortMode::OrderDependent:
+			// Does nothing, uses submit order
+			break;
+		default:
+			assert(false && "spr::ERROR: Draw call sort mode is not supported yet");
+			break;
+		}
 	}
 
 	uint32_t FrameData::lastDrawCallUniformEnd() {
@@ -38,9 +53,9 @@ namespace spr {
 	}
 
 	void DrawCallData::clear() {
-		Program = kInvalidHandle;
-		VertexBuffer = kInvalidHandle;
-		IndexBuffer = kInvalidHandle;
+		Program = k_InvalidHandle;
+		VertexBuffers.clear();
+		IndexBuffer = k_InvalidHandle;
 		UniformsStart = 0;
 		UniformsEnd = 0;
 		TextureBindings.clear();
@@ -73,7 +88,7 @@ namespace spr {
 	void FrameDataManager::init(Context *owner, const struct ContextInfo &info) {
 		m_Owner = owner;
 		m_CurrentFrame.UniformDataBuffer = UniformDataBuffer::alloc();
-		m_CurrentFrame.RenderTargets[DefaultRenderTargetIndex].ViewportRect = { 0, 0, info.Width, info.Height }; 
+		m_CurrentFrame.RenderTargets[k_DefaultRenderTargetIndex].ViewportRect = { 0, 0, info.Width, info.Height }; 
 	}
 
 	void FrameDataManager::submit(uint8_t renderTargetIndex, ProgramHandle &program) {
@@ -97,9 +112,12 @@ namespace spr {
 		m_CurrentFrame.sortDrawCalls();
 	}
 
+	void FrameDataManager::setDrawCallSortMode(DrawCallSortMode sortMode) {
+		m_CurrentFrame.SortMode = sortMode;
+	}
+
 	void FrameDataManager::setVertexBuffer(const VertexBufferHandle handle) {
-		assert(!m_CurrentDrawCall.VertexBuffer.isValid() && "::ERROR: Vertex buffer was already set for this frame.");
-		m_CurrentDrawCall.VertexBuffer = handle;
+		m_CurrentDrawCall.VertexBuffers.push_back(handle);
 	}
 
 	void FrameDataManager::setIndexBuffer(const IndexBufferHandle handle) {

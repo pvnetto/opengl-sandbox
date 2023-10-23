@@ -79,6 +79,8 @@ void SPRE_01_Stenciling::OnUpdate() {
 	spr::setRenderTargetFramebuffer(renderPassTarget, m_Framebuffer);
 	spr::setRenderTargetClear(renderPassTarget, 0);
 	spr::setRenderTargetRect(renderPassTarget, { 0, 0, (uint32_t) windowWidth, (uint32_t) windowHeight });
+	
+	spr ::setDrawCallSortMode(spr::DrawCallSortMode::OrderDependent);		// We don't want draw call sorting to fumble our render passes
 
 	// 1. Stencil Pass:
 	// - Performs a render pass on a framebuffer while writing only to the stencil buffer;
@@ -153,7 +155,7 @@ void SPRE_01_Stenciling::OnUpdate() {
 	// - We're doing this to force the windowing system (in our case GLFW) to swap it with the front buffer and draw it to the screen;
 	// - Alternatively, we could also get the resulting Render Target Texture from the Render Pass and draw it to a quad;
 	{
-		const spr::FramebufferHandle defaultFramebuffer = spr::kInvalidHandle;
+		const spr::FramebufferHandle defaultFramebuffer = spr::k_InvalidHandle;
 		const auto &[windowWidth, windowHeight] = spw::getWindowSize();
 
 		spr::BlitParameters blitParameters;

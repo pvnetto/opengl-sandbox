@@ -19,11 +19,15 @@ namespace spr {
 
 		uint32_t ID;
 		UniformInfoBufferPtr UniformInfoBuffer;
+
 		mutable std::vector<ProgramAttributeGL> Attributes;
+		mutable uint32_t CurrentBufferBindingPoint = -1;
 
 		void create(const ShaderInstanceGL &vertexShader, const ShaderInstanceGL &fragmentShader, const UniformManager &uniformManager);
 		void destroy();
 		void use() const;
+
+		void resetAttributeBindings() const;
 		void bindAttributes(uint32_t vaoId, const VertexBufferInstanceGL& vertexBuffer) const;
 
 		void findUniforms(const UniformManager &uniformManager);

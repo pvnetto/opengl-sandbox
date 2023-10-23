@@ -15,10 +15,12 @@ namespace spr {
 	public:
 		void init(Context *owner);
 
-		VertexBufferHandle createVertexBuffer(const void *data, uint32_t size, const VertexAttributeLayout &layout);		
+		VertexBufferHandle createVertexBuffer(const void *data, uint32_t byteSize, const VertexAttributeLayout &layout);
+		VertexBufferHandle createInstancedVertexBuffer(const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout);
+		void updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t offset);
 		void destroy(VertexBufferHandle &handle);
 
-		IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);		
+		IndexBufferHandle createIndexBuffer(const void *data, uint32_t size);
 		void destroy(IndexBufferHandle &handle);
 
 		FramebufferHandle createFramebuffer(const FramebufferAttachmentMap& attachments);

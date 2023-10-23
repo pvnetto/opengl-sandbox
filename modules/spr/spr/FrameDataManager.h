@@ -3,9 +3,9 @@
 #include "Handles.h"
 #include "FixedFunctionState.h"
 #include "MathTypes.h"
+#include "ResourceManager/FramebufferAttachmentType.h"
 #include "ResourceManager/SamplerInfo.h"
 #include "ResourceManager/UniformManager.h"
-#include "ResourceManager/FramebufferAttachmentType.h"
 
 namespace spr {
 
@@ -24,7 +24,7 @@ namespace spr {
 	using TextureBindings = std::vector<TextureBinding>;
 
 	struct RenderTarget {
-		FramebufferHandle Framebuffer = kInvalidHandle;
+		FramebufferHandle Framebuffer = k_InvalidHandle;
 		Rect ViewportRect;
 		uint8_t ClearFlags = spr::AsFlag(FramebufferAttachmentFlags::All);
 
@@ -62,9 +62,11 @@ namespace spr {
 
 	struct DrawCallData {
 		FixedFunctionState FixedFunctionState;
-		ProgramHandle Program;
-		VertexBufferHandle VertexBuffer;
+
+		std::vector<VertexBufferHandle> VertexBuffers;
 		IndexBufferHandle IndexBuffer;
+		ProgramHandle Program;
+
 		TextureBindings TextureBindings;
 
 		uint32_t UniformsStart;
@@ -100,11 +102,17 @@ namespace spr {
 		uint32_t BlitMask = 0;
 	};
 
+	enum class DrawCallSortMode {
+		Default,
+		OrderDependent,
+	};
+
 	struct FrameData {
 		std::vector<DrawCallData>		DrawCalls;
 		std::vector<BlitParameters>		BlitRequests;
 		UniformDataBufferPtr			UniformDataBuffer;
 		RenderTarget					RenderTargets[RenderTarget::kMaxRenderTargets + 1];
+		DrawCallSortMode				SortMode = DrawCallSortMode::Default;
 
 		void clear();
 		void sortDrawCalls();
@@ -124,6 +132,8 @@ namespace spr {
 		void reset();
 		/* Sorts draw calls by their sort key */
 		void sortDrawCalls();
+		/* Sets sort mode for draw calls */
+		void setDrawCallSortMode(DrawCallSortMode sortMode);
 
 		void setVertexBuffer(const VertexBufferHandle handle);
 		void setIndexBuffer(const IndexBufferHandle handle);

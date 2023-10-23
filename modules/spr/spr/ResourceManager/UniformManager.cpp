@@ -15,7 +15,7 @@ namespace spr {
 	}
 
 	UniformHandle UniformManager::createUniform(const char *name, UniformType type, uint32_t count) {
-		HandleType index = kInvalidHandle;
+		HandleType index = k_InvalidHandle;
 		UniformRef *uniformRef = nullptr;
 		UniformHandle handle;
 
@@ -69,7 +69,7 @@ namespace spr {
 		}
 
 		assert(false && "::ERROR: Uniform doesn't exist. You should call spr::createUniform before calling this.");
-		return { kInvalidHandle };
+		return { k_InvalidHandle };
 	}
 
 }

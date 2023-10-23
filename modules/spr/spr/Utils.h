@@ -29,12 +29,12 @@ namespace spr {
             }
 
             assert(false && "::ERROR: No handles available");
-            return kInvalidHandle;
+            return k_InvalidHandle;
         }
 
         void removeHandle(T& handle) {
             m_Handles[handle.idx] = false;
-            handle = kInvalidHandle;
+            handle = k_InvalidHandle;
         }
 
     };

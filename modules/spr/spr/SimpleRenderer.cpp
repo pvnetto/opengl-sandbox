@@ -37,7 +37,11 @@ namespace spr {
 		clean();
 	}
 
-	void setVertexBuffer(const VertexBufferHandle& handle) {
+	void setDrawCallSortMode(const DrawCallSortMode sortMode) {
+		s_Context.getFrameDataManager().setDrawCallSortMode(sortMode);
+	}
+
+	void setVertexBuffer(const VertexBufferHandle &handle) {
 		s_Context.getFrameDataManager().setVertexBuffer(handle);
 	}
 
@@ -69,8 +73,16 @@ namespace spr {
 		s_Context.getFrameDataManager().setRenderTargetClear(renderTargetIndex, clearFlags);
 	}
 
-	VertexBufferHandle createVertexBuffer(const void* data, uint32_t size, const VertexAttributeLayout& layout) {
-		return s_Context.getResourceManager().createVertexBuffer(data, size, layout);
+	VertexBufferHandle createVertexBuffer(const void *data, uint32_t byteSize, const VertexAttributeLayout &layout) {
+		return s_Context.getResourceManager().createVertexBuffer(data, byteSize, layout);
+	}
+
+	VertexBufferHandle createInstancedVertexBuffer(const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout) {
+		return s_Context.getResourceManager().createInstancedVertexBuffer(data, byteSize, instanceCount, layout);
+	}
+
+	void updateInstancedVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t offset) {
+		s_Context.getResourceManager().updateVertexBuffer(handle, data, byteSize, offset);
 	}
 	
 	void destroy(VertexBufferHandle& handle) {
