@@ -21,6 +21,7 @@ namespace spw {
 	spw::Vec2 getWindowSize();
 	int getWindowWidth();
 	int getWindowHeight();
+	float getWindowAspectRatio();
 
 	GlLoaderFn getGlLoaderFn();
 

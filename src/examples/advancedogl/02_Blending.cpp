@@ -37,9 +37,13 @@ void AOGL_02_Blending::OnAttach() {
 	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
 
 	glClearColor(0xaa, 0xaa, 0xaa, 0xff);
+	
+	// (OPTIONAL) Disables draw call sorting, just so we can show fragments caused by blending w/ unordered draw calls
+	spr::setDrawCallSortMode(spr::DrawCallSortMode::OrderDependent);
 }
 
 void AOGL_02_Blending::OnUpdate() {
+
 	// 0. Renders a bunch of cubes at different depths and draws their depth values
 	glm::mat4 projection(1.0f);
 	const float aspectRatio = (float)(spw::getWindowWidth() / spw::getWindowHeight());
@@ -50,7 +54,6 @@ void AOGL_02_Blending::OnUpdate() {
 	// 1. Renders Opaque pass
 	const float offsetMagnitude = 5.0f;
 	auto renderOpaquePass = [this, offsetMagnitude](bool bClearColor) {
-		glDisable(GL_BLEND);
 		const float zPosition = m_OpaquePosition == OpaquePosition_Front ? 0.5f : -0.5f;
 		const glm::vec3 offset{
 		    glm::cos(Runtime::get()->getTime()),
@@ -61,6 +64,9 @@ void AOGL_02_Blending::OnUpdate() {
 		model = glm::scale(model, m_Scale);
 
 		const glm::vec4 color{0.12f, 0.12f, 0.12f, 1.f};
+		spr::FixedFunctionState opaqueState;
+		opaqueState.SetBlendingEnabled(false);
+		spr::setFixedFunctionState(opaqueState);
 		spr::setVertexBuffer(m_CubeVertexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ColorUniform, glm::value_ptr(color));
@@ -78,6 +84,9 @@ void AOGL_02_Blending::OnUpdate() {
 	}
 
 	// 2. Transparency pass
+	// For this pass, we'll enable blending and set its source/dest factors. These are the functions that are called under the hood with spr:
+	// glEnable(GL_BLEND);
+	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	static constexpr int cubeCount = 10;
 	const glm::vec4 colors[cubeCount] = {
 	    MAKE_RGBA(249, 180, 182, 50),
@@ -91,9 +100,6 @@ void AOGL_02_Blending::OnUpdate() {
 	    MAKE_RGBA(0xdf, 0xac, 0xf6, 50),
 	    MAKE_RGBA(0xcc, 0xed, 0xff, 50),
 	};
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	const uint8_t clearFlags = m_OpaqueFirst ? 0 : spr::AsMask(spr::FramebufferAttachmentFlags::All);
 	spr::setRenderTargetClear(0, clearFlags);
@@ -110,6 +116,9 @@ void AOGL_02_Blending::OnUpdate() {
 		model = glm::translate(model, m_Position + offset * offsetMagnitude);
 		model = glm::scale(model, m_Scale);
 
+		spr::FixedFunctionState transparentState;
+		transparentState.SetBlendingEnabled(true);
+		spr::setFixedFunctionState(transparentState);
 		spr::setVertexBuffer(m_CubeVertexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ColorUniform, glm::value_ptr(colors[i]));
@@ -134,7 +143,10 @@ void AOGL_02_Blending::OnDetach() {
 	spr::destroy(m_ProjectionUniform);
 	spr::destroy(m_ColorUniform);
 
-	glDisable(GL_BLEND);
+	spr::setRenderTargetClear(0);
+
+	// (OPTIONAL) Reenables draw call sorting
+	spr::setDrawCallSortMode(spr::DrawCallSortMode::Default);
 }
 
 void AOGL_02_Blending::OnImGuiRender() {

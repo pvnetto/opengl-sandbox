@@ -14,7 +14,7 @@ namespace spr {
 	}
 
 	void ResourceManagerGL::createInstancedVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout) {
-		m_VertexBufferManager.createVertexBuffer(handle, data, byteSize, layout);
+		m_VertexBufferManager.createInstancedVertexBuffer(handle, data, byteSize, instanceCount, layout);
 	}
 
 	void ResourceManagerGL::updateVertexBuffer(const VertexBufferHandle &handle, const void *data, uint32_t byteSize, uint32_t offset) {

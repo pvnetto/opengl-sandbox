@@ -55,18 +55,26 @@ namespace spr {
         m_Hash = hash;
 
         return *this;
-    }
+	}
 
-    const VertexAttribute& VertexAttributeLayout::getAttribute(int index) const {
+	bool VertexAttributeLayout::getAttribute(int index, VertexAttribute &outAttribute) const {
+		if (index >= 0 && index < m_Attributes.size()) {
+			outAttribute = m_Attributes[index];
+			return true;
+		}
+		return false;
+	}
 
-        if(index >= 0 && index < m_Attributes.size()) {
-            return m_Attributes[index];
-        }
+	bool VertexAttributeLayout::getAttribute(const std::string &name, VertexAttribute &outAttribute) const {
+		for (const VertexAttribute &attribute : m_Attributes) {
+			if (attribute.Name == name) {
+				outAttribute = attribute;
+				return true;
+			}
+		}
 
-        static VertexAttribute empty; 
-        assert(false && "::ERROR: Invalid attribute index");
-        return empty;
-    }
+		return false;
+	}
 
     VertexAttribute::VertexAttribute(const std::string& name, AttributeType type, uint32_t num, bool normalized) :
         Name(name), Type(type), Num(num), Normalized(normalized) {}

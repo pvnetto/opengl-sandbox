@@ -1,8 +1,9 @@
 add_subdirectory(glm)
 add_subdirectory(stb)
 
-set(ASSIMP_BUILD_TESTS off)
-set(ASSIMP_WARNINGS_AS_ERRORS off)
+set(ASSIMP_BUILD_TESTS OFF)
+set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
 add_subdirectory(assimp)
 
 # Builds imgui library

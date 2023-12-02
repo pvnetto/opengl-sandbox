@@ -159,11 +159,12 @@ void AOGL_03_Antialiasing::CreateCube() {
 	const int bufferBindingPoint = 0;
 	glVertexArrayVertexBuffer(m_CubeVertexArray, bufferBindingPoint, m_CubeVertexBuffer, NULL, m_CubeData.Layout.getStride());
 	for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
-		const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+		spr::VertexAttribute layoutAttribute;
+		if (m_CubeData.Layout.getAttribute(i, layoutAttribute)) {
+			glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+			glVertexArrayAttribBinding(m_CubeVertexArray, i, bufferBindingPoint);
 
-		glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-		glVertexArrayAttribBinding(m_CubeVertexArray, i, bufferBindingPoint);
-
-		glEnableVertexArrayAttrib(m_CubeVertexArray, i);
+			glEnableVertexArrayAttrib(m_CubeVertexArray, i);		
+		}
 	}
 }

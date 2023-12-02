@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <glad/glad.h>
+#include "ProgramUtilsGL.h"
 
 namespace spr {
 
@@ -22,12 +23,6 @@ namespace spr {
 	const ProgramInstanceGL& ProgramManagerGL::getProgram(const ProgramHandle &handle) const {
 		assert(handle.isValid() && "::ERROR: Invalid program");
 		return m_Programs[handle.idx];
-	}
-
-	namespace {
-		UniformType getSPRUniformTypeFromGLType(GLenum type);
-		GLenum getGLTypeFromAttributeType(AttributeType attributeType);
-		GLenum getGLBool(bool value);
 	}
 
     void ProgramInstanceGL::create(const ShaderInstanceGL &vertexShader, const ShaderInstanceGL &fragmentShader, const UniformManager& uniformManager) {
@@ -75,21 +70,43 @@ namespace spr {
 		glVertexArrayVertexBuffer(vaoId, CurrentBufferBindingPoint, vertexBuffer.ID, NULL, layout.getStride());
 		for (int i = 0; i < Attributes.size(); i++) {
 			const ProgramAttributeGL &programAttribute = Attributes[i];
-			const int attributeLocation = programAttribute.Location;
-			const VertexAttribute &layoutAttribute = layout.getAttribute(attributeLocation);
+			const int attributeBaseLocation = programAttribute.Location;
+			const std::string &attributeName = programAttribute.Name;
 
-			assert(layoutAttribute.Name == programAttribute.Name && "::ERROR: Vertex layout attribute location mismatch");
-			glVertexArrayAttribFormat(vaoId, attributeLocation,
-			                          layoutAttribute.Num,
-			                          getGLTypeFromAttributeType(layoutAttribute.Type),
-			                          getGLBool(layoutAttribute.Normalized),
-			                          layoutAttribute.Offset);
-			glEnableVertexArrayAttrib(vaoId, attributeLocation);
-			glVertexArrayAttribBinding(vaoId, attributeLocation, CurrentBufferBindingPoint);
+			VertexAttribute layoutAttribute;
+			if (!layout.getAttribute(attributeName, layoutAttribute)) {
+				continue;
+			}
+
+			// Attributes can only have up to 4 elements at a time. GLSL solves this by assigning more than one location for attributes that require more than 4 elements.
+			// e.g., mat4x4 takes up 4 locations, each with 4 elements per attribute.
+			const int locationCount = getAttributeLocationCountGL(programAttribute.Type);
+			const int attributeElementCount = layoutAttribute.Num / locationCount;
+			const GLenum attributeType = getGLTypeFromAttributeType(layoutAttribute.Type);
+			const GLboolean bIsAttributeNormalized = getBoolGL(layoutAttribute.Normalized);
+			const int attributeStride = layout.getStride() / locationCount;
+			const int attributeOffset = layoutAttribute.Offset;
+			assert(layoutAttribute.Num == getAttributeElementCountGL(programAttribute.Type));
+			for (int currentLocation = attributeBaseLocation; currentLocation < attributeBaseLocation + locationCount; currentLocation++) {
+				// Attributes that take up more than one location and live in the same buffer are offset from each other
+				const int relativeLocation = currentLocation - attributeBaseLocation;
+				const int additionalOffset = relativeLocation * attributeStride;
+
+				glVertexArrayAttribFormat(vaoId, currentLocation,
+				                          attributeElementCount,
+										  attributeType,
+				                          bIsAttributeNormalized,
+										  attributeOffset + additionalOffset);
+				glEnableVertexArrayAttrib(vaoId, currentLocation);
+				glVertexArrayAttribBinding(vaoId, currentLocation, CurrentBufferBindingPoint);			
+			}
 		}
 
 		if (vertexBuffer.InstanceCount > 0) {
-			glVertexArrayBindingDivisor(vaoId, CurrentBufferBindingPoint, vertexBuffer.InstanceCount);
+			const int size = vertexBuffer.ByteSize / layout.getStride();
+			const int divisor = size / vertexBuffer.InstanceCount;
+			assert(divisor > 0);
+			glVertexArrayBindingDivisor(vaoId, CurrentBufferBindingPoint, divisor);
 		}
 		CurrentBufferBindingPoint++;
 	}
@@ -147,6 +164,11 @@ namespace spr {
 		glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTES, &activeAttributesCount);
 		Attributes.resize(activeAttributesCount);
 
+		// We'll use this mask to check whether an attribute is taking a location that was already taken by another attribute.
+		// e.g. Let's say we have a mat4x4 attribute at location = 4, it would take one location for each row, so locations 4, 5, 6, 7 would all be busy,
+		// and while we'd still be able to assign an attribute to location = 5 on GLSL, it would be wrong. This is what we're trying to catch here.
+		uint32_t attributeLocationMask = 0;
+
 		glGetProgramiv(ID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeNameLength);
 		std::string name;
 		name.reserve(maxAttributeNameLength);
@@ -159,51 +181,15 @@ namespace spr {
 			int32_t location = glGetAttribLocation(ID, name.c_str());
 			Attributes[i].Name = name.c_str();
 			Attributes[i].Location = location;
-		}
-	}
+			Attributes[i].Type = type;
 
-	namespace {
-
-		UniformType getSPRUniformTypeFromGLType(GLenum type) {
-			switch (type) {
-			case GL_INT:
-				return UniformType::Integer;
-			case GL_FLOAT:
-				return UniformType::Float;
-			case GL_FLOAT_VEC2:
-				return UniformType::Vec2;
-			case GL_FLOAT_VEC3:
-				return UniformType::Vec3;
-			case GL_FLOAT_VEC4:
-				return UniformType::Vec4;
-			case GL_SAMPLER_2D:
-				return UniformType::Sampler;
-			case GL_FLOAT_MAT4:
-				return UniformType::Mat4x4;
-			default:
-				assert(false && "::ERROR: Undefined uniform type");
-				return UniformType::Float;
+			const int locationCount = getAttributeLocationCountGL(type);
+			for (int currentLocation = location; currentLocation < location + locationCount; currentLocation++) {
+				const bool bIsLocationTaken = (attributeLocationMask >> currentLocation) & 1;
+				assert(!bIsLocationTaken && "::ERROR: Attribute location is already taken");
+				attributeLocationMask |= (1 << currentLocation);
 			}
 		}
-
-		GLenum getGLTypeFromAttributeType(AttributeType attributeType) {
-			switch (attributeType) {
-			case AttributeType::Float:
-				return GL_FLOAT;
-			case AttributeType::Int:
-				return GL_INT;
-			case AttributeType::UnsignedInt:
-				return GL_UNSIGNED_INT;
-			default:
-				assert(false && "::ERROR: Undefined attribute type");
-				return GL_FLOAT;
-			}
-		}
-
-		GLenum getGLBool(bool value) {
-			return value ? GL_TRUE : GL_FALSE;
-		}
-
 	}
 
 }

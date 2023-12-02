@@ -40,8 +40,8 @@ void SPRE_01_Stenciling::OnAttach() {
 	static const int msaaSampleCount = 8;
 	const auto &[windowWidth, windowHeight] = spw::getWindowSize();
 	spr::TextureInfo colorTextureInfo;
-	colorTextureInfo.Width			= windowWidth;
-	colorTextureInfo.Height			= windowHeight;
+	colorTextureInfo.Width			= std::round(windowWidth);
+	colorTextureInfo.Height			= std::round(windowHeight);
 	colorTextureInfo.Format			= spr::TextureFormat::RGB8;
 	colorTextureInfo.Flags			|= (uint8_t) spr::TextureFlags::IsRenderTargetTexture;
 	colorTextureInfo.NumSamples		= msaaSampleCount; 

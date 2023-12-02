@@ -21,7 +21,7 @@ set(SPR_SOURCES
 		OpenGL/ResourceManager/TextureUtilsGL.cpp)
 
 
-add_library(spr STATIC ${SPR_SOURCES} "OpenGL/ResourceManager/FramebufferManagerGL.cpp" "OpenGL/ResourceManager/FramebufferUtilsGL.cpp")
+add_library(spr STATIC ${SPR_SOURCES} "OpenGL/ResourceManager/FramebufferManagerGL.cpp" "OpenGL/ResourceManager/FramebufferUtilsGL.cpp" "OpenGL/ResourceManager/ProgramUtilsGL.cpp")
 
 # sets OpenGL policy to prioritize newer versions over legacy when both are found
 cmake_policy(SET CMP0072 NEW)

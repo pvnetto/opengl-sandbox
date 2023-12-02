@@ -32,12 +32,13 @@ void AOGL_05_GeometryShading::OnAttach() {
 	const int perVertexBufferBindingPoint = 0;
 	glVertexArrayVertexBuffer(m_VertexArray, perVertexBufferBindingPoint, m_MeshVertexBuffer, NULL, m_CubeData.Layout.getStride());
 	for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
-		const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+		spr::VertexAttribute layoutAttribute;
+		if (m_CubeData.Layout.getAttribute(i, layoutAttribute)) {
+			glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+			glVertexArrayAttribBinding(m_VertexArray, i, perVertexBufferBindingPoint);
 
-		glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-		glVertexArrayAttribBinding(m_VertexArray, i, perVertexBufferBindingPoint);
-
-		glEnableVertexArrayAttrib(m_VertexArray, i);
+			glEnableVertexArrayAttrib(m_VertexArray, i);		
+		}
 	}
 
 	// 0. Creates Program with a Geometry Shader

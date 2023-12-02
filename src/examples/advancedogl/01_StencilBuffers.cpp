@@ -33,11 +33,12 @@ void AOGL_01_StencilBuffers::OnAttach() {
 		const int vertexBufferBindingPoint = 0;
 		glVertexArrayVertexBuffer(m_QuadVertexArray, vertexBufferBindingPoint, m_QuadVertexBuffer, NULL, m_QuadData.Layout.getStride());
 		for (int i = 0, count = m_QuadData.Layout.getAttributeCount(); i < count; i++) {
-			const spr::VertexAttribute &layoutAttribute = m_QuadData.Layout.getAttribute(i);
-
-			glVertexArrayAttribFormat(m_QuadVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-			glVertexArrayAttribBinding(m_QuadVertexArray, i, vertexBufferBindingPoint);
-			glEnableVertexArrayAttrib(m_QuadVertexArray, i);
+			spr::VertexAttribute layoutAttribute;
+			if (m_QuadData.Layout.getAttribute(i, layoutAttribute)) {
+				glVertexArrayAttribFormat(m_QuadVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+				glVertexArrayAttribBinding(m_QuadVertexArray, i, vertexBufferBindingPoint);
+				glEnableVertexArrayAttrib(m_QuadVertexArray, i);			
+			}
 		}
 		glVertexArrayElementBuffer(m_QuadVertexArray, m_QuadIndexBuffer);
 	}
@@ -53,12 +54,13 @@ void AOGL_01_StencilBuffers::OnAttach() {
 		const int perVertexBufferBindingPoint = 0;
 		glVertexArrayVertexBuffer(m_CubeVertexArray, perVertexBufferBindingPoint, m_CubeVertexBuffer, NULL, m_CubeData.Layout.getStride());
 		for (int i = 0, count = m_CubeData.Layout.getAttributeCount(); i < count; i++) {
-			const spr::VertexAttribute &layoutAttribute = m_CubeData.Layout.getAttribute(i);
+			spr::VertexAttribute layoutAttribute;
+			if (m_CubeData.Layout.getAttribute(i, layoutAttribute)) {
+				glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+				glVertexArrayAttribBinding(m_CubeVertexArray, i, perVertexBufferBindingPoint);
 
-			glVertexArrayAttribFormat(m_CubeVertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-			glVertexArrayAttribBinding(m_CubeVertexArray, i, perVertexBufferBindingPoint);
-
-			glEnableVertexArrayAttrib(m_CubeVertexArray, i);
+				glEnableVertexArrayAttrib(m_CubeVertexArray, i);			
+			}
 		}
 	}
 

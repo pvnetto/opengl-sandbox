@@ -175,6 +175,13 @@ namespace spw {
 		return s_State.Height;
 	}
 
+	float getWindowAspectRatio() {
+		if (getWindowWidth() > 0 && getWindowHeight() > 0) {
+			return (float)(spw::getWindowWidth() / spw::getWindowHeight());
+		}
+		return 0.0f;
+	}
+
 	spw::Vec2 getMousePos() {
 		return s_State.LastMousePos;
 	}

@@ -5,15 +5,15 @@
 
 namespace spr {
 
-	void VertexBufferInstanceGL::create(const void *data, uint32_t size, uint32_t instanceCount, const VertexAttributeLayoutHandle &layoutHandle) {
-		Size = size;
+	void VertexBufferInstanceGL::create(const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayoutHandle &layoutHandle) {
+		ByteSize = byteSize;
 		LayoutHandle = layoutHandle;
 		InstanceCount = instanceCount;
 
 		// Instanced vertex buffers are dynamic by default, others are not
 		const GLbitfield storageFlags = InstanceCount > 0 ? GL_DYNAMIC_STORAGE_BIT : 0;
 		glCreateBuffers(1, &ID);
-		glNamedBufferStorage(ID, size, data, storageFlags);
+		glNamedBufferStorage(ID, byteSize, data, storageFlags);
 	}
 
 	void VertexBufferInstanceGL::update(const void *data, uint32_t byteSize, uint32_t offset) {

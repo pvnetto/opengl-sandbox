@@ -27,11 +27,12 @@ void AOGL_01_DepthBuffers::OnAttach() {
 	const int vertexBufferBindingPoint = 0;
 	glVertexArrayVertexBuffer(m_VertexArray, vertexBufferBindingPoint, m_QuadVertexBuffer, NULL, m_QuadData.Layout.getStride());
 	for (int i = 0, count = m_QuadData.Layout.getAttributeCount(); i < count; i++) {
-		const spr::VertexAttribute &layoutAttribute = m_QuadData.Layout.getAttribute(i);
-
-		glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
-		glVertexArrayAttribBinding(m_VertexArray, i, vertexBufferBindingPoint);
-		glEnableVertexArrayAttrib(m_VertexArray, i);
+		spr::VertexAttribute layoutAttribute;
+		if (m_QuadData.Layout.getAttribute(i, layoutAttribute)) {
+			glVertexArrayAttribFormat(m_VertexArray, i, layoutAttribute.Num, GL_FLOAT, GL_FALSE, layoutAttribute.Offset);
+			glVertexArrayAttribBinding(m_VertexArray, i, vertexBufferBindingPoint);
+			glEnableVertexArrayAttrib(m_VertexArray, i);		
+		}
 	}
 	glVertexArrayElementBuffer(m_VertexArray, m_QuadIndexBuffer);
 

@@ -13,8 +13,12 @@ namespace spr {
 
     struct ProgramInstanceGL {
 		struct ProgramAttributeGL {
+			/* Name of the attribute inside the program */
 			std::string Name;
+			/* Attribute location inside the program (Note: Attributes may take up multiple contiguous locations, this value stores the base location) */
 			int Location;
+			/* GL type of the attribute (GLenum) */
+			int Type;
 		};
 
 		uint32_t ID;

@@ -6,7 +6,7 @@ namespace spr {
 
     struct VertexBufferInstanceGL {
 		uint32_t ID;
-		uint32_t Size;
+		uint32_t ByteSize;
 		uint32_t InstanceCount = 0;
 		VertexAttributeLayoutHandle LayoutHandle;
 

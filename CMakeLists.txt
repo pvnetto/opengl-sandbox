@@ -13,6 +13,11 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${PROJECT_SOURCE_DIR}/src -I${PROJECT_SOURCE_DIR}/src/shared/layers")
 
+# Disables building libraries as shared (dynamic) by default, and will default to static instead.
+# We're doing this because we don't want to deal with copying DLLs over to the executable folder.
+# https://discourse.cmake.org/t/why-is-manual-copying-of-dll-needed-when-linking-library/6971
+# https://stackoverflow.com/questions/61386679/how-to-get-static-library-default-by-cmake
+set(BUILD_SHARED_LIBS FALSE) 
 
 add_subdirectory(src)
 add_subdirectory(vendor)

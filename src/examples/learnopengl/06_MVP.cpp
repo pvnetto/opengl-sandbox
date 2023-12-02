@@ -53,7 +53,7 @@ void LOGL_06_MVP::OnUpdate() {
 
 	// 3. Creates Projection matrix
 	glm::mat4 projection(1.0f);
-	const float aspectRatio = (float) (spw::getWindowWidth() / spw::getWindowHeight());
+	const float aspectRatio = spw::getWindowAspectRatio();
 	const float near = 0.1f;
 	const float far = 100.f;
 	projection = glm::perspective(m_FieldOfView, aspectRatio, near, far);
@@ -73,8 +73,7 @@ void LOGL_06_MVP::OnUpdate() {
 
 	spr::submit(m_ShaderProgram);
 
-	spr::render();
-	spr::clean();
+	spr::flush();
 }
 
 void LOGL_06_MVP::OnImGuiRender() {

@@ -148,31 +148,46 @@ namespace spr {
 			}
 			glCheckError();
 
-			// Stores any non-instanced vertex buffer, just in case we need to determine how many vertices we're drawing.
-			VertexBufferHandle nonInstancedVertexBuffer = k_InvalidHandle;
+			// Stores how many vertices/instances we're drawing.
+			int instanceCount = 0, vertexCount = 0;
 			for (const VertexBufferHandle &vertexBufferHandle : drawCall.VertexBuffers) {
 				const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(vertexBufferHandle);
-				if (vertexBuffer.InstanceCount == 0) {
-					nonInstancedVertexBuffer = vertexBufferHandle;
-					break;
+				if (vertexCount == 0 && vertexBuffer.InstanceCount == 0) {
+					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(vertexBufferHandle);
+					const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
+					vertexCount = vertexBuffer.ByteSize / vertexAttributeLayout.getStride();
+				}
+
+				if (instanceCount == 0 && vertexBuffer.InstanceCount > 0) {
+					instanceCount = vertexBuffer.InstanceCount;
 				}
 			}
 			glCheckError();
 
-			// Finally, draws stuff to the screen
-			if (!cachedDrawCall.VertexBuffers.empty()) {
-				if (cachedDrawCall.IndexBuffer.isValid()) {
-					const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
-					const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
+			if (cachedDrawCall.VertexBuffers.empty()) {
+				continue;
+			}
+
+			// Draws stuff to the screen. Will use glDraw{*}Instanced if an instance count was specified
+			if (cachedDrawCall.IndexBuffer.isValid()) {
+				const auto &indexBufferManager = m_ResourceManager.getIndexBufferManager();
+				const auto &indexBuffer = indexBufferManager.getIndexBuffer(cachedDrawCall.IndexBuffer);
+				if (instanceCount == 0) {
 					glDrawElements(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL);
 				}
 				else {
-					const VertexBufferInstanceGL &vertexBuffer = vertexBufferManager.getVertexBuffer(nonInstancedVertexBuffer);
-					const auto &vertexAttributeLayout = spr::getVertexAttributeLayout(vertexBuffer.LayoutHandle);
-					const int vertexCount = vertexBuffer.Size / vertexAttributeLayout.getStride();
-					glDrawArrays(GL_TRIANGLES, 0, vertexCount);
-				}			
+					glDrawElementsInstanced(GL_TRIANGLES, indexBuffer.IndexCount, GL_UNSIGNED_INT, NULL, instanceCount);
+				}
 			}
+			else {
+				if (instanceCount == 0) {
+					glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+				}
+				else {
+					glDrawArraysInstanced(GL_TRIANGLES, 0, vertexCount, instanceCount);
+				}
+			}
+
 			glCheckError();
 		}
 

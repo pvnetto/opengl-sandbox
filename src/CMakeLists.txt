@@ -47,7 +47,7 @@ set(SANDBOX_SOURCES
 		)
 
 
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/simplerenderer/03_Instancing.cpp")
 
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)
