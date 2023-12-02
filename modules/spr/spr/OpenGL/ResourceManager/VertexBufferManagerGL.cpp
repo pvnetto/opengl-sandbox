@@ -41,7 +41,7 @@ namespace spr {
 		m_VertexBuffers[handle.idx].create(data, byteSize, instanceCount, layoutHandle);
 	}
 
-	void VertexBufferManagerGL::updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t offset, uint32_t byteSize) {
+	void VertexBufferManagerGL::updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t offset) {
 		m_VertexBuffers[handle.idx].update(data, byteSize, offset);
 	}
 

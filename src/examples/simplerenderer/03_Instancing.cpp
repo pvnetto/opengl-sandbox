@@ -19,7 +19,7 @@ static std::vector<float> GetColors(int amount) {
 		const float progress = i / (float)amount;
 		const float r = glm::mix(0.f, 1.f, progress);
 		const float g = 0.f;
-		const float b = 0.f;
+		const float b = glm::mix(1.f, 0.f, progress);
 		const float a = 1.f;
 		colors.push_back(r);
 		colors.push_back(g);
@@ -29,19 +29,20 @@ static std::vector<float> GetColors(int amount) {
 	return colors;
 }
 
-static std::vector<float> GetModels(int amount) {
+static std::vector<float> GetDynamicModels(int amount) {
 	const int rowSize = sqrt(amount);
 	const float gridSize = 2.f;
 	std::vector<float> models;
 	for (int cubeIndex = 0; cubeIndex < amount; cubeIndex++) {
 		const int rowIdx = (cubeIndex / rowSize) - (rowSize / 2);
 		const int colIdx = (cubeIndex % rowSize) - (rowSize / 2);
-		const float rotationAngle = glm::sin((float)cubeIndex) * 360.f;
+		const float timeScaled = spw::getTime() * 0.01f;
+		const float rotationAngle = glm::sin((float)cubeIndex) + glm::sin(timeScaled) * 360.f;
 
 		const glm::vec3 worldPosition{rowIdx * gridSize, colIdx * gridSize, -10.f};
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, worldPosition);
-		model = glm::rotate(model, rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::rotate(model, rotationAngle, glm::vec3(0.5f, 0.5f, 1.0f));
 		for (int modelIndex = 0; modelIndex < 16; modelIndex++) {
 			const int modelRow = modelIndex / 4, modelCol = modelIndex - (modelRow * 4);
 			models.push_back(model[modelRow][modelCol]);
@@ -76,17 +77,21 @@ void SPRE_03_Instancing::OnAttach() {
 
 	// 1. Creates Instanced Vertex Buffer to store per-instance world positions
 	// NOTE: We could have used the same Vertex Buffer that we use for colors, but we created a separate one to make it easier to use different divisors
-	const std::vector<float> worldPositions = GetModels(m_CubeCount);
+	const std::vector<float> modelMatrices = GetDynamicModels(m_CubeCount);
 	spr::VertexAttributeLayout modelsLayout;
 	modelsLayout.begin()
 	    .add({"inModel", spr::AttributeType::Float, 16})
 	    .end();
-	m_InstancedModelBuffer = spr::createInstancedVertexBuffer(worldPositions.data(), worldPositions.size() * sizeof(float), m_CubeCount, modelsLayout);
+	m_InstancedModelBuffer = spr::createInstancedVertexBuffer(modelMatrices.data(), modelMatrices.size() * sizeof(float), m_CubeCount, modelsLayout);
 
 	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 }
 
 void SPRE_03_Instancing::OnUpdate() {
+	// 2. Updates instanced vertex buffer each frame
+	const std::vector<float> modelMatrices = GetDynamicModels(m_CubeCount);
+	spr::updateInstancedVertexBuffer(m_InstancedModelBuffer, modelMatrices.data(), modelMatrices.size() * sizeof(float), 0);
+
 	spr::setVertexBuffer(m_CubeVertexBuffer);
 	spr::setVertexBuffer(m_InstancedColorBuffer);
 	spr::setVertexBuffer(m_InstancedModelBuffer);

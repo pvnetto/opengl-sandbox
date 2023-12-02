@@ -54,9 +54,11 @@ namespace spr {
 
 	void DrawCallData::clear() {
 		FixedFunctionState = {};
-		Program = k_InvalidHandle;
+
 		VertexBuffers.clear();
 		IndexBuffer = k_InvalidHandle;
+
+		Program = k_InvalidHandle;
 		UniformsStart = 0;
 		UniformsEnd = 0;
 		TextureBindings.clear();

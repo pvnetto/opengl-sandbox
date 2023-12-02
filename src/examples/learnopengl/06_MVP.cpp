@@ -12,11 +12,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glad/glad.h>
 
-static spr::SamplerInfo GetDefaultSamplerInfo() {
-	static spr::SamplerInfo defaultSampler;
-	return defaultSampler;
-}
-
 void LOGL_06_MVP::OnAttach() {
 	m_CubeVertexBuffer = Utils::LoadCube();
 
@@ -66,8 +61,8 @@ void LOGL_06_MVP::OnUpdate() {
 	spr::setUniform(m_ViewUniform, glm::value_ptr(view));
 	spr::setUniform(m_ProjectionUniform, glm::value_ptr(projection));
 
-	spr::setTexture(0, m_BrickTexture, GetDefaultSamplerInfo());
-	spr::setTexture(1, m_LadybugTexture, GetDefaultSamplerInfo());
+	spr::setTexture(0, m_BrickTexture);
+	spr::setTexture(1, m_LadybugTexture);
 
 	spr::setVertexBuffer(m_CubeVertexBuffer);
 

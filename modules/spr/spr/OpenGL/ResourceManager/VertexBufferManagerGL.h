@@ -19,7 +19,7 @@ namespace spr {
 	public:
 		void createVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, const VertexAttributeLayout &layout);
 		void createInstancedVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t instanceCount, const VertexAttributeLayout &layout);
-		void updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t offset, uint32_t byteSize);
+		void updateVertexBuffer(const VertexBufferHandle handle, const void *data, uint32_t byteSize, uint32_t offset);
 		void destroy(VertexBufferHandle &handle);
 
 	    const VertexBufferInstanceGL &getVertexBuffer(const VertexBufferHandle handle) const;
