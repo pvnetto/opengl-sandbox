@@ -10,7 +10,7 @@ int main() {
 
 	// Initialization
 	{
-		spw::createWindow("OpenGL Sandbox", 1280, 720);
+		spw::createWindow("OpenGL Sandbox", 1920, 1080);
 		
 		spr::ContextInfo info;
 		info.Width = spw::getWindowWidth();

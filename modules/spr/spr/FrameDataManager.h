@@ -33,6 +33,9 @@ namespace spr {
 
 	// Refer to this for draw call sorting: https://realtimecollisiondetection.net/blog/?p=86
 	struct DrawCallSortKey {
+		// 1 byte - render target
+		uint8_t RenderTargetIndexInversed;
+
 		// 1 byte - blending
 		uint8_t bIsBlendingDisabled		: 1;
 		uint8_t BlendingEquation		: 3;

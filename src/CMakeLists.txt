@@ -44,10 +44,12 @@ set(SANDBOX_SOURCES
 		examples/advancedogl/06_Tessellation.cpp
 		examples/simplerenderer/01_Stenciling.cpp
 		examples/simplerenderer/02_OrderIndependentBlending.cpp
+		examples/simplerenderer/03_Instancing.cpp
+		examples/simplerenderer/04_HDR.cpp
 		)
 
 
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/simplerenderer/03_Instancing.cpp")
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)

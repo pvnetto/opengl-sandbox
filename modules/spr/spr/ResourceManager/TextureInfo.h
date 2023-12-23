@@ -8,6 +8,7 @@ namespace spr {
 		None,
 		RGB8,
 		RGBA8,
+		RGBA16F,
 		DEPTH_24,
 		STENCIL_8,
 		DEPTH_24_STENCIL_8,

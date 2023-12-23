@@ -10,6 +10,8 @@ namespace spr {
 			return GL_RGB8;
 		case spr::TextureFormat::RGBA8:
 			return GL_RGBA8;
+		case spr::TextureFormat::RGBA16F:
+			return GL_RGBA16F;
 		case spr::TextureFormat::DEPTH_24_STENCIL_8:
 			return GL_DEPTH24_STENCIL8;
 		default:

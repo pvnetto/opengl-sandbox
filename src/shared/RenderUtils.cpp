@@ -163,7 +163,7 @@ namespace Utils {
 		int texWidth, texHeight, numOfChannels;
 		unsigned char *textureData = stbi_load(path, &texWidth, &texHeight, &numOfChannels, 0);
 		if (!textureData) {
-			std::cout << "Couldn't load texture\n";
+			assert(false && "::ERROR: Couldn't load texture");
 		}
 
 		spr::TextureInfo textureInfo;

@@ -31,6 +31,7 @@
 #include "examples/simplerenderer/01_Stenciling.h"
 #include "examples/simplerenderer/02_OrderIndependentBlending.h"
 #include "examples/simplerenderer/03_Instancing.h"
+#include "examples/simplerenderer/04_HDR.h"
 
 #include "shared/Runtime.h"
 
@@ -82,6 +83,7 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(RendererExamples, SPRE_01_Stenciling,				"01 - Stenciling");
 	ADD_SIMPLE(RendererExamples, SPRE_02_OrderIndependentBlending,	"02 - Order Independent Blending");
 	ADD_SIMPLE(RendererExamples, SPRE_03_Instancing,				"03 - Instancing");
+	ADD_SIMPLE(RendererExamples, SPRE_04_HDR,						"04 - HDR");
 }
 
 void ExampleGUILayer::OnImGuiRender() {

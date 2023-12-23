@@ -81,6 +81,7 @@ namespace spr {
 
 	DrawCallSortKey DrawCallData::getSortKey() const {
 		DrawCallSortKey sortKey;
+		sortKey.RenderTargetIndexInversed = (RenderTargetIndex ^ 0b11111111);
 		sortKey.bIsBlendingDisabled = !(!!FixedFunctionState.ColorState.bIsBlendingEnabled);
 		sortKey.BlendingEquation = FixedFunctionState.ColorState.BlendingEquation;
 		sortKey.ShaderProgram = Program.idx;

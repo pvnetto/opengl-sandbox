@@ -17,14 +17,14 @@ public:
 	Camera(glm::vec3 position, glm::vec3 rotation, glm::vec3 up);
 
     glm::mat4 GetView() const;
-    glm::mat4 GetProjection() const { return m_projection; }
+    glm::mat4 GetProjection() const { return m_Projection; }
 
     glm::vec3 GetForward() const { return m_Forward; }
     glm::vec3 GetRight() const;
     glm::vec3 GetUp() const;
 
     glm::vec3& GetPosition() { return m_Position; }
-    glm::vec3 GetRotationEuler() { return m_rotationEuler; }
+    glm::vec3 GetRotationEuler() { return m_RotationEuler; }
 
     void SetPosition(glm::vec3 position) { m_Position = position; }
     void SetRotation(glm::vec3 newRotation);
@@ -38,11 +38,11 @@ public:
 private:
     glm::vec3 m_Position;
     glm::vec3 m_Forward;
-    glm::vec3 m_rotationEuler;
+    glm::vec3 m_RotationEuler;
 
     glm::vec3 m_WorldUp;
 
-    glm::mat4 m_projection;
+    glm::mat4 m_Projection;
 
     void UpdateDirection();
 };

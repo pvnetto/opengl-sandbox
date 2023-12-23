@@ -31,7 +31,6 @@ private:
 	spr::UniformHandle m_ResolutionUniform;
 	spr::UniformHandle m_TimeUniform;
 
-
 	spr::ProgramHandle m_LightingShaderProgram;
 	spr::UniformHandle m_ModelUniform;
 	spr::UniformHandle m_ViewUniform;
