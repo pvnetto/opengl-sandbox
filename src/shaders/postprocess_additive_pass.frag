@@ -14,5 +14,8 @@ uniform sampler2D factorTextureB;
 void main() {
     vec4 colorA = texture(factorTextureA, inFragment.uv);
     vec4 colorB = texture(factorTextureB, inFragment.uv);
+
+    float colorMag = max(length(colorA), length(colorB));
     outFragColor = colorA + colorB;
+    outFragColor = normalize(outFragColor) * colorMag;
 }
