@@ -13,10 +13,21 @@ namespace spr {
 	void FramebufferInstanceGL::create(const FramebufferAttachmentMapGL &attachments) {
 		glCreateFramebuffers(1, &ID);
 
+		GLenum colorAttachments[32];
+		int colorAttachmentsCount = 0;
+
 		for (const auto [attachmentType, attachmentTextureInstance] : attachments) {
 			const GLenum attachmentTypeGl = getFramebufferAttachmentTypeGL(attachmentType);
 			glNamedFramebufferTexture(ID, attachmentTypeGl, attachmentTextureInstance.ID, 0);
+
+			if (attachmentTypeGl >= GL_COLOR_ATTACHMENT0 && attachmentTypeGl <= GL_COLOR_ATTACHMENT31) {
+				const int attachmentIndex = attachmentTypeGl - GL_COLOR_ATTACHMENT0;
+				colorAttachments[attachmentIndex] = attachmentTypeGl;
+				colorAttachmentsCount++;
+			}
 		}
+
+		glNamedFramebufferDrawBuffers(ID, colorAttachmentsCount, colorAttachments);
 
 		if (auto status = glCheckNamedFramebufferStatus(ID, GL_FRAMEBUFFER); status != GL_FRAMEBUFFER_COMPLETE) {
 			assert(false && "::ERROR: Framebuffer is incomplete");

@@ -44,7 +44,7 @@ void LOGL_12_SpotLight::OnAttach() {
 
 	m_TimeUniform = spr::createUniform("time", spr::UniformType::Float);
 
-	m_SpotLightShaderProgram = Utils::LoadShaderProgram("shaders/09_specular_map.vert", "shaders/10_spotlight.frag");
+	m_SpotLightShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/10_spotlight.frag");
 	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 }
 

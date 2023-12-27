@@ -15,32 +15,34 @@ struct Light {
     vec3 color;
 };
 
-out vec4 fragmentColor;
+in VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} inFragment;
 
-in vec3 worldPosition;
-in vec2 uvCoords;
-in vec3 normal;
+out vec4 fragmentColor;
 
 uniform Material material;
 uniform Light light;
 uniform vec3 viewPos;
 
 void main() {
-    vec3 color = vec3(texture(material.diffuseMap, uvCoords));
+    vec3 color = vec3(texture(material.diffuseMap, inFragment.uv));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * light.color * color;
 
     // calculates diffuse
-    vec3 lightDir = normalize(light.position - worldPosition);
-    vec3 diffuse = max(dot(lightDir, normal), 0.0f) * light.color * color * material.diffuseStrength;
+    vec3 lightDir = normalize(light.position - inFragment.worldPosition);
+    vec3 diffuse = max(dot(lightDir, inFragment.normal), 0.0f) * light.color * color * material.diffuseStrength;
 
     // calculates specular
-    vec3 viewDir = normalize(viewPos - worldPosition);
-    vec3 lightDirReflected = reflect(-lightDir, normal);
+    vec3 viewDir = normalize(viewPos - inFragment.worldPosition);
+    vec3 lightDirReflected = reflect(-lightDir, inFragment.normal);
     float specularIntensity = max(dot(viewDir, lightDirReflected), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(material.specularMap, uvCoords));
+    vec3 specularSample = vec3(texture(material.specularMap, inFragment.uv));
     vec3 specular = specularIntensity * light.color * specularSample * material.specularStrength;
     
     // calculates fragment color

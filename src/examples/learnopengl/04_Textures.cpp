@@ -50,7 +50,8 @@ void LOGL_04_Textures::OnAttach() {
 	assert(isGLExtensionSupported("GL_ARB_texture_storage") && "::ERROR: GL_ARB_texture_storage is not enabled");
 
 	// 2. Loads image from disk
-	// BEWARE: Y coordinates are flipped on OpenGL, so textures must be flipped
+	// BEWARE: Y coordinates are flipped on OpenGL, so you should either flip your textures or UV y-coordinates.
+	// In this case, we're going to flip the textures, but flipping Y is preferred if you're doing multi pass rendering.
 	stbi_set_flip_vertically_on_load(true);
 
 	int texWidth, texHeight, numOfChannels;
@@ -105,6 +106,7 @@ void LOGL_04_Textures::OnAttach() {
 	glBindSampler(1, m_OtherTextureSampler);
 
 	stbi_image_free(tex2Data);
+	stbi_set_flip_vertically_on_load(false);
 }
 
 void LOGL_04_Textures::OnUpdate() {

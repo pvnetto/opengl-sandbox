@@ -55,7 +55,7 @@ void AOGL_06_Tessellation::OnAttach() {
 void AOGL_06_Tessellation::CreateShaderProgram() {
 	m_TessellatedShaderProgram = glCreateProgram();
 
-	CompileShaderAndAttach("shaders/default_unlit.vert",		GL_VERTEX_SHADER);
+	CompileShaderAndAttach("shaders/default_vertex.vert",		GL_VERTEX_SHADER);
 	CompileShaderAndAttach("shaders/wireframe.geom",			GL_GEOMETRY_SHADER);
 	CompileShaderAndAttach("shaders/default_unlit.frag",		GL_FRAGMENT_SHADER);
 

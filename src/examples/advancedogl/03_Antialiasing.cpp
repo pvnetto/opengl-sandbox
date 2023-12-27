@@ -30,7 +30,7 @@ void AOGL_03_Antialiasing::OnAttach() {
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
 	CreateCube();
-	m_DefaultShaderProgram = Utils::CreateShaderProgramGL("shaders/default_unlit.vert", "shaders/default_unlit.frag");
+	m_DefaultShaderProgram = Utils::CreateShaderProgramGL("shaders/default_vertex.vert", "shaders/default_unlit.frag");
 
 	// 0. Creates Framebuffer and Multisampled Textures to use as attachments
 	// NOTE: If you're using GLFW, you can configure the Default Framebuffer to use MSAA with glfwWindowHint(GLFW_SAMPLES, numSamples), without

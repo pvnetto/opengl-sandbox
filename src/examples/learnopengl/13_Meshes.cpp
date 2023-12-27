@@ -47,7 +47,7 @@ void LOGL_13_Meshes::OnAttach() {
 
 	m_TimeUniform = spr::createUniform("time", spr::UniformType::Float);
 
-	m_PhongShaderProgram = Utils::LoadShaderProgram("shaders/09_specular_map.vert", "shaders/12_default.frag");
+	m_PhongShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/12_default.frag");
 	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 }
 
@@ -82,10 +82,14 @@ void LOGL_13_Meshes::OnUpdate() {
 		spr::setIndexBuffer(mesh.IndexBuffer);
 		
 		if (mesh.Textures.size() > 0) {
-			spr::setTexture(0, mesh.Textures[0]);
+			const int32_t diffuseTextureUnit = 0;
+			spr::setTexture(diffuseTextureUnit, mesh.Textures[0]);
+			spr::setUniform(m_MaterialDiffuseMapUniform, &diffuseTextureUnit);
 		}
 		if (mesh.Textures.size() > 1) {
-			spr::setTexture(0, mesh.Textures[1]);
+			const int32_t specularTextureUnit = 1;
+			spr::setTexture(specularTextureUnit, mesh.Textures[1]);
+			spr::setUniform(m_MaterialSpecularMapUniform, &specularTextureUnit);
 		}
 
 		const float ambientStrength = 0.1f, diffuseStrength = 0.5f, specularStrength = 1.f, shininess = 32.f;

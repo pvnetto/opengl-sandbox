@@ -19,8 +19,10 @@ uniform mat4 projection;
 void main() {
     gl_Position = projection * view * model * vec4(inPosition, 1.0f);
 
+    mat3 normalMatrix = mat3(transpose(inverse(model)));    // Rotates/scales the normal if necessary
     vec4 worldPosition4d = model * vec4(inPosition, 1.0f);
+
     outVertexData.worldPosition = vec3(worldPosition4d.xyz);
-    outVertexData.uv = vec2(inUV.xy);
-    outVertexData.normal = vec3(inNormal.xyz);
+    outVertexData.uv = vec2(inUV.x, -inUV.y);
+    outVertexData.normal = normalize(normalMatrix * inNormal);
 }

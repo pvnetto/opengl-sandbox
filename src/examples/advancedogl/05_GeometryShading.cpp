@@ -51,7 +51,7 @@ void AOGL_05_GeometryShading::CreateShaderProgram() {
 	unsigned int vertexShader, geometryShader, fragmentShader;
 
 	{
-		const std::string vertexSrc = Utils::ReadShaderFile("shaders/default_unlit.vert");
+		const std::string vertexSrc = Utils::ReadShaderFile("shaders/default_vertex.vert");
 		const char *vertexSrcC = vertexSrc.c_str();
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vertexShader, 1, &vertexSrcC, NULL);

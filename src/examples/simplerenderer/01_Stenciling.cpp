@@ -34,7 +34,7 @@ void SPRE_01_Stenciling::OnAttach() {
 	m_ColorUniform = spr::createUniform("color", spr::UniformType::Vec4);
 	
 	m_LightingShaderProgram = Utils::LoadShaderProgram("shaders/07_phong.vert", "shaders/07_phong.frag");
-	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
+	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/default_unlit.frag");
 
 
 	static const int msaaSampleCount = 8;

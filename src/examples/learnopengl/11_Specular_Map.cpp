@@ -40,7 +40,7 @@ void LOGL_11_SpecularMap::OnAttach() {
 
 	m_TimeUniform = spr::createUniform("time", spr::UniformType::Float);
 
-	m_SpecularShaderProgram = Utils::LoadShaderProgram("shaders/09_specular_map.vert", "shaders/09_specular_map.frag");
+	m_SpecularShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/09_specular_map.frag");
 	m_LightSourceShaderProgram = Utils::LoadShaderProgram("shaders/05_vertex_mvp.vert", "shaders/06_frag_light_source.frag");
 }
 

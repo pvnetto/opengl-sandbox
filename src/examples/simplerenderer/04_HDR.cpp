@@ -13,7 +13,7 @@
 void SPRE_04_HDR::OnAttach() {
 	m_Camera = Camera(
 	    glm::vec3(0.f, 0.f, -10.f),
-	    glm::vec3(180.f, -270.f, 0.f),
+	    glm::vec3(0.f, -90.f, 0.f),
 	    glm::vec3(0.f, 1.f, 0.f));
 	m_Controller = FreeCameraController(m_Camera, 15.f);
 
@@ -41,15 +41,15 @@ void SPRE_04_HDR::OnAttach() {
 	m_GammaCorrectionRatioUniform = spr::createUniform("gammaCorrectionRatio", spr::UniformType::Integer);
 	m_AlbedoTexture = Utils::LoadTexture("assets/bricks.jpg");
 
-	m_LightingShaderProgram = Utils::LoadShaderProgram("shaders/default_lit.vert", "shaders/default_lit.frag");
-	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
-	m_ToneMappingShaderProgram = Utils::LoadShaderProgram("shaders/postprocess_tonemapping.vert", "shaders/postprocess_tonemapping.frag");
+	m_LitShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/default_lit.frag");
+	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/default_unlit.frag");
+	m_ToneMappingShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/postprocess_tonemapping.frag");
 
 	const auto &[windowWidth, windowHeight] = spw::getWindowSize();
 	spr::TextureInfo hdrColorTextureInfo;
 	hdrColorTextureInfo.Width = std::round(windowWidth);
 	hdrColorTextureInfo.Height = std::round(windowHeight);
-	hdrColorTextureInfo.Format = spr::TextureFormat::RGB8;
+	hdrColorTextureInfo.Format = spr::TextureFormat::RGBA16F;
 	hdrColorTextureInfo.Flags |= (uint8_t)spr::TextureFlags::IsRenderTargetTexture;
 	m_HDRColorBufferTexture = spr::createTexture(hdrColorTextureInfo, nullptr);
 
@@ -69,9 +69,9 @@ void SPRE_04_HDR::OnAttach() {
 	postProcessColorTextureInfo.Height = std::round(windowHeight);
 	postProcessColorTextureInfo.Format = spr::TextureFormat::RGBA16F;
 	postProcessColorTextureInfo.Flags |= (uint8_t)spr::TextureFlags::IsRenderTargetTexture;
-	m_PostProcessColorBufferTexture = spr::createTexture(postProcessColorTextureInfo, nullptr);
-	m_PostProcessFramebuffer = spr::createFramebuffer({
-	    {spr::FramebufferAttachmentType::Color0, m_PostProcessColorBufferTexture},
+	m_ToneMappingColorBufferTexture = spr::createTexture(postProcessColorTextureInfo, nullptr);
+	m_ToneMappingFramebuffer = spr::createFramebuffer({
+	    {spr::FramebufferAttachmentType::Color0, m_ToneMappingColorBufferTexture},
 	});
 
 	// TODO: Move to RenderTarget clear config
@@ -90,7 +90,7 @@ void SPRE_04_HDR::OnUpdate() {
 	spr::setRenderTargetRect(hdrRenderPassTarget, {0, 0, (uint32_t)windowWidth, (uint32_t)windowHeight});
 
 	const uint8_t postProcessRenderPassTarget = 1;
-	spr::setRenderTargetFramebuffer(postProcessRenderPassTarget, m_PostProcessFramebuffer);
+	spr::setRenderTargetFramebuffer(postProcessRenderPassTarget, m_ToneMappingFramebuffer);
 	spr::setRenderTargetClear(postProcessRenderPassTarget, spr::AsFlag(spr::FramebufferAttachmentFlags::All));
 	spr::setRenderTargetRect(postProcessRenderPassTarget, {0, 0, (uint32_t)windowWidth, (uint32_t)windowHeight});
 
@@ -144,9 +144,7 @@ void SPRE_04_HDR::OnUpdate() {
 			litModel = glm::rotate(litModel, 0.f, glm::vec3(0.0f, 0.0f, 1.0f));
 			litModel = glm::scale(litModel, scale);
 
-			const int albedoTextureUnit = 0;
-			const float ambientIntensity = 0.01f;
-			const float textureTiling = tunnelDepth * 0.25f;
+			const float textureTiling = tunnelDepth * 0.2f;
 
 			spr::SamplerInfo brickSampler;
 			brickSampler.WrappingVertical = spr::WrappingMethod::Repeat;
@@ -165,7 +163,7 @@ void SPRE_04_HDR::OnUpdate() {
 			spr::setUniform(m_AmbientIntensityUniform, &ambientIntensity);
 			spr::setUniform(m_SpecularShininessUniform, &specularShininess);
 			spr::setUniform(m_SpecularStrengthUniform, &specularStrength);
-			spr::submit(hdrRenderPassTarget, m_LightingShaderProgram);
+			spr::submit(hdrRenderPassTarget, m_LitShaderProgram);
 		}
 
 
@@ -197,7 +195,7 @@ void SPRE_04_HDR::OnUpdate() {
 		spr::setUniform(m_AmbientIntensityUniform, &ambientIntensity);
 		spr::setUniform(m_SpecularShininessUniform, &specularShininess);
 		spr::setUniform(m_SpecularStrengthUniform, &specularStrength);
-		spr::submit(hdrRenderPassTarget, m_LightingShaderProgram);
+		spr::submit(hdrRenderPassTarget, m_LitShaderProgram);
 	}
 
 	// 3. Tone Mapping pass
@@ -210,9 +208,13 @@ void SPRE_04_HDR::OnUpdate() {
 		spr::setUniform(m_ToneMappingExposureUniform, &m_Exposure);
 		spr::setUniform(m_GammaCorrectionRatioUniform, &gammaCorrectionRatio);
 
+		const glm::mat4 identity(1.0f);
 		const auto& quadMesh = m_QuadModel.Meshes[0];
 		spr::setVertexBuffer(quadMesh.VertexBuffer);
 		spr::setIndexBuffer(quadMesh.IndexBuffer);
+		spr::setUniform(m_ModelUniform, glm::value_ptr(identity));
+		spr::setUniform(m_ViewUniform, glm::value_ptr(identity));
+		spr::setUniform(m_ProjectionUniform, glm::value_ptr(identity));
 		spr::submit(postProcessRenderPassTarget, m_ToneMappingShaderProgram);
 	}
 
@@ -222,7 +224,7 @@ void SPRE_04_HDR::OnUpdate() {
 		const auto& [windowWidth, windowHeight] = spw::getWindowSize();
 
 		spr::BlitParameters blitParameters;
-		blitParameters.Source = m_PostProcessFramebuffer;
+		blitParameters.Source = m_ToneMappingFramebuffer;
 		blitParameters.Destination = defaultFramebuffer;
 		blitParameters.SourceRect = { 0, 0, (uint32_t)windowWidth, (uint32_t)windowHeight };
 		blitParameters.DestinationRect = { 0, 0, (uint32_t)windowWidth, (uint32_t)windowHeight };
@@ -276,9 +278,10 @@ void SPRE_04_HDR::OnDetach() {
 	spr::destroy(m_CubeVertexBuffer);
 	spr::destroy(m_HDRFramebuffer);
 	spr::destroy(m_HDRColorBufferTexture);
-	spr::destroy(m_PostProcessFramebuffer);
-	spr::destroy(m_PostProcessColorBufferTexture);
-	spr::destroy(m_LightingShaderProgram);
+	spr::destroy(m_HDRStencilDepthBufferTexture);
+	spr::destroy(m_ToneMappingFramebuffer);
+	spr::destroy(m_ToneMappingColorBufferTexture);
+	spr::destroy(m_LitShaderProgram);
 	spr::destroy(m_ModelUniform);
 	spr::destroy(m_ViewUniform);
 	spr::destroy(m_ProjectionUniform);
@@ -286,11 +289,16 @@ void SPRE_04_HDR::OnDetach() {
 	spr::destroy(m_LightColorUniform);
 	spr::destroy(m_LightPositionUniform);
 	spr::destroy(m_AlbedoUniform);
+	spr::destroy(m_TilingUniform);
+	spr::destroy(m_AmbientIntensityUniform);
+	spr::destroy(m_SpecularShininessUniform);
+	spr::destroy(m_SpecularStrengthUniform);
 	spr::destroy(m_UnlitShaderProgram);
 	spr::destroy(m_ColorUniform);
 	spr::destroy(m_ToneMappingShaderProgram);
 	spr::destroy(m_ToneMappingTextureUniform);
 	spr::destroy(m_ToneMappingTypeUniform);
+	spr::destroy(m_ToneMappingExposureUniform);
 	spr::destroy(m_GammaCorrectionRatioUniform);
 	spr::destroy(m_AlbedoTexture);
 }

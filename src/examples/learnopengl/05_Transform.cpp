@@ -48,8 +48,8 @@ void LOGL_05_Transform::OnUpdate() {
 
 	// 4. Calculates the cube's transform
 	glm::mat4 transform(1.0f);
-	transform = glm::translate(transform, glm::vec3(glm::sin((float)glfwGetTime()) * 0.5f, 0.2f, 0.0f));
-	transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+	//transform = glm::translate(transform, glm::vec3(glm::sin((float)glfwGetTime()) * 0.5f, 0.2f, 0.0f));
+	//transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 	transform = glm::scale(transform, glm::vec3(1.2f, 1.2f, 1.2f));
 
 	// 5. Passes the transform to the Shader Program as an Uniform

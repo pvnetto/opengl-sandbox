@@ -15,9 +15,11 @@ struct DirectionalLight {
     vec3 color;
 };
 
-in vec3 worldPosition;
-in vec3 normal;
-in vec2 uvCoords;
+in VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} inFragment;
 
 out vec4 fragmentColor;
 
@@ -26,21 +28,21 @@ uniform DirectionalLight light;
 uniform vec3 viewPos;
 
 void main() {
-    vec3 diffuseSample = vec3(texture(material.diffuseMap, uvCoords));
+    vec3 diffuseSample = vec3(texture(material.diffuseMap, inFragment.uv));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * diffuseSample * light.color;
 
     // calculates diffuse
     vec3 lightDir = normalize(-light.direction);
-    vec3 diffuse = max(dot(lightDir, normal), 0.0f) * diffuseSample * light.color;
+    vec3 diffuse = max(dot(lightDir, inFragment.normal), 0.0f) * diffuseSample * light.color;
 
     // calculates specular
-    vec3 lightDirReflected = reflect(-lightDir, normal);
-    vec3 viewDir = normalize(viewPos - worldPosition);
+    vec3 lightDirReflected = reflect(-lightDir, inFragment.normal);
+    vec3 viewDir = normalize(viewPos - inFragment.worldPosition);
     float specularIntensity = max(dot(lightDirReflected, viewDir), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(material.specularMap, uvCoords));
+    vec3 specularSample = vec3(texture(material.specularMap, inFragment.uv));
     vec3 specular = specularIntensity * material.specularStrength * specularSample * light.color;
 
     // calculates fragment color

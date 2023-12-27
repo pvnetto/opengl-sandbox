@@ -37,11 +37,13 @@ struct SpotLight {
     float shadowSmoothAngle;    // given in radians
 };
 
-out vec4 fragmentColor;
+in VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} inFragment;
 
-in vec3 worldPosition;
-in vec3 normal;
-in vec2 uvCoords;
+out vec4 fragmentColor;
 
 #define NUM_LIGHTS 4
 uniform Material material;
@@ -52,21 +54,21 @@ uniform SpotLight spotlight;
 uniform vec3 viewPos;
 
 vec3 CalculateDirectionalLight(DirectionalLight light, Material material, vec3 viewPos) {
-    vec3 diffuseSample = vec3(texture(material.diffuseMap, uvCoords));
+    vec3 diffuseSample = vec3(texture(material.diffuseMap, inFragment.uv));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * light.color * diffuseSample;
 
     // calculates diffuse
     vec3 lightDir = normalize(-light.direction);
-    vec3 diffuse = max(dot(lightDir, normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
+    vec3 diffuse = max(dot(lightDir, inFragment.normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
 
     // calculates specular
-    vec3 lightDirReflected = reflect(-lightDir, normal);
-    vec3 viewDir = normalize(viewPos - worldPosition);
+    vec3 lightDirReflected = reflect(-lightDir, inFragment.normal);
+    vec3 viewDir = normalize(viewPos - inFragment.worldPosition);
     float specularIntensity = max(dot(lightDirReflected, viewDir), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(material.specularMap, uvCoords));
+    vec3 specularSample = vec3(texture(material.specularMap, inFragment.uv));
     vec3 specular = specularIntensity * material.specularStrength * light.color * specularSample;
 
     // calculates final light color
@@ -74,25 +76,25 @@ vec3 CalculateDirectionalLight(DirectionalLight light, Material material, vec3 v
 }
 
 vec3 CalculatePointLight(PointLight light, Material material, vec3 viewPos) {
-    vec3 diffuseSample = vec3(texture(material.diffuseMap, uvCoords));
+    vec3 diffuseSample = vec3(texture(material.diffuseMap, inFragment.uv));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * light.color * diffuseSample;
 
     // calculates diffuse
-    vec3 lightDir = normalize(light.position - worldPosition);
-    vec3 diffuse = max(dot(lightDir, normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
+    vec3 lightDir = normalize(light.position - inFragment.worldPosition);
+    vec3 diffuse = max(dot(lightDir, inFragment.normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
 
     // calculates specular
-    vec3 lightDirReflected = reflect(-lightDir, normal);
-    vec3 viewDir = normalize(viewPos - worldPosition);
+    vec3 lightDirReflected = reflect(-lightDir, inFragment.normal);
+    vec3 viewDir = normalize(viewPos - inFragment.worldPosition);
     float specularIntensity = max(dot(lightDirReflected, viewDir), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(material.specularMap, uvCoords));
+    vec3 specularSample = vec3(texture(material.specularMap, inFragment.uv));
     vec3 specular = specularIntensity * material.specularStrength * light.color * specularSample;
 
     // calculates attenuation
-    float distanceFromFragment = length(light.position - worldPosition);
+    float distanceFromFragment = length(light.position - inFragment.worldPosition);
     float attenuation = 1.0f / (
         light.constantAttenuation +
         light.linearAttenuation * distanceFromFragment +
@@ -104,21 +106,21 @@ vec3 CalculatePointLight(PointLight light, Material material, vec3 viewPos) {
 }
 
 vec3 CalculateSpotLight(SpotLight light, Material material, vec3 viewPos) {
-    vec3 diffuseSample = vec3(texture(material.diffuseMap, uvCoords));
+    vec3 diffuseSample = vec3(texture(material.diffuseMap, inFragment.uv));
 
     // calculates ambient
     vec3 ambient = material.ambientStrength * light.color * diffuseSample;
 
     // calculates diffuse
-    vec3 lightDir = normalize(worldPosition - light.position);
-    vec3 diffuse = max(dot(-lightDir, normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
+    vec3 lightDir = normalize(inFragment.worldPosition - light.position);
+    vec3 diffuse = max(dot(-lightDir, inFragment.normal), 0.0f) * material.diffuseStrength * light.color * diffuseSample;
 
     // calculates specular
-    vec3 lightDirReflected = reflect(lightDir, normal);
-    vec3 viewDir = normalize(viewPos - worldPosition);
+    vec3 lightDirReflected = reflect(lightDir, inFragment.normal);
+    vec3 viewDir = normalize(viewPos - inFragment.worldPosition);
     float specularIntensity = max(dot(lightDirReflected, viewDir), 0.0f);
     specularIntensity = pow(specularIntensity, material.shininess);
-    vec3 specularSample = vec3(texture(material.specularMap, uvCoords));
+    vec3 specularSample = vec3(texture(material.specularMap, inFragment.uv));
     vec3 specular = specularIntensity * material.specularStrength * light.color * specularSample;
 
     // calculates cutoff
@@ -128,7 +130,7 @@ vec3 CalculateSpotLight(SpotLight light, Material material, vec3 viewPos) {
     spotlightIntensity *= (1.0f - smoothstep(outerRingStart, light.cutoffAngle, lightFragAngle));    // applies shadow smoothing around edges
 
     // calculates attenuation
-    float distanceFromFragment = length(light.position - worldPosition);
+    float distanceFromFragment = length(light.position - inFragment.worldPosition);
     float attenuation = 1.0f / (
         light.constantAttenuation +
         light.linearAttenuation * distanceFromFragment +

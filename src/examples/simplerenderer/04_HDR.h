@@ -29,10 +29,10 @@ private:
 	spr::TextureHandle m_HDRColorBufferTexture;
 	spr::TextureHandle m_HDRStencilDepthBufferTexture;
 
-	spr::FramebufferHandle m_PostProcessFramebuffer;
-	spr::TextureHandle m_PostProcessColorBufferTexture;
+	spr::FramebufferHandle m_ToneMappingFramebuffer;
+	spr::TextureHandle m_ToneMappingColorBufferTexture;
 
-	spr::ProgramHandle m_LightingShaderProgram;
+	spr::ProgramHandle m_LitShaderProgram;
 	spr::UniformHandle m_ModelUniform;
 	spr::UniformHandle m_ViewUniform;
 	spr::UniformHandle m_ProjectionUniform;
@@ -67,6 +67,6 @@ private:
 	bool m_bSpecularEnabled = true;
 	int m_SelectedShininess = 1;
 
-	// NOTE: This is probably gamma incorrect, we're not using an SRGB framebuffer, or SRGB textures
+	// NOTE: We're applying gamma correction on the fragment shader, but we could instead use sRGB textures and framebuffers
 	bool m_bEnableGammaCorrection = true;
 };

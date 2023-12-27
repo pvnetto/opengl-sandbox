@@ -32,6 +32,7 @@
 #include "examples/simplerenderer/02_OrderIndependentBlending.h"
 #include "examples/simplerenderer/03_Instancing.h"
 #include "examples/simplerenderer/04_HDR.h"
+#include "examples/simplerenderer/05_Bloom.h"
 
 #include "shared/Runtime.h"
 
@@ -84,6 +85,7 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	ADD_SIMPLE(RendererExamples, SPRE_02_OrderIndependentBlending,	"02 - Order Independent Blending");
 	ADD_SIMPLE(RendererExamples, SPRE_03_Instancing,				"03 - Instancing");
 	ADD_SIMPLE(RendererExamples, SPRE_04_HDR,						"04 - HDR");
+	ADD_SIMPLE(RendererExamples, SPRE_05_Bloom,						"05 - Bloom");
 }
 
 void ExampleGUILayer::OnImGuiRender() {

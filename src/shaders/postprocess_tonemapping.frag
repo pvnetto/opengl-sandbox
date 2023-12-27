@@ -1,6 +1,11 @@
 #version 330 core
 
-in vec2 fragUV;
+in VertexShaderOutput {
+    vec3 worldPosition;
+    vec2 uv;
+    vec3 normal;
+} inFragment;
+
 out vec4 fragColor;
 
 uniform sampler2D renderTargetTexture;
@@ -8,8 +13,12 @@ uniform float gammaCorrectionRatio;
 uniform int tonemappingType;
 uniform float exposure;
 
+const float gamma = 2.2;
+
 void main() {
-    vec3 color = texture(renderTargetTexture, fragUV).rgb;
+    // Converts texture color from sRGB (gamma-encoded) to linear space
+    vec3 color = texture(renderTargetTexture, inFragment.uv).rgb;
+    color = pow(color, vec3(gamma));
 
     // Applies Reinhard tone mapping
     if (tonemappingType == 1) {
@@ -20,9 +29,6 @@ void main() {
         color = vec3(1.0) - exp(-color * exposure);
     }
     
-    // Applies gamma correction
-    const float gamma = 2.2;
-    color = pow(color, vec3(1.0 / gammaCorrectionRatio));
-  
-    fragColor = vec4(color, 1.0);
+    // Outputs gamma-corrected color
+    fragColor = pow(vec4(color.rgb, 1.0), vec4(1.0 / gamma));
 }

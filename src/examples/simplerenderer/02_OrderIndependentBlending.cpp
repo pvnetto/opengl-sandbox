@@ -23,7 +23,7 @@ void SPRE_02_OrderIndependentBlending::OnAttach() {
 	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
 	m_ColorUniform = spr::createUniform("color", spr::UniformType::Vec4);
 
-	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
+	m_UnlitShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/default_unlit.frag");
 
 	// TODO: Move to RenderTarget clear config
 	glClearColor(0.12f, 0.12f, 0.12f, 1.0f);

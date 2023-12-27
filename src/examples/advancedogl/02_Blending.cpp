@@ -34,7 +34,7 @@ void AOGL_02_Blending::OnAttach() {
 	m_ViewUniform = spr::createUniform("view", spr::UniformType::Mat4x4);
 	m_ProjectionUniform = spr::createUniform("projection", spr::UniformType::Mat4x4);
 	m_ColorUniform = spr::createUniform("color", spr::UniformType::Vec4);
-	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/default_unlit.vert", "shaders/default_unlit.frag");
+	m_DefaultShaderProgram = Utils::LoadShaderProgram("shaders/default_vertex.vert", "shaders/default_unlit.frag");
 
 	glClearColor(0xaa, 0xaa, 0xaa, 0xff);
 	

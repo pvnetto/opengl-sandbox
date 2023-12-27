@@ -139,6 +139,8 @@ namespace Utils {
 	ModelInstance LoadModel(const char* path) {
 		ModelData model = ModelLoader::Load(path);
 
+		std::unordered_map<std::string, spr::TextureHandle> loadedTextures;
+
 		ModelInstance modelInstance;
 		modelInstance.Meshes.reserve(model.Meshes.size());
 		for (const MeshData &mesh : model.Meshes) {
@@ -149,7 +151,10 @@ namespace Utils {
 			}
 
 			for (const std::string &texturePath : mesh.TextureFilenames) {
-				meshInstance.Textures.push_back(LoadTexture(texturePath.c_str()));
+				if (loadedTextures.count(texturePath) == 0) {
+					loadedTextures[texturePath] = LoadTexture(texturePath.c_str());
+				}
+				meshInstance.Textures.push_back(loadedTextures[texturePath]);
 			}
 			modelInstance.Meshes.push_back(meshInstance);
 		}
@@ -158,8 +163,6 @@ namespace Utils {
 	}
 
 	spr::TextureHandle LoadTexture(const char *path) {
-		stbi_set_flip_vertically_on_load(true);
-
 		int texWidth, texHeight, numOfChannels;
 		unsigned char *textureData = stbi_load(path, &texWidth, &texHeight, &numOfChannels, 0);
 		if (!textureData) {

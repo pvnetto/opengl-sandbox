@@ -50,6 +50,7 @@ namespace spr {
 	}
 
 	void setUniform(const UniformHandle& uniformHandle, const void* data, uint8_t count /*= 1*/) {
+		assert(data != NULL);
 		s_Context.getFrameDataManager().setUniform(uniformHandle, data, count);
 	}
 
