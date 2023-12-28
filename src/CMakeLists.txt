@@ -49,7 +49,7 @@ set(SANDBOX_SOURCES
 		)
 
 
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/simplerenderer/05_Bloom.cpp")
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/simplerenderer/05_Bloom.cpp" "examples/advancedogl/07_Compute.cpp")
 
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)

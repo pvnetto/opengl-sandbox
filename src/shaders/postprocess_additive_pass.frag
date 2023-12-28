@@ -15,7 +15,9 @@ void main() {
     vec4 colorA = texture(factorTextureA, inFragment.uv);
     vec4 colorB = texture(factorTextureB, inFragment.uv);
 
-    float colorMag = max(length(colorA), length(colorB));
     outFragColor = colorA + colorB;
+
+    // Prevents bleeding when mixing HDR colors by clamping the result
+    float colorMag = max(length(colorA), length(colorB));
     outFragColor = normalize(outFragColor) * colorMag;
 }

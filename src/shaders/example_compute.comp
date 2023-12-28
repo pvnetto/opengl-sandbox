@@ -1,0 +1,21 @@
+#version 450 core
+
+// Specifies the number of threads per work group(num = x * y * z).
+// In our example, we have one work group for each 2x2 grid, so we'll get one thread for each cell
+// NOTE: You could omit any of these dimensions if you wanted, and they'd default to 1
+layout (local_size_x = 2, local_size_y = 2, local_size_z = 1) in;
+
+// Uniform image that we'll use as output
+// NOTE: We could also read from it, so uniforms are basically pass by ref parameters
+layout (rgba32f) uniform image2D outputImage;
+
+void main() {
+	// Assumes one work group for each 2x2 grid, and one thread for each cell in the grid
+	ivec2 texelCoordinate = ivec2(gl_WorkGroupID.x * 2 + gl_LocalInvocationID.x,
+								  gl_WorkGroupID.y * 2 + gl_LocalInvocationID.y);
+
+	vec2 colorRG = vec2(texelCoordinate.x, texelCoordinate.y) / vec2(1024.0, 1024.0);
+	vec4 colorRGBA = vec4(colorRG.rg, 0.0, 1.0);
+
+	imageStore(outputImage, texelCoordinate, colorRGBA);
+}

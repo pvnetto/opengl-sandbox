@@ -12,17 +12,17 @@ out VertexShaderOutput {
     vec3 normal;
 } outVertexData;
 
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 model = mat4(1.0);
+uniform mat4 view = mat4(1.0);
+uniform mat4 projection = mat4(1.0);
 
 void main() {
     gl_Position = projection * view * model * vec4(inPosition, 1.0f);
 
-    mat3 normalMatrix = mat3(transpose(inverse(model)));    // Rotates/scales the normal if necessary
+    mat3 normalMatrix = mat3(transpose(inverse(model)));        // Rotates/scales the normal if necessary
     vec4 worldPosition4d = model * vec4(inPosition, 1.0f);
 
     outVertexData.worldPosition = vec3(worldPosition4d.xyz);
-    outVertexData.uv = vec2(inUV.x, -inUV.y);
+    outVertexData.uv = vec2(inUV.x, -inUV.y);                   // Y-coordinates are inversed in OpenGL
     outVertexData.normal = normalize(normalMatrix * inNormal);
 }
