@@ -12,6 +12,8 @@ namespace spr {
 			return GL_RGBA8;
 		case spr::TextureFormat::RGBA16F:
 			return GL_RGBA16F;
+		case spr::TextureFormat::RED:
+			return GL_R8;
 		case spr::TextureFormat::DEPTH_24_STENCIL_8:
 			return GL_DEPTH24_STENCIL8;
 		default:
@@ -26,6 +28,8 @@ namespace spr {
 			return GL_RGB;
 		case spr::TextureFormat::RGBA8:
 			return GL_RGBA;
+		case spr::TextureFormat::RED:
+			return GL_RED;
 		default:
 			assert(false && "::ERROR: Unknown texture format");
 			return GL_RGB;

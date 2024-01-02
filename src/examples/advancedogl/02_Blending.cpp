@@ -14,7 +14,7 @@
 
 void AOGL_02_Blending::OnAttach() {
 	m_Position = glm::vec3(0.f, 0.f, -5.0f);
-	m_Scale = glm::vec3(1.5f, 1.5f, 1.5f);
+	m_Scale = glm::vec3(1.f, 1.f, 1.f);
 	m_Camera = Camera(
 	    glm::vec3(0.f, 0.f, 0.f),
 	    glm::vec3(0.f, -90.f, 0.f),
@@ -119,7 +119,8 @@ void AOGL_02_Blending::OnUpdate() {
 		spr::FixedFunctionState transparentState;
 		transparentState.SetBlendingEnabled(true);
 		spr::setFixedFunctionState(transparentState);
-		spr::setVertexBuffer(m_CubeVertexBuffer);
+		spr::setVertexBuffer(m_QuadModel.Meshes[0].VertexBuffer);
+		spr::setIndexBuffer(m_QuadModel.Meshes[0].IndexBuffer);
 		spr::setUniform(m_ModelUniform, glm::value_ptr(model));
 		spr::setUniform(m_ColorUniform, glm::value_ptr(colors[i]));
 		spr::submit(m_DefaultShaderProgram);

@@ -1,5 +1,6 @@
 add_subdirectory(glm)
 add_subdirectory(stb)
+add_subdirectory(freetype)
 
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)

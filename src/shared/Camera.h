@@ -34,6 +34,7 @@ public:
 
     void SetPerspective(float fieldOfView, float aspectRatio, float near, float far);
     void SetOrthographic(float sizeX, float sizeY, float near, float far);
+    void SetOrthographicRect(glm::vec2 origin, glm::vec2 size);
     
 private:
     glm::vec3 m_Position;

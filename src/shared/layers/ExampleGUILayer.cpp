@@ -34,6 +34,7 @@
 #include "examples/simplerenderer/03_Instancing.h"
 #include "examples/simplerenderer/04_HDR.h"
 #include "examples/simplerenderer/05_Bloom.h"
+#include "examples/simplerenderer/06_TextRendering.h"
 
 #include "shared/Runtime.h"
 
@@ -54,40 +55,41 @@ ExampleGUILayer::ExampleGUILayer() : Layer("Example GUI") {
 	m_examples.emplace(LearnOpenGL, std::vector<std::shared_ptr<Example>>());
 	m_examples.emplace(AdvancedOpenGL, std::vector<std::shared_ptr<Example>>());
 
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO,					"02 - VBO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO,					"02 - VAO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO,					"02 - EBO");
-	ADD_SIMPLE(LearnOpenGL, LOGL_03_Shaders,				"03 - Shaders with uniforms");
-	ADD_SIMPLE(LearnOpenGL, LOGL_04_Textures,				"04 - Textures");
-	ADD_SIMPLE(LearnOpenGL, LOGL_05_Transform,				"05 - Transform");
-	ADD_SIMPLE(LearnOpenGL, LOGL_06_MVP,					"06 - MVP");
-	ADD_SIMPLE(LearnOpenGL, LOGL_07_Camera,					"07 - Camera");
-	ADD_SIMPLE(LearnOpenGL, LOGL_08_Lighting,				"08 - Basic Lighting");
-	ADD_SIMPLE(LearnOpenGL, LOGL_09_Phong,					"09 - Phong Shading");
-	ADD_SIMPLE(LearnOpenGL, LOGL_10_Material,				"10 - Materials");
-	ADD_SIMPLE(LearnOpenGL, LOGL_11_SpecularMap,			"11 - Specular Map");
-	ADD_SIMPLE(LearnOpenGL, LOGL_11_EmissionMap,			"11 - Emission Map");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_DirectionalLight,		"12 - Directional light");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_PointLight,				"12 - Point light");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_SpotLight,				"12 - Spotlight");
-	ADD_SIMPLE(LearnOpenGL, LOGL_12_MultipleLights,			"12 - Multiple lights");
-	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes,					"13 - Meshes");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_VBO,							"02 - VBO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_VAO,							"02 - VAO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_02_EBO,							"02 - EBO");
+	ADD_SIMPLE(LearnOpenGL, LOGL_03_Shaders,						"03 - Shaders with uniforms");
+	ADD_SIMPLE(LearnOpenGL, LOGL_04_Textures,						"04 - Textures");
+	ADD_SIMPLE(LearnOpenGL, LOGL_05_Transform,						"05 - Transform");
+	ADD_SIMPLE(LearnOpenGL, LOGL_06_MVP,							"06 - MVP");
+	ADD_SIMPLE(LearnOpenGL, LOGL_07_Camera,							"07 - Camera");
+	ADD_SIMPLE(LearnOpenGL, LOGL_08_Lighting,						"08 - Basic Lighting");
+	ADD_SIMPLE(LearnOpenGL, LOGL_09_Phong,							"09 - Phong Shading");
+	ADD_SIMPLE(LearnOpenGL, LOGL_10_Material,						"10 - Materials");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_SpecularMap,					"11 - Specular Map");
+	ADD_SIMPLE(LearnOpenGL, LOGL_11_EmissionMap,					"11 - Emission Map");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_DirectionalLight,				"12 - Directional light");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_PointLight,						"12 - Point light");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_SpotLight,						"12 - Spotlight");
+	ADD_SIMPLE(LearnOpenGL, LOGL_12_MultipleLights,					"12 - Multiple lights");
+	ADD_SIMPLE(LearnOpenGL, LOGL_13_Meshes,							"13 - Meshes");
 
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers,		"01 - FrameBuffers");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers,		"01 - FrameBuffers: Depth Testing");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers,		"01 - FrameBuffers: Stencil Testing");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_02_Blending,			"02 - Blending");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_03_Antialiasing,		"03 - Antialiasing");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_04_Instancing,			"04 - Instancing");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_05_GeometryShading,		"05 - Geometry Shading");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_06_Tessellation,		"06 - Tessellation Shading");
-	ADD_SIMPLE(AdvancedOpenGL, AOGL_07_Compute,				"07 - Compute Shading");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_Framebuffers,				"01 - FrameBuffers");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_DepthBuffers,				"01 - FrameBuffers: Depth Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_01_StencilBuffers,				"01 - FrameBuffers: Stencil Testing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_02_Blending,					"02 - Blending");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_03_Antialiasing,				"03 - Antialiasing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_04_Instancing,					"04 - Instancing");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_05_GeometryShading,				"05 - Geometry Shading");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_06_Tessellation,				"06 - Tessellation Shading");
+	ADD_SIMPLE(AdvancedOpenGL, AOGL_07_Compute,						"07 - Compute Shading");
 
 	ADD_SIMPLE(RendererExamples, SPRE_01_Stenciling,				"01 - Stenciling");
 	ADD_SIMPLE(RendererExamples, SPRE_02_OrderIndependentBlending,	"02 - Order Independent Blending");
 	ADD_SIMPLE(RendererExamples, SPRE_03_Instancing,				"03 - Instancing");
 	ADD_SIMPLE(RendererExamples, SPRE_04_HDR,						"04 - HDR");
 	ADD_SIMPLE(RendererExamples, SPRE_05_Bloom,						"05 - Bloom");
+	ADD_SIMPLE(RendererExamples, SPRE_06_TextRendering,				"06 - Text");
 }
 
 void ExampleGUILayer::OnImGuiRender() {
@@ -98,7 +100,6 @@ void ExampleGUILayer::OnImGuiRender() {
     ImGui::SetNextWindowPos(ImVec2(viewport->GetWorkPos().x + windowSize.X - width, viewport->GetWorkPos().y));
     ImGui::SetNextWindowSize(ImVec2(width, viewport->GetWorkSize().y));
 
-	// ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Examples");
 	for (int i = 0; i < CategoryCount; i++) {
 		if (ImGui::CollapsingHeader(categoryStr.at((ExampleCategory)i).c_str())) {

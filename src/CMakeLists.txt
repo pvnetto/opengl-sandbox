@@ -42,14 +42,16 @@ set(SANDBOX_SOURCES
 		examples/advancedogl/04_Instancing.cpp
 		examples/advancedogl/05_GeometryShading.cpp
 		examples/advancedogl/06_Tessellation.cpp
+		examples/advancedogl/07_Compute.cpp
 		examples/simplerenderer/01_Stenciling.cpp
 		examples/simplerenderer/02_OrderIndependentBlending.cpp
 		examples/simplerenderer/03_Instancing.cpp
 		examples/simplerenderer/04_HDR.cpp
+		examples/simplerenderer/05_Bloom.cpp
+		examples/simplerenderer/06_TextRendering.cpp
 		)
 
-
-add_executable(Sandbox main.cpp ${SANDBOX_SOURCES} "examples/simplerenderer/05_Bloom.cpp" "examples/advancedogl/07_Compute.cpp")
+add_executable(Sandbox main.cpp ${SANDBOX_SOURCES})
 
 target_link_libraries(Sandbox glm)
 target_link_libraries(Sandbox imgui)
@@ -57,6 +59,7 @@ target_link_libraries(Sandbox assimp)
 target_link_libraries(Sandbox stb)
 target_link_libraries(Sandbox spw)
 target_link_libraries(Sandbox spr)
+target_link_libraries(Sandbox freetype)
 
 target_compile_definitions(Sandbox PRIVATE GLFW_INCLUDE_NONE)
 
@@ -68,7 +71,8 @@ target_include_directories(Sandbox
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm/glm
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/imgui
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/stb
-	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include)
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/assimp/include
+	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/vendor/freetype/include)
 
 # consider hard-coding this or using an environment variable, so we can make it consistent with whatever is on the Python script
 set(SANDBOX_BINARY_DIR "bin/${CMAKE_SYSTEM_NAME}")

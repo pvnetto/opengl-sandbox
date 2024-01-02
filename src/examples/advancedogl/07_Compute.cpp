@@ -4,7 +4,6 @@
 
 #include <glad/glad.h>
 #include <iostream>
-#include <spr\OpenGL\Helpers.h>
 
 void AOGL_07_Compute::OnAttach() {
 	m_OutputSize = { 1024.f, 1024.f };
@@ -164,6 +163,4 @@ void AOGL_07_Compute::OnUpdate() {
 		glBindVertexArray(m_VertexArrayObjectID);
 		glDrawElements(GL_TRIANGLES, m_QuadData.NumIndices, GL_UNSIGNED_INT, NULL);
 	}
-
-	glCheckError();
 }

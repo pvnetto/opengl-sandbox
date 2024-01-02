@@ -4,6 +4,7 @@
 
 #include <glad/glad.h>
 #include <cassert>
+#include <spr\OpenGL\Helpers.h>
 
 namespace spr {
 
@@ -32,6 +33,15 @@ namespace spr {
 	void TextureInstanceGL::create(const TextureInfo &textureInfo, const void *data) {
 		assert(textureInfo.Depth == 1 && "::ERROR: 3D textures are not supported yet");
 		
+		// Disables byte-alignment restriction when loading GL_R8 images, as they only use a single byte for each texture color
+		GLenum glInternalFormat = getInternalFormatGL(textureInfo.Format);
+		if (glInternalFormat == GL_R8) {
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		}
+		else {
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		}
+
 		const bool bMultisampled = textureInfo.NumSamples > 1;
 		if (bMultisampled) {
 			create2DMultisampled(textureInfo, data);
@@ -39,6 +49,8 @@ namespace spr {
 		else {
 			create2D(textureInfo, data);
 		}
+
+		glCheckError();
 
 		// Render target textures don't need to store data, as they'll be filled during rendering
 		// NOTE: We should consider creating Renderbuffers if the texture doesn't need to be accessed
@@ -50,6 +62,8 @@ namespace spr {
 				glGenerateTextureMipmap(ID);
 			}
 		}
+
+		glCheckError();
 	}
 
 	void TextureInstanceGL::create2D(const TextureInfo& textureInfo, const void* data) {

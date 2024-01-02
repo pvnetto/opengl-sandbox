@@ -10,3 +10,6 @@
 [submodule "vendor/imgui"]
 	path = vendor/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "vendor/freetype"]
+	path = vendor/freetype
+	url = https://github.com/freetype/freetype.git

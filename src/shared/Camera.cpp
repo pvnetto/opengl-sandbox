@@ -62,15 +62,19 @@ void Camera::UpdateDirection() {
 
 
 /// <summary>
-/// Defines an irregular-shaped box frustrum, with sense of depth just like human vision. Check "Basics - Transforms" for more.
+/// Defines an irregular-shaped box frustum, with sense of depth just like human vision. Check "Basics - Transforms" for more.
 /// </summary>
 void Camera::SetPerspective(float fieldOfView, float aspectRatio, float near, float far) {
 	m_Projection = glm::perspective(glm::radians(fieldOfView), aspectRatio, near, far);
 }
 
 /// <summary>
-/// Defines a box-sized frustrum with no sense of depth. Check "Basics - Transforms" for more.
+/// Defines a box-sized frustum with no sense of depth. Check "Basics - Transforms" for more.
 /// </summary>
 void Camera::SetOrthographic(float sizeX, float sizeY, float near, float far) {
 	m_Projection = glm::ortho(-sizeX, sizeX, -sizeY, sizeY, near, far);
+}
+
+void Camera::SetOrthographicRect(glm::vec2 origin, glm::vec2 size) {
+	m_Projection = glm::ortho(origin.x, size.x, size.y, origin.y, 0.f, 1000.f);
 }
